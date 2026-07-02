@@ -1,6 +1,33 @@
+# OS
 .DS_Store
-target/
+Thumbs.db
+
+# Editor
 *.swp
 *.swo
 *~
+.vscode/settings.json
+.vscode/tasks.json
+.idea/
+*.iml
+
+# Rust
+/target/
+**/*.rs.bk
+
+# Environment & Secrets
 .env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Database local files
+*.db
+*.sqlite
+*.sqlite3
+
+# omo/opencode
+.omo/
+
