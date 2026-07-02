@@ -141,6 +141,7 @@ CREATE TABLE review_1718 (
     ),
     content TEXT,
     create_at TIMESTAMPTZ DEFAULT now (),
+    update_at TIMESTAMPTZ DEFAULT now (),
     UNIQUE (user_id, order_id) -- 每笔订单每个用户只能评价一次
 );
 
@@ -271,6 +272,41 @@ CREATE TRIGGER trg_review_user_match
     ON review_1718
     FOR EACH ROW
     EXECUTE FUNCTION fn_validate_review_user ();
+
+-- 通用：更新行时自动刷新 update_at
+CREATE OR REPLACE FUNCTION fn_set_update_at ()
+RETURNS TRIGGER
+LANGUAGE plpgsql AS $$
+BEGIN
+    NEW.update_at = now ();
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_user_update_at
+    BEFORE UPDATE ON user_1718
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_set_update_at ();
+
+CREATE TRIGGER trg_hotel_update_at
+    BEFORE UPDATE ON hotel_1718
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_set_update_at ();
+
+CREATE TRIGGER trg_room_update_at
+    BEFORE UPDATE ON room_1718
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_set_update_at ();
+
+CREATE TRIGGER trg_order_update_at
+    BEFORE UPDATE ON order_1718
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_set_update_at ();
+
+CREATE TRIGGER trg_review_update_at
+    BEFORE UPDATE ON review_1718
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_set_update_at ();
 
 -- 客房可预订数量自动更新
 CREATE OR REPLACE FUNCTION fn_update_room_quantity ()
