@@ -5,7 +5,7 @@
 ## 技术栈
 
 - **后端**: Rust + [Axum](https://github.com/tokio-rs/axum)
-- **数据库**: （待定）
+- **数据库**: [PostgreSQL 18](https://www.postgresql.org/about/news/postgresql-18-released-3142/)
 - **前端**: （待定，推荐前后端分离架构）
 
 ## 功能需求
