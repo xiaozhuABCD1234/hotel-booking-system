@@ -176,81 +176,16 @@ CREATE INDEX idx_review_rating ON review_1718 (rating);
 -- 入住人员
 CREATE INDEX idx_order_guest_id_card ON order_guest_1718 (id_card);
 -- ============================================================
--- 4. 视图
+-- 4. 视图 → 详见 sql/view.sql（已从本文件分离，避免重复定义）
+--    view_room_details_1718        — 按城市/区域/酒店查看客房详情
+--    view_person_info_1718         — 身份证号推导性别/年龄
+--    view_user_vip_1718            — 用户 VIP 信息
+--    view_hotel_summary_1718       — 酒店摘要列表（搜索页）
+--    view_order_full_1718          — 订单完整详情
+--    view_my_orders_1718           — 我的订单列表
+--    view_review_full_1718         — 评价详情
+--    view_guest_booking_stats_1718 — 入住人预订统计分析
 -- ============================================================
--- 4.1 按城市 → 区域 → 酒店查看所有客房详细信息
-CREATE VIEW view_room_details AS
-SELECT r_province.region_name AS province,
-    r_city.region_name AS city,
-    r_district.region_name AS district,
-    h.id AS hotel_id,
-    h.hotel_name,
-    h.address,
-    h.star_level,
-    h.telephone AS hotel_telephone,
-    rm.id AS room_id,
-    rm.type_name,
-    rm.total_quantity,
-    rm.available_quantity,
-    rm.price,
-    rm.weekend_price,
-    rm.description AS room_description,
-    STRING_AGG (
-        DISTINCT rf.facility_name,
-        ', '
-        ORDER BY rf.facility_name
-    ) AS facilities,
-    rev_stats.avg_rating,
-    rev_stats.review_count
-FROM hotel_1718 h
-    JOIN region_1718 r_district ON h.region_id = r_district.id
-    LEFT JOIN region_1718 r_city ON r_district.parents_id = r_city.id
-    LEFT JOIN region_1718 r_province ON r_city.parents_id = r_province.id
-    JOIN room_1718 rm ON rm.hotel_id = h.id
-    AND rm.status = 1
-    LEFT JOIN room_facility_1718 rf ON rf.room_id = rm.id
-    LEFT JOIN (
-        SELECT hotel_id,
-            AVG(rating)::DECIMAL(3, 2) AS avg_rating,
-            COUNT(*) AS review_count
-        FROM review_1718
-        GROUP BY hotel_id
-    ) rev_stats ON rev_stats.hotel_id = h.id
-WHERE h.status = 1
-GROUP BY r_province.region_name,
-    r_city.region_name,
-    r_district.region_name,
-    h.id,
-    h.hotel_name,
-    h.address,
-    h.star_level,
-    h.telephone,
-    rm.id,
-    rm.type_name,
-    rm.total_quantity,
-    rm.available_quantity,
-    rm.price,
-    rm.weekend_price,
-    rm.description,
-    rev_stats.avg_rating,
-    rev_stats.review_count;
-
--- 4.2 从身份证号推导性别与年龄
---     身份证第 7-14 位为出生日期（YYYYMMDD），第 17 位奇数为男、偶数为女
-CREATE VIEW view_person_info AS
-SELECT id_card,
-       name,
-       phone,
-       TO_DATE(SUBSTRING(id_card, 7, 8), 'YYYYMMDD') AS birth_date,
-       CASE
-           WHEN SUBSTRING(id_card, 17, 1) ~ '\d'
-                AND SUBSTRING(id_card, 17, 1)::INT % 2 = 1 THEN '男'
-           WHEN SUBSTRING(id_card, 17, 1) ~ '\d'
-                AND SUBSTRING(id_card, 17, 1)::INT % 2 = 0 THEN '女'
-           ELSE NULL
-       END AS gender,
-       DATE_PART('year', AGE(TO_DATE(SUBSTRING(id_card, 7, 8), 'YYYYMMDD')))::INT AS age
-FROM person_1718;
 -- ============================================================
 -- 5. 触发器
 -- ============================================================
