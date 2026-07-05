@@ -1,0 +1,154 @@
+package handler
+
+import (
+	"net/http"
+	"time"
+
+	"backend/model"
+	schema "backend/model/schema"
+	"backend/repo"
+
+	"github.com/gofiber/fiber/v3"
+	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
+)
+
+// UserHandler 用户 CRUD HTTP 处理器。
+type UserHandler struct {
+	users     repo.UserRepository
+	vipLevels repo.VipLevelRepository
+}
+
+// NewUserHandler 创建 UserHandler 实例。
+func NewUserHandler(userRepo repo.UserRepository, vipLevelRepo repo.VipLevelRepository) *UserHandler {
+	return &UserHandler{
+		users:     userRepo,
+		vipLevels: vipLevelRepo,
+	}
+}
+
+// List 查询用户列表（支持分页与按角色筛选）。
+func (h *UserHandler) List(c fiber.Ctx) error {
+	ctx := c.Context()
+
+	var query struct {
+		Page     int    `query:"page"`
+		PageSize int    `query:"pageSize"`
+		Role     string `query:"role"`
+	}
+	if err := c.Bind().Query(&query); err != nil {
+		return err
+	}
+
+	if query.Page <= 0 {
+		query.Page = 1
+	}
+	if query.PageSize <= 0 {
+		query.PageSize = 10
+	}
+
+	offset := (query.Page - 1) * query.PageSize
+
+	var rolePtr *schema.UserRole
+	if query.Role != "" {
+		role := schema.UserRole(query.Role)
+		rolePtr = &role
+	}
+
+	users, total, err := h.users.FindAll(ctx, offset, query.PageSize, rolePtr)
+	if err != nil {
+		return err
+	}
+
+	return model.SendSuccess(c,
+		model.WithData(users),
+		model.WithPagination(total, query.Page, query.PageSize),
+	)
+}
+
+// GetByID 根据 ID 查询单个用户。
+func (h *UserHandler) GetByID(c fiber.Ctx) error {
+	ctx := c.Context()
+
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	user, err := h.users.FindByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	return model.SendSuccess(c, model.WithData(user))
+}
+
+// Create 创建用户，返回 201 Created。
+func (h *UserHandler) Create(c fiber.Ctx) error {
+	ctx := c.Context()
+
+	var user schema.User
+	if err := c.Bind().Body(&user); err != nil {
+		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
+	}
+
+	if user.Username == "" || user.Password == "" {
+		return model.SendError(c, http.StatusBadRequest, "Username and password are required")
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	user.Password = string(hashedPassword)
+
+	if err := h.users.Create(ctx, &user); err != nil {
+		return err
+	}
+
+	r := model.Response{
+		Success:   true,
+		Data:      user,
+		Timestamp: time.Now(),
+	}
+	return c.Status(http.StatusCreated).JSON(r)
+}
+
+// Update 根据 ID 更新用户信息。
+func (h *UserHandler) Update(c fiber.Ctx) error {
+	ctx := c.Context()
+
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	var user schema.User
+	if err := c.Bind().Body(&user); err != nil {
+		return err
+	}
+
+	user.ID = id
+
+	if err := h.users.Update(ctx, &user); err != nil {
+		return err
+	}
+
+	return model.SendSuccess(c, model.WithData(user))
+}
+
+// Delete 根据 ID 软删除用户。
+func (h *UserHandler) Delete(c fiber.Ctx) error {
+	ctx := c.Context()
+
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return err
+	}
+
+	if err := h.users.Delete(ctx, id); err != nil {
+		return err
+	}
+
+	return model.SendSuccess(c, model.WithMessage("User deleted"))
+}

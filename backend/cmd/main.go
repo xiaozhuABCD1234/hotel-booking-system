@@ -1,29 +1,34 @@
+// Package main 启动 Fiber v3 HTTP 服务，连接 PostgreSQL，注册路由与全局错误处理。
 package main
 
 import (
-	"github.com/gofiber/fiber/v3"
 	"log"
+
+	"backend/database"
+	"backend/middleware"
+	"backend/router"
+
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/logger"
+	recoverer "github.com/gofiber/fiber/v3/middleware/recover"
 )
 
-type CustomCtx struct {
-	fiber.DefaultCtx
-}
-
-func (c *CustomCtx) CustomMethod() string {
-	return "custom value"
-}
-
 func main() {
-	app := fiber.NewWithCustomCtx(func(app *fiber.App) fiber.CustomCtx {
-		return &CustomCtx{
-			DefaultCtx: *fiber.NewDefaultCtx(app),
-		}
+	db, err := database.Connect(database.DefaultConfig())
+	if err != nil {
+		log.Fatalf("Database connection failed: %v", err)
+	}
+	log.Println("Database connected")
+
+	app := fiber.New(fiber.Config{
+		AppName:      "Hotel Booking API",
+		ErrorHandler: middleware.ErrorHandler,
 	})
 
-	app.Get("/", func(c fiber.Ctx) error {
-		customCtx := c.(*CustomCtx)
-		return c.SendString(customCtx.CustomMethod())
-	})
+	app.Use(recoverer.New())
+	app.Use(logger.New())
+
+	router.RegisterRoutes(app, db)
 
 	log.Fatal(app.Listen(":3000"))
 }
