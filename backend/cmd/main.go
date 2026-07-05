@@ -4,6 +4,7 @@ package main
 import (
 	"log"
 
+	"backend/auth"
 	"backend/database"
 	"backend/middleware"
 	"backend/router"
@@ -14,6 +15,9 @@ import (
 )
 
 func main() {
+	if err := auth.LoadSecret(); err != nil {
+		log.Fatalf("JWT configuration failed: %v", err)
+	}
 	db, err := database.Connect(database.DefaultConfig())
 	if err != nil {
 		log.Fatalf("Database connection failed: %v", err)
