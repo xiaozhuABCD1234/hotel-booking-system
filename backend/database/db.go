@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"backend/utils"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -29,12 +31,12 @@ type Config struct {
 // DefaultConfig 从环境变量读取默认配置
 func DefaultConfig() Config {
 	return Config{
-		Host:     envOrDefault("DB_HOST", "localhost"),
-		Port:     envOrDefault("DB_PORT", "5432"),
-		User:     envOrDefault("DB_USER", "postgres"),
-		Password: envOrDefault("DB_PASSWORD", ""),
-		DBName:   envOrDefault("DB_NAME", "hotel_booking"),
-		SSLMode:  envOrDefault("DB_SSLMODE", "disable"),
+		Host:     utils.GetEnv("DB_HOST", "localhost"),
+		Port:     utils.GetEnv("DB_PORT", "5432"),
+		User:     utils.GetEnv("DB_USER", "postgres"),
+		Password: utils.GetEnv("DB_PASSWORD", ""),
+		DBName:   utils.GetEnv("DB_NAME", "hotel_booking"),
+		SSLMode:  utils.GetEnv("DB_SSLMODE", "disable"),
 		// 连接池配置
 		MaxIdleConns:    10,
 		MaxOpenConns:    100,
@@ -79,11 +81,4 @@ func Connect(cfg Config) (*gorm.DB, error) {
 	sqlDB.SetConnMaxLifetime(cfg.ConnMaxLifetime)
 
 	return db, nil
-}
-
-func envOrDefault(key, fallback string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
-	}
-	return fallback
 }
