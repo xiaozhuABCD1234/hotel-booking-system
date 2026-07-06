@@ -15,7 +15,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// AuthHandler 认证 HTTP 处理器，处理注册、登录、令牌刷新和登出。
+// AuthHandler 认证 HTTP 处理器，处理注册、登录、令牌刷新。
 type AuthHandler struct {
 	users repo.UserRepository
 }
@@ -41,9 +41,12 @@ type loginRequest struct {
 }
 
 type tokenResponse struct {
-	AccessToken string `json:"accessToken"`
-	ExpiresIn   int    `json:"expiresIn"` // 秒
-	TokenType   string `json:"tokenType"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
+type refreshRequest struct {
+	RefreshToken string `json:"refreshToken"`
 }
 
 // passwordMinLen 注册密码最小长度。
@@ -116,7 +119,7 @@ func (h *AuthHandler) Register(c fiber.Ctx) error {
 		return err
 	}
 
-	return h.issueAccessToken(c, user.ID.String(), string(user.Role))
+	return h.issueTokens(c, user.ID.String(), string(user.Role))
 }
 
 // ─── Login ─────────────────────────────────────────────────────
@@ -160,51 +163,55 @@ func (h *AuthHandler) Login(c fiber.Ctx) error {
 		return model.SendError(c, http.StatusUnauthorized, "Invalid username or password")
 	}
 
-	return h.issueAccessToken(c, user.ID.String(), string(user.Role))
+	return h.issueTokens(c, user.ID.String(), string(user.Role))
 }
 
 // ─── Refresh ───────────────────────────────────────────────────
 
-// Refresh 刷新令牌（暂未实现，保留接口待后续开发）。
+// Refresh 刷新令牌，用 refreshToken 换取新的 accessToken + refreshToken。
 //
 //	@Summary		刷新令牌
-//	@Description	刷新访问令牌（暂未实现，返回 501）
+//	@Description	用刷新令牌换取新的访问令牌和刷新令牌
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Success		501	{object}	model.Response	"暂未实现"
+//	@Param			body	body		refreshRequest				true	"刷新令牌"
+//	@Success		200		{object}	model.Response{data=tokenResponse}
+//	@Failure		400		{object}	model.Response	"请求参数无效"
+//	@Failure		401		{object}	model.Response	"刷新令牌无效或已过期"
 //	@Router			/auth/refresh [post]
 func (h *AuthHandler) Refresh(c fiber.Ctx) error {
-	return model.SendError(c, http.StatusNotImplemented, "Refresh token not yet implemented")
-}
+	var req refreshRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
+	}
+	if req.RefreshToken == "" {
+		return model.SendError(c, http.StatusBadRequest, "refreshToken is required")
+	}
 
-// ─── Logout ────────────────────────────────────────────────────
+	claims, err := auth.ParseAccessToken(req.RefreshToken)
+	if err != nil {
+		return model.SendError(c, http.StatusUnauthorized, "Invalid or expired refresh token")
+	}
 
-// Logout 登出（无状态 JWT，服务端不存储令牌，客户端自行丢弃令牌即可）。
-//
-//	@Summary		登出
-//	@Description	登出当前用户（客户端自行丢弃 JWT 令牌）
-//	@Tags			auth
-//	@Produce		json
-//	@Success		200	{object}	model.Response
-//	@Router			/auth/logout [post]
-func (h *AuthHandler) Logout(c fiber.Ctx) error {
-	return model.SendSuccess(c, model.WithMessage("Logged out — discard your access token on the client"))
+	return h.issueTokens(c, claims.UserID, claims.Role)
 }
 
 // ─── 内部辅助 ─────────────────────────────────────────────────
 
-// issueAccessToken 签发 JWT 访问令牌（15 分钟有效），返回 200。
-// Register 与 Login 都返回令牌而非用户资源，故统一用 200 而非 201。
-func (h *AuthHandler) issueAccessToken(c fiber.Ctx, userID, role string) error {
+// issueTokens 签发 accessToken（15 分钟）和 refreshToken（7 天），返回 200。
+func (h *AuthHandler) issueTokens(c fiber.Ctx, userID, role string) error {
 	accessToken, err := auth.GenerateAccessToken(userID, role)
+	if err != nil {
+		return err
+	}
+	refreshToken, err := auth.GenerateRefreshToken(userID, role)
 	if err != nil {
 		return err
 	}
 
 	return model.SendSuccess(c, model.WithData(tokenResponse{
-		AccessToken: accessToken,
-		ExpiresIn:   int(auth.AccessTokenExpiry.Seconds()),
-		TokenType:   "Bearer",
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
 	}))
 }

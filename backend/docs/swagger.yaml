@@ -515,6 +515,11 @@ definitions:
       username:
         type: string
     type: object
+  handler.refreshRequest:
+    properties:
+      refreshToken:
+        type: string
+    type: object
   handler.registerRequest:
     properties:
       email:
@@ -537,10 +542,7 @@ definitions:
     properties:
       accessToken:
         type: string
-      expiresIn:
-        description: 秒
-        type: integer
-      tokenType:
+      refreshToken:
         type: string
     type: object
   handler.updateReviewInput:
@@ -637,29 +639,36 @@ paths:
       summary: 用户登录
       tags:
       - auth
-  /auth/logout:
+  /auth/refresh:
     post:
-      description: 登出当前用户（客户端自行丢弃 JWT 令牌）
+      consumes:
+      - application/json
+      description: 用刷新令牌换取新的访问令牌和刷新令牌
+      parameters:
+      - description: 刷新令牌
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.refreshRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handler.tokenResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
             $ref: '#/definitions/model.Response'
-      summary: 登出
-      tags:
-      - auth
-  /auth/refresh:
-    post:
-      consumes:
-      - application/json
-      description: 刷新访问令牌（暂未实现，返回 501）
-      produces:
-      - application/json
-      responses:
-        "501":
-          description: 暂未实现
+        "401":
+          description: 刷新令牌无效或已过期
           schema:
             $ref: '#/definitions/model.Response'
       summary: 刷新令牌

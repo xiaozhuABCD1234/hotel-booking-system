@@ -65,7 +65,6 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	auth.Post("/register", authH.Register)
 	auth.Post("/login", authH.Login)
 	auth.Post("/refresh", authH.Refresh)
-	auth.Post("/logout", authH.Logout)
 
 	// ═══════════════════════════════════════════════════════════
 	// 公开路由（无需认证）

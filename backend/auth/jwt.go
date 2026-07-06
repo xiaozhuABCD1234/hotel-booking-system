@@ -20,6 +20,9 @@ type Claims struct {
 // AccessTokenExpiry 访问令牌过期时间。
 const AccessTokenExpiry = 15 * time.Minute
 
+// RefreshTokenExpiry 刷新令牌过期时间（7 天）。
+const RefreshTokenExpiry = 7 * 24 * time.Hour
+
 // minSecretLen 是 JWT_SECRET 的最小字节数，防止过弱的签名密钥。
 const minSecretLen = 16
 
@@ -64,6 +67,25 @@ func GenerateAccessToken(userID, role string) (string, error) {
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(AccessTokenExpiry)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			Issuer:    "hotel-booking-api",
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(*sk)
+}
+
+// GenerateRefreshToken 生成 7 天有效的刷新令牌，使用与 access token 相同的 Claims 结构。
+func GenerateRefreshToken(userID, role string) (string, error) {
+	sk := secretKey.Load()
+	if sk == nil {
+		return "", ErrSecretNotSet
+	}
+	claims := &Claims{
+		UserID: userID,
+		Role:   role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(RefreshTokenExpiry)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    "hotel-booking-api",
 		},

@@ -85,29 +85,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/logout": {
-            "post": {
-                "description": "登出当前用户（客户端自行丢弃 JWT 令牌）",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "登出",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/auth/refresh": {
             "post": {
-                "description": "刷新访问令牌（暂未实现，返回 501）",
+                "description": "用刷新令牌换取新的访问令牌和刷新令牌",
                 "consumes": [
                     "application/json"
                 ],
@@ -118,9 +98,44 @@ const docTemplate = `{
                     "auth"
                 ],
                 "summary": "刷新令牌",
+                "parameters": [
+                    {
+                        "description": "刷新令牌",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.refreshRequest"
+                        }
+                    }
+                ],
                 "responses": {
-                    "501": {
-                        "description": "暂未实现",
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handler.tokenResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "刷新令牌无效或已过期",
                         "schema": {
                             "$ref": "#/definitions/model.Response"
                         }
@@ -4513,6 +4528,14 @@ const docTemplate = `{
                 }
             }
         },
+        "handler.refreshRequest": {
+            "type": "object",
+            "properties": {
+                "refreshToken": {
+                    "type": "string"
+                }
+            }
+        },
         "handler.registerRequest": {
             "type": "object",
             "properties": {
@@ -4547,11 +4570,7 @@ const docTemplate = `{
                 "accessToken": {
                     "type": "string"
                 },
-                "expiresIn": {
-                    "description": "秒",
-                    "type": "integer"
-                },
-                "tokenType": {
+                "refreshToken": {
                     "type": "string"
                 }
             }
