@@ -481,3 +481,11 @@ BEGIN
     ORDER BY rm.type_name;
 END;
 $$;
+
+-- jwt token 黑名单表
+CREATE TABLE jwt_blacklist_1718 (
+    jti         TEXT PRIMARY KEY,                 -- JWT ID，直接做主键（查询最快）
+    expires_at  TIMESTAMPTZ NOT NULL              -- 令牌过期时间
+);
+
+CREATE INDEX idx_blacklist_expires_1718 ON jwt_blacklist_1718 (expires_at);
