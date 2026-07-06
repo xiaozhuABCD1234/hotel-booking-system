@@ -23,6 +23,7 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	reviewRepo := repo.NewReviewRepo(db)
 	personRepo := repo.NewPersonRepo(db)
 	regionRepo := repo.NewRegionRepo(db)
+	blacklistRepo := repo.NewBlacklistRepo(db)
 
 	// 视图 repos
 	hotelSummaryRepo := repo.NewHotelSummaryRepo(db)
@@ -38,7 +39,7 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	orderSvc := service.NewOrderService(orderRepo)
 
 	// ─── 创建 handlers ─────────────────────────────────────────
-	authH := handler.NewAuthHandler(userRepo)
+	authH := handler.NewAuthHandler(userRepo, blacklistRepo)
 	userH := handler.NewUserHandler(userRepo, vipLevelRepo)
 	hotelH := handler.NewHotelHandler(hotelRepo, roomRepo)
 	orderH := handler.NewOrderHandler(orderSvc)
@@ -65,6 +66,7 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	auth.Post("/register", authH.Register)
 	auth.Post("/login", authH.Login)
 	auth.Post("/refresh", authH.Refresh)
+	auth.Post("/logout", authH.Logout)
 
 	// ═══════════════════════════════════════════════════════════
 	// 公开路由（无需认证）
@@ -88,7 +90,7 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	// ═══════════════════════════════════════════════════════════
 	// 需要认证的路由（JWT 中间件保护）
 	// ═══════════════════════════════════════════════════════════
-	protected := v1.Group("", middleware.JWTAuth())
+	protected := v1.Group("", middleware.JWTAuth(blacklistRepo))
 
 	// 用户管理（需认证）
 	protectedUsers := protected.Group("/users")

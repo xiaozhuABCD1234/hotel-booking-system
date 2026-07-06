@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"backend/auth"
 	"backend/handler"
@@ -27,6 +28,13 @@ type mockUserRepo struct {
 }
 
 var _ repo.UserRepository = (*mockUserRepo)(nil)
+
+type mockBlacklistRepo struct{}
+
+var _ repo.BlacklistRepository = (*mockBlacklistRepo)(nil)
+
+func (m *mockBlacklistRepo) Insert(_ context.Context, _ string, _ time.Time) error { return nil }
+func (m *mockBlacklistRepo) Exists(_ context.Context, _ string) (bool, error)      { return false, nil }
 
 func (m *mockUserRepo) Create(ctx context.Context, user *schema.User) error {
 	if m.createFunc != nil {
@@ -63,7 +71,7 @@ func (m *mockUserRepo) Delete(ctx context.Context, id uuid.UUID) error { return 
 
 // ─── Test Helpers ──────────────────────────────────────────────
 
-func setupAuthApp(t *testing.T, repo repo.UserRepository) *fiber.App {
+func setupAuthApp(t *testing.T, userRepo repo.UserRepository, blacklistRepo repo.BlacklistRepository) *fiber.App {
 	t.Helper()
 	if err := auth.LoadSecret(); err != nil {
 		t.Fatalf("setupAuthApp: failed to load JWT secret: %v", err)
@@ -84,7 +92,7 @@ func setupAuthApp(t *testing.T, repo repo.UserRepository) *fiber.App {
 
 	api := app.Group("/api/v1")
 	authGroup := api.Group("/auth")
-	h := handler.NewAuthHandler(repo)
+	h := handler.NewAuthHandler(userRepo, blacklistRepo)
 	authGroup.Post("/register", h.Register)
 	authGroup.Post("/login", h.Login)
 	authGroup.Post("/refresh", h.Refresh)
@@ -104,15 +112,14 @@ func postJSON(t *testing.T, app *fiber.App, path, body string) *http.Response {
 	return resp
 }
 
-// assertTokenBody 校验响应体为成功的令牌响应，且 accessToken 非空、tokenType 为 Bearer。
+// assertTokenBody 校验响应体为成功的令牌响应，accessToken 和 refreshToken 非空。
 func assertTokenBody(t *testing.T, resp *http.Response) {
 	t.Helper()
 	var got struct {
 		Success bool `json:"success"`
 		Data    struct {
-			AccessToken string `json:"accessToken"`
-			TokenType   string `json:"tokenType"`
-			ExpiresIn   int    `json:"expiresIn"`
+			AccessToken  string `json:"accessToken"`
+			RefreshToken string `json:"refreshToken"`
 		} `json:"data"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&got); err != nil {
@@ -124,11 +131,8 @@ func assertTokenBody(t *testing.T, resp *http.Response) {
 	if got.Data.AccessToken == "" {
 		t.Errorf("expected non-empty accessToken, got empty")
 	}
-	if got.Data.TokenType != "Bearer" {
-		t.Errorf("expected tokenType=Bearer, got %q", got.Data.TokenType)
-	}
-	if got.Data.ExpiresIn <= 0 {
-		t.Errorf("expected positive expiresIn, got %d", got.Data.ExpiresIn)
+	if got.Data.RefreshToken == "" {
+		t.Errorf("expected non-empty refreshToken, got empty")
 	}
 }
 
@@ -147,7 +151,7 @@ func TestRegister_Success(t *testing.T) {
 			return nil
 		},
 	}
-	app := setupAuthApp(t, mock)
+	app := setupAuthApp(t, mock, &mockBlacklistRepo{})
 
 	resp := postJSON(t, app, "/api/v1/auth/register", `{"username":"testuser","password":"secret123"}`)
 
@@ -159,7 +163,7 @@ func TestRegister_Success(t *testing.T) {
 
 func TestRegister_MissingFields(t *testing.T) {
 	t.Setenv("JWT_SECRET", "test-secret-key-register-missing")
-	app := setupAuthApp(t, &mockUserRepo{})
+	app := setupAuthApp(t, &mockUserRepo{}, &mockBlacklistRepo{})
 
 	resp := postJSON(t, app, "/api/v1/auth/register", `{"username":"","password":""}`)
 
@@ -170,7 +174,7 @@ func TestRegister_MissingFields(t *testing.T) {
 
 func TestRegister_ShortPassword(t *testing.T) {
 	t.Setenv("JWT_SECRET", "test-secret-key-register-short")
-	app := setupAuthApp(t, &mockUserRepo{})
+	app := setupAuthApp(t, &mockUserRepo{}, &mockBlacklistRepo{})
 
 	resp := postJSON(t, app, "/api/v1/auth/register", `{"username":"testuser","password":"abc"}`)
 
@@ -190,7 +194,7 @@ func TestRegister_DuplicateUsername(t *testing.T) {
 			return nil, gorm.ErrRecordNotFound
 		},
 	}
-	app := setupAuthApp(t, mock)
+	app := setupAuthApp(t, mock, &mockBlacklistRepo{})
 
 	resp := postJSON(t, app, "/api/v1/auth/register", `{"username":"existing","password":"secret123"}`)
 
@@ -206,7 +210,7 @@ func TestRegister_DatabaseError(t *testing.T) {
 			return nil, errDB
 		},
 	}
-	app := setupAuthApp(t, mock)
+	app := setupAuthApp(t, mock, &mockBlacklistRepo{})
 
 	resp := postJSON(t, app, "/api/v1/auth/register", `{"username":"testuser","password":"secret123"}`)
 
@@ -234,7 +238,7 @@ func TestLogin_Success(t *testing.T) {
 			}, nil
 		},
 	}
-	app := setupAuthApp(t, mock)
+	app := setupAuthApp(t, mock, &mockBlacklistRepo{})
 
 	resp := postJSON(t, app, "/api/v1/auth/login", `{"username":"testuser","password":"secret123"}`)
 
@@ -260,7 +264,7 @@ func TestLogin_WrongPassword(t *testing.T) {
 			}, nil
 		},
 	}
-	app := setupAuthApp(t, mock)
+	app := setupAuthApp(t, mock, &mockBlacklistRepo{})
 
 	resp := postJSON(t, app, "/api/v1/auth/login", `{"username":"testuser","password":"wrongpassword"}`)
 
@@ -276,7 +280,7 @@ func TestLogin_UserNotFound(t *testing.T) {
 			return nil, gorm.ErrRecordNotFound
 		},
 	}
-	app := setupAuthApp(t, mock)
+	app := setupAuthApp(t, mock, &mockBlacklistRepo{})
 
 	resp := postJSON(t, app, "/api/v1/auth/login", `{"username":"nonexistent","password":"secret123"}`)
 
@@ -292,7 +296,7 @@ func TestLogin_DatabaseError(t *testing.T) {
 			return nil, errDB
 		},
 	}
-	app := setupAuthApp(t, mock)
+	app := setupAuthApp(t, mock, &mockBlacklistRepo{})
 
 	resp := postJSON(t, app, "/api/v1/auth/login", `{"username":"testuser","password":"secret123"}`)
 
@@ -303,24 +307,35 @@ func TestLogin_DatabaseError(t *testing.T) {
 
 // ─── Refresh Test ──────────────────────────────────────────────
 
-func TestRefresh_NotImplemented(t *testing.T) {
+func TestRefresh_Success(t *testing.T) {
 	t.Setenv("JWT_SECRET", "test-secret-key-refresh")
-	app := setupAuthApp(t, &mockUserRepo{})
+	app := setupAuthApp(t, &mockUserRepo{}, &mockBlacklistRepo{})
 
-	resp := postJSON(t, app, "/api/v1/auth/refresh", `{"refreshToken":"any"}`)
-
-	if resp.StatusCode != http.StatusNotImplemented {
-		t.Errorf("expected 501, got %d", resp.StatusCode)
+	token, err := auth.GenerateRefreshToken("user-id", "customer")
+	if err != nil {
+		t.Fatal(err)
 	}
+
+	resp := postJSON(t, app, "/api/v1/auth/refresh", `{"refreshToken":"`+token+`"}`)
+
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("expected 200, got %d", resp.StatusCode)
+	}
+	assertTokenBody(t, resp)
 }
 
 // ─── Logout Test ───────────────────────────────────────────────
 
 func TestLogout_Success(t *testing.T) {
 	t.Setenv("JWT_SECRET", "test-secret-key-logout")
-	app := setupAuthApp(t, &mockUserRepo{})
+	app := setupAuthApp(t, &mockUserRepo{}, &mockBlacklistRepo{})
 
-	resp := postJSON(t, app, "/api/v1/auth/logout", "")
+	token, err := auth.GenerateAccessToken("user-id", "customer")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	resp := postJSON(t, app, "/api/v1/auth/logout", `{"accessToken":"`+token+`"}`)
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("expected 200, got %d", resp.StatusCode)

@@ -4,6 +4,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"backend/auth"
 	"backend/model"
@@ -15,14 +16,15 @@ import (
 	"gorm.io/gorm"
 )
 
-// AuthHandler 认证 HTTP 处理器，处理注册、登录、令牌刷新。
+// AuthHandler 认证 HTTP 处理器，处理注册、登录、令牌刷新、登出。
 type AuthHandler struct {
-	users repo.UserRepository
+	users     repo.UserRepository
+	blacklist repo.BlacklistRepository
 }
 
 // NewAuthHandler 创建 AuthHandler 实例。
-func NewAuthHandler(users repo.UserRepository) *AuthHandler {
-	return &AuthHandler{users: users}
+func NewAuthHandler(users repo.UserRepository, blacklist repo.BlacklistRepository) *AuthHandler {
+	return &AuthHandler{users: users, blacklist: blacklist}
 }
 
 // ─── 请求/响应结构 ────────────────────────────────────────────
@@ -47,6 +49,10 @@ type tokenResponse struct {
 
 type refreshRequest struct {
 	RefreshToken string `json:"refreshToken"`
+}
+
+type logoutRequest struct {
+	AccessToken string `json:"accessToken"`
 }
 
 // passwordMinLen 注册密码最小长度。
@@ -195,6 +201,46 @@ func (h *AuthHandler) Refresh(c fiber.Ctx) error {
 	}
 
 	return h.issueTokens(c, claims.UserID, claims.Role)
+}
+
+// ─── Logout ────────────────────────────────────────────────────
+
+// Logout 登出，将当前访问令牌加入黑名单，使其立即失效。
+//
+//	@Summary		登出
+//	@Description	将当前访问令牌加入黑名单，使其立即失效
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		logoutRequest				true	"访问令牌"
+//	@Success		200		{object}	model.Response
+//	@Failure		400		{object}	model.Response	"请求参数无效"
+//	@Failure		401		{object}	model.Response	"令牌无效或已过期"
+//	@Router			/auth/logout [post]
+func (h *AuthHandler) Logout(c fiber.Ctx) error {
+	var req logoutRequest
+	if err := c.Bind().Body(&req); err != nil {
+		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
+	}
+	if req.AccessToken == "" {
+		return model.SendError(c, http.StatusBadRequest, "accessToken is required")
+	}
+
+	claims, err := auth.ParseAccessToken(req.AccessToken)
+	if err != nil {
+		return model.SendError(c, http.StatusUnauthorized, "Invalid or expired token")
+	}
+
+	// 校验 token 类型：accessToken 有效期 15 分钟，refreshToken 7 天
+	if claims.ExpiresAt.Time.After(time.Now().Add(1 * time.Hour)) {
+		return model.SendError(c, http.StatusBadRequest, "expected an access token, not a refresh token")
+	}
+
+	if err := h.blacklist.Insert(c.Context(), claims.ID, claims.ExpiresAt.Time); err != nil {
+		return err
+	}
+
+	return model.SendSuccess(c, model.WithMessage("Logged out successfully"))
 }
 
 // ─── 内部辅助 ─────────────────────────────────────────────────

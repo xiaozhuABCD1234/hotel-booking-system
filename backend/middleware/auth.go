@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"backend/auth"
+	"backend/repo"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -16,7 +17,8 @@ const contextKey = "auth_claims"
 // JWTAuth 返回 JWT 认证中间件。
 // 从 Authorization: Bearer <token> 头提取并校验访问令牌，
 // 校验通过后将 *auth.Claims 存入 fiber.Ctx 的上下文中。
-func JWTAuth() fiber.Handler {
+// 同时检查令牌是否已被列入黑名单（登出）。
+func JWTAuth(blacklistRepo repo.BlacklistRepository) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		// 提取 Authorization 头
 		authHeader := c.Get("Authorization")
@@ -36,6 +38,15 @@ func JWTAuth() fiber.Handler {
 		claims, err := auth.ParseAccessToken(tokenString)
 		if err != nil {
 			return fiber.NewError(http.StatusUnauthorized, "invalid or expired token")
+		}
+
+		// 检查是否在黑名单中（已登出）
+		exists, err := blacklistRepo.Exists(c.Context(), claims.ID)
+		if err != nil {
+			return fiber.NewError(http.StatusInternalServerError, "failed to check token revocation")
+		}
+		if exists {
+			return fiber.NewError(http.StatusUnauthorized, "token has been revoked")
 		}
 
 		// 将 claims 存入 context，供后续 handler 使用
