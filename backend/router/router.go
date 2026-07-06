@@ -7,6 +7,7 @@ import (
 	"backend/repo"
 	"backend/service"
 
+	swaggo "github.com/gofiber/contrib/v3/swaggo"
 	"github.com/gofiber/fiber/v3"
 	"gorm.io/gorm"
 )
@@ -50,6 +51,9 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 		userVipRepo, personInfoRepo,
 		guestBookingStatsRepo, myOrdersRepo,
 	)
+
+	// ─── Swagger 文档（不依赖 /api/v1 前缀）─────────────────────
+	app.Get("/swagger/*", swaggo.HandlerDefault)
 
 	// ─── /api/v1 路由组 ────────────────────────────────────────
 	v1 := app.Group("/api/v1")

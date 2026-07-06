@@ -23,7 +23,17 @@ func NewReviewHandler(reviewRepo repo.ReviewRepository) *ReviewHandler {
 }
 
 // List 查询全部评价列表（分页）。
-// Query: page (default 1), pageSize (default 10)
+//
+//	@Summary		查询全部评价
+//	@Description	分页查询全部评价列表
+//	@Tags			reviews
+//	@Produce		json
+//	@Param			page		query		int		false	"页码"			default(1)
+//	@Param			pageSize	query		int		false	"每页数量"		default(10)
+//	@Success		200			{object}	model.Response{data=[]modelSchema.Review}
+//	@Failure		500			{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/reviews [get]
 func (h *ReviewHandler) List(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -55,6 +65,18 @@ func (h *ReviewHandler) List(c fiber.Ctx) error {
 }
 
 // GetByID 根据评价 ID 查询详情，预加载 User、Hotel、Order。
+//
+//	@Summary		查询评价详情
+//	@Description	根据 UUID 查询单个评价信息（含关联用户、酒店、订单）
+//	@Tags			reviews
+//	@Produce		json
+//	@Param			id		path		string	true	"评价 ID (UUID)"
+//	@Success		200		{object}	model.Response{data=modelSchema.Review}
+//	@Failure		400		{object}	model.Response	"无效的评价 ID"
+//	@Failure		404		{object}	model.Response	"评价不存在"
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/reviews/{id} [get]
 func (h *ReviewHandler) GetByID(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -72,6 +94,18 @@ func (h *ReviewHandler) GetByID(c fiber.Ctx) error {
 }
 
 // Create 创建评价，返回 201 Created。
+//
+//	@Summary		创建评价
+//	@Description	创建新评价记录
+//	@Tags			reviews
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		modelSchema.Review	true	"评价信息"
+//	@Success		201		{object}	model.Response{data=modelSchema.Review}
+//	@Failure		400		{object}	model.Response	"请求参数无效"
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/reviews [post]
 func (h *ReviewHandler) Create(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -93,18 +127,33 @@ func (h *ReviewHandler) Create(c fiber.Ctx) error {
 	return c.Status(http.StatusCreated).JSON(r)
 }
 
+// updateReviewInput 评价更新请求体（仅允许修改评分和内容）。
+type updateReviewInput struct {
+	Rating  int    `json:"rating"`
+	Content string `json:"content"`
+}
+
 // Update 更新评价（仅 Rating 和 Content）。
+//
+//	@Summary		更新评价
+//	@Description	根据 UUID 更新评价的评分和内容
+//	@Tags			reviews
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string					true	"评价 ID (UUID)"
+//	@Param			body	body		updateReviewInput		true	"评分和内容"
+//	@Success		200		{object}	model.Response{data=modelSchema.Review}
+//	@Failure		400		{object}	model.Response
+//	@Failure		404		{object}	model.Response
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/reviews/{id} [put]
 func (h *ReviewHandler) Update(c fiber.Ctx) error {
 	ctx := c.Context()
 
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
 		return model.SendError(c, http.StatusBadRequest, "Invalid review ID")
-	}
-
-	type updateReviewInput struct {
-		Rating  int    `json:"rating"`
-		Content string `json:"content"`
 	}
 
 	var input updateReviewInput
@@ -128,6 +177,18 @@ func (h *ReviewHandler) Update(c fiber.Ctx) error {
 }
 
 // Delete 根据 ID 硬删除评价。
+//
+//	@Summary		删除评价
+//	@Description	根据 UUID 硬删除评价
+//	@Tags			reviews
+//	@Produce		json
+//	@Param			id		path		string	true	"评价 ID (UUID)"
+//	@Success		200		{object}	model.Response
+//	@Failure		400		{object}	model.Response
+//	@Failure		404		{object}	model.Response
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/reviews/{id} [delete]
 func (h *ReviewHandler) Delete(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -144,7 +205,19 @@ func (h *ReviewHandler) Delete(c fiber.Ctx) error {
 }
 
 // ListByHotelID 根据酒店 ID 查询评价列表（分页）。
-// Query: hotelID (required), page (default 1), pageSize (default 10)
+//
+//	@Summary		按酒店查询评价
+//	@Description	根据酒店 ID 分页查询该酒店的全部评价
+//	@Tags			reviews
+//	@Produce		json
+//	@Param			hotelID		query		string	true	"酒店 ID (UUID)"
+//	@Param			page		query		int		false	"页码"			default(1)
+//	@Param			pageSize	query		int		false	"每页数量"		default(10)
+//	@Success		200			{object}	model.Response{data=[]modelSchema.Review}
+//	@Failure		400			{object}	model.Response
+//	@Failure		500			{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/reviews/by-hotel [get]
 func (h *ReviewHandler) ListByHotelID(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -182,7 +255,19 @@ func (h *ReviewHandler) ListByHotelID(c fiber.Ctx) error {
 }
 
 // ListByUserID 根据用户 ID 查询评价列表（分页）。
-// Query: userID (required), page (default 1), pageSize (default 10)
+//
+//	@Summary		按用户查询评价
+//	@Description	根据用户 ID 分页查询该用户的全部评价
+//	@Tags			reviews
+//	@Produce		json
+//	@Param			userID		query		string	true	"用户 ID (UUID)"
+//	@Param			page		query		int		false	"页码"			default(1)
+//	@Param			pageSize	query		int		false	"每页数量"		default(10)
+//	@Success		200			{object}	model.Response{data=[]modelSchema.Review}
+//	@Failure		400			{object}	model.Response
+//	@Failure		500			{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/reviews/by-user [get]
 func (h *ReviewHandler) ListByUserID(c fiber.Ctx) error {
 	ctx := c.Context()
 

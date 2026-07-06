@@ -28,6 +28,18 @@ func NewUserHandler(userRepo repo.UserRepository, vipLevelRepo repo.VipLevelRepo
 }
 
 // List 查询用户列表（支持分页与按角色筛选）。
+//
+//	@Summary		查询用户列表
+//	@Description	分页查询用户列表，支持按角色筛选
+//	@Tags			users
+//	@Produce		json
+//	@Param			page		query		int		false	"页码"			default(1)
+//	@Param			pageSize	query		int		false	"每页数量"		default(10)
+//	@Param			role		query		string	false	"角色筛选"
+//	@Success		200			{object}	model.Response{data=[]schema.User}
+//	@Failure		500			{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/users [get]
 func (h *UserHandler) List(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -67,6 +79,18 @@ func (h *UserHandler) List(c fiber.Ctx) error {
 }
 
 // GetByID 根据 ID 查询单个用户。
+//
+//	@Summary		查询用户详情
+//	@Description	根据 UUID 查询单个用户信息
+//	@Tags			users
+//	@Produce		json
+//	@Param			id		path		string	true	"用户 ID (UUID)"
+//	@Success		200		{object}	model.Response{data=schema.User}
+//	@Failure		400		{object}	model.Response	"无效的用户 ID"
+//	@Failure		404		{object}	model.Response	"用户不存在"
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/users/{id} [get]
 func (h *UserHandler) GetByID(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -84,6 +108,18 @@ func (h *UserHandler) GetByID(c fiber.Ctx) error {
 }
 
 // Create 创建用户，返回 201 Created。
+//
+//	@Summary		创建用户
+//	@Description	创建新用户（管理员操作），密码自动 bcrypt 哈希
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		schema.User	true	"用户信息"
+//	@Success		201		{object}	model.Response{data=schema.User}
+//	@Failure		400		{object}	model.Response	"请求参数无效"
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/users [post]
 func (h *UserHandler) Create(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -115,6 +151,20 @@ func (h *UserHandler) Create(c fiber.Ctx) error {
 }
 
 // Update 根据 ID 更新用户信息。
+//
+//	@Summary		更新用户信息
+//	@Description	根据 UUID 更新用户信息
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string		true	"用户 ID (UUID)"
+//	@Param			body	body		schema.User	true	"更新的用户信息"
+//	@Success		200		{object}	model.Response{data=schema.User}
+//	@Failure		400		{object}	model.Response
+//	@Failure		404		{object}	model.Response
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/users/{id} [put]
 func (h *UserHandler) Update(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -138,6 +188,18 @@ func (h *UserHandler) Update(c fiber.Ctx) error {
 }
 
 // Delete 根据 ID 软删除用户。
+//
+//	@Summary		删除用户
+//	@Description	根据 UUID 软删除用户
+//	@Tags			users
+//	@Produce		json
+//	@Param			id		path		string	true	"用户 ID (UUID)"
+//	@Success		200		{object}	model.Response
+//	@Failure		400		{object}	model.Response
+//	@Failure		404		{object}	model.Response
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/users/{id} [delete]
 func (h *UserHandler) Delete(c fiber.Ctx) error {
 	ctx := c.Context()
 

@@ -1,0 +1,2874 @@
+basePath: /api/v1
+definitions:
+  backend_model_schema.Hotel:
+    properties:
+      address:
+        type: string
+      createAt:
+        type: string
+      description:
+        type: string
+      hotelName:
+        type: string
+      id:
+        type: string
+      images:
+        items:
+          $ref: '#/definitions/backend_model_schema.HotelImage'
+        type: array
+      region:
+        $ref: '#/definitions/backend_model_schema.Region'
+      regionID:
+        type: integer
+      starLevel:
+        type: integer
+      status:
+        type: integer
+      telephone:
+        type: string
+      updateAt:
+        type: string
+    type: object
+  backend_model_schema.HotelImage:
+    properties:
+      hotel:
+        $ref: '#/definitions/backend_model_schema.Hotel'
+      hotelID:
+        type: string
+      imageURL:
+        type: string
+    type: object
+  backend_model_schema.Order:
+    properties:
+      actualPrice:
+        type: number
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      createAt:
+        type: string
+      discount:
+        type: number
+      guests:
+        items:
+          $ref: '#/definitions/backend_model_schema.OrderGuest'
+        type: array
+      id:
+        type: string
+      quantity:
+        type: integer
+      room:
+        $ref: '#/definitions/backend_model_schema.Room'
+      roomID:
+        type: string
+      status:
+        $ref: '#/definitions/backend_model_schema.OrderStatus'
+      totalPrice:
+        type: number
+      updateAt:
+        type: string
+      user:
+        $ref: '#/definitions/backend_model_schema.User'
+      userID:
+        type: string
+    type: object
+  backend_model_schema.OrderGuest:
+    properties:
+      idcard:
+        type: string
+      order:
+        $ref: '#/definitions/backend_model_schema.Order'
+      orderID:
+        type: string
+      person:
+        $ref: '#/definitions/backend_model_schema.Person'
+    type: object
+  backend_model_schema.OrderStatus:
+    enum:
+    - pending
+    - booked
+    - checked_in
+    - completed
+    - cancelled
+    type: string
+    x-enum-varnames:
+    - OrderPending
+    - OrderBooked
+    - OrderCheckedIn
+    - OrderCompleted
+    - OrderCancelled
+  backend_model_schema.Person:
+    properties:
+      idcard:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  backend_model_schema.Region:
+    properties:
+      id:
+        type: integer
+      parent:
+        $ref: '#/definitions/backend_model_schema.Region'
+      parentsID:
+        type: integer
+      regionName:
+        type: string
+    type: object
+  backend_model_schema.Review:
+    properties:
+      content:
+        type: string
+      createAt:
+        type: string
+      hotel:
+        $ref: '#/definitions/backend_model_schema.Hotel'
+      hotelID:
+        type: string
+      id:
+        type: string
+      order:
+        $ref: '#/definitions/backend_model_schema.Order'
+      orderID:
+        type: string
+      rating:
+        type: integer
+      updateAt:
+        type: string
+      user:
+        $ref: '#/definitions/backend_model_schema.User'
+      userID:
+        type: string
+    type: object
+  backend_model_schema.Room:
+    properties:
+      availableQuantity:
+        type: integer
+      createAt:
+        type: string
+      description:
+        type: string
+      facilities:
+        items:
+          $ref: '#/definitions/backend_model_schema.RoomFacility'
+        type: array
+      hotel:
+        $ref: '#/definitions/backend_model_schema.Hotel'
+      hotelID:
+        type: string
+      id:
+        type: string
+      images:
+        items:
+          $ref: '#/definitions/backend_model_schema.RoomImage'
+        type: array
+      price:
+        type: number
+      status:
+        type: integer
+      totalQuantity:
+        type: integer
+      typeName:
+        type: string
+      updateAt:
+        type: string
+      weekendPrice:
+        type: number
+    type: object
+  backend_model_schema.RoomFacility:
+    properties:
+      facilityName:
+        type: string
+      room:
+        $ref: '#/definitions/backend_model_schema.Room'
+      roomID:
+        type: string
+    type: object
+  backend_model_schema.RoomImage:
+    properties:
+      imageURL:
+        type: string
+      room:
+        $ref: '#/definitions/backend_model_schema.Room'
+      roomID:
+        type: string
+    type: object
+  backend_model_schema.User:
+    properties:
+      createAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      idcard:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      points:
+        type: integer
+      realName:
+        type: string
+      role:
+        $ref: '#/definitions/backend_model_schema.UserRole'
+      status:
+        type: integer
+      updateAt:
+        type: string
+      username:
+        type: string
+      vipLevel:
+        $ref: '#/definitions/backend_model_schema.VipLevel'
+      vipLevelID:
+        type: integer
+    type: object
+  backend_model_schema.UserRole:
+    enum:
+    - customer
+    - vip
+    - hotel_manager
+    - admin
+    type: string
+    x-enum-varnames:
+    - RoleCustomer
+    - RoleVIP
+    - RoleHotelManager
+    - RoleAdmin
+  backend_model_schema.VipLevel:
+    properties:
+      discountRate:
+        type: number
+      level:
+        type: integer
+      levelName:
+        type: string
+      minPoints:
+        type: integer
+    type: object
+  backend_model_view.GuestBookingStats:
+    properties:
+      age:
+        type: integer
+      ageGroup:
+        type: string
+      avgOrderAmount:
+        type: number
+      favCity:
+        type: string
+      favHotel:
+        type: string
+      favRoomType:
+        type: string
+      gender:
+        type: string
+      lastOrderDate:
+        type: string
+      personIDCard:
+        type: string
+      personName:
+        type: string
+      totalAmount:
+        type: number
+      totalNights:
+        type: integer
+      totalOrders:
+        type: integer
+    type: object
+  backend_model_view.HotelSummary:
+    properties:
+      address:
+        type: string
+      avgRating:
+        type: number
+      city:
+        type: string
+      description:
+        type: string
+      district:
+        type: string
+      hotelID:
+        type: string
+      hotelName:
+        type: string
+      mainImage:
+        type: string
+      minPrice:
+        type: number
+      province:
+        type: string
+      reviewCount:
+        type: integer
+      roomCount:
+        type: integer
+      starLevel:
+        type: integer
+      status:
+        type: integer
+      telephone:
+        type: string
+      totalRooms:
+        type: integer
+    type: object
+  backend_model_view.MyOrders:
+    properties:
+      actualPrice:
+        type: number
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      city:
+        type: string
+      createAt:
+        type: string
+      guestCount:
+        type: integer
+      hotelName:
+        type: string
+      nights:
+        type: integer
+      orderID:
+        type: string
+      orderStatus:
+        type: string
+      quantity:
+        type: integer
+      roomType:
+        type: string
+      userID:
+        type: string
+    type: object
+  backend_model_view.OrderFull:
+    properties:
+      actualPrice:
+        type: number
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      city:
+        type: string
+      createAt:
+        type: string
+      discount:
+        type: number
+      district:
+        type: string
+      guestAge:
+        type: integer
+      guestGender:
+        type: string
+      guestIDCard:
+        type: string
+      guestName:
+        type: string
+      hotelID:
+        type: string
+      hotelName:
+        type: string
+      hotelTelephone:
+        type: string
+      nights:
+        type: integer
+      orderID:
+        type: string
+      orderStatus:
+        type: string
+      quantity:
+        type: integer
+      roomID:
+        type: string
+      roomType:
+        type: string
+      totalPrice:
+        type: number
+      userID:
+        type: string
+      userPhone:
+        type: string
+      userRealName:
+        type: string
+      username:
+        type: string
+      vipDiscountRate:
+        type: number
+    type: object
+  backend_model_view.PersonInfo:
+    properties:
+      age:
+        type: integer
+      birthDate:
+        type: string
+      gender:
+        type: string
+      idcard:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+    type: object
+  backend_model_view.ReviewFull:
+    properties:
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      content:
+        type: string
+      createAt:
+        type: string
+      hotelID:
+        type: string
+      hotelName:
+        type: string
+      orderID:
+        type: string
+      rating:
+        type: integer
+      reviewID:
+        type: string
+      roomType:
+        type: string
+      userID:
+        type: string
+      username:
+        type: string
+    type: object
+  backend_model_view.RoomDetails:
+    properties:
+      address:
+        type: string
+      availableQuantity:
+        type: integer
+      avgRating:
+        type: number
+      city:
+        type: string
+      district:
+        type: string
+      facilities:
+        type: string
+      hotelID:
+        type: string
+      hotelName:
+        type: string
+      hotelTelephone:
+        type: string
+      price:
+        type: number
+      province:
+        type: string
+      reviewCount:
+        type: integer
+      roomDescription:
+        type: string
+      roomID:
+        type: string
+      starLevel:
+        type: integer
+      totalQuantity:
+        type: integer
+      typeName:
+        type: string
+      weekendPrice:
+        type: number
+    type: object
+  backend_model_view.UserVip:
+    properties:
+      createAt:
+        type: string
+      discountRate:
+        type: number
+      email:
+        type: string
+      idcard:
+        type: string
+      phone:
+        type: string
+      points:
+        type: integer
+      pointsToNextLevel:
+        type: integer
+      realName:
+        type: string
+      role:
+        type: string
+      userID:
+        type: string
+      username:
+        type: string
+      vipLevel:
+        type: integer
+      vipLevelName:
+        type: string
+    type: object
+  handler.loginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  handler.registerRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      realName:
+        type: string
+      username:
+        type: string
+    type: object
+  handler.statusBody:
+    properties:
+      status:
+        $ref: '#/definitions/backend_model_schema.OrderStatus'
+    type: object
+  handler.tokenResponse:
+    properties:
+      accessToken:
+        type: string
+      expiresIn:
+        description: 秒
+        type: integer
+      tokenType:
+        type: string
+    type: object
+  handler.updateReviewInput:
+    properties:
+      content:
+        type: string
+      rating:
+        type: integer
+    type: object
+  model.ErrorObj:
+    properties:
+      code:
+        type: string
+      details: {}
+      message:
+        type: string
+    type: object
+  model.PaginationObj:
+    properties:
+      currentPage:
+        type: integer
+      hasNext:
+        type: boolean
+      hasPrev:
+        type: boolean
+      itemsPerPage:
+        type: integer
+      totalItems:
+        type: integer
+      totalPages:
+        type: integer
+    type: object
+  model.Response:
+    properties:
+      data: {}
+      error:
+        $ref: '#/definitions/model.ErrorObj'
+      message:
+        type: string
+      pagination:
+        $ref: '#/definitions/model.PaginationObj'
+      success:
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact:
+    name: 上海电力大学
+    url: https://www.shiep.edu.cn
+  description: 酒店预订管理系统 API — 支持用户注册、酒店搜索、客房预订、订单管理、评价与数据统计
+  license:
+    name: MIT
+  title: Hotel Booking API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: 验证用户名密码并返回 JWT 访问令牌
+      parameters:
+      - description: 登录凭据
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.loginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handler.tokenResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: 用户名或密码错误
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 用户登录
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: 登出当前用户（客户端自行丢弃 JWT 令牌）
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 登出
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: 刷新访问令牌（暂未实现，返回 501）
+      produces:
+      - application/json
+      responses:
+        "501":
+          description: 暂未实现
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 刷新令牌
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: 创建新账户并返回 JWT 访问令牌
+      parameters:
+      - description: 注册信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handler.tokenResponse'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: 用户名已存在
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: 服务器错误
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 用户注册
+      tags:
+      - auth
+  /hotels:
+    get:
+      description: 分页查询酒店列表，支持按区域、星级、关键词筛选
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 区域 ID
+        in: query
+        name: regionID
+        type: integer
+      - description: 星级
+        in: query
+        name: starLevel
+        type: integer
+      - description: 搜索关键词
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Hotel'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 查询酒店列表
+      tags:
+      - hotels
+    post:
+      consumes:
+      - application/json
+      description: 创建新酒店记录
+      parameters:
+      - description: 酒店信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.Hotel'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Hotel'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 创建酒店
+      tags:
+      - hotels
+  /hotels/{id}:
+    delete:
+      description: 根据 UUID 软删除酒店
+      parameters:
+      - description: 酒店 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除酒店
+      tags:
+      - hotels
+    get:
+      description: 根据 UUID 查询单个酒店信息
+      parameters:
+      - description: 酒店 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Hotel'
+              type: object
+        "400":
+          description: 无效的酒店 ID
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: 酒店不存在
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 查询酒店详情
+      tags:
+      - hotels
+    put:
+      consumes:
+      - application/json
+      description: 根据 UUID 更新酒店信息
+      parameters:
+      - description: 酒店 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新的酒店信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.Hotel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Hotel'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新酒店信息
+      tags:
+      - hotels
+  /orders:
+    get:
+      description: 分页查询全部订单列表
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Order'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 查询全部订单
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: 创建新订单（含入住人信息），返回 201 Created
+      parameters:
+      - description: 订单信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.Order'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Order'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 创建订单
+      tags:
+      - orders
+  /orders/{id}:
+    delete:
+      description: 根据 UUID 硬删除订单
+      parameters:
+      - description: 订单 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除订单
+      tags:
+      - orders
+    get:
+      description: 根据 UUID 查询单个订单信息
+      parameters:
+      - description: 订单 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Order'
+              type: object
+        "400":
+          description: 无效的订单 ID
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: 订单不存在
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 查询订单详情
+      tags:
+      - orders
+  /orders/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: 根据 UUID 更新订单状态（如已预订→已入住）
+      parameters:
+      - description: 订单 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 状态更新请求
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.statusBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Order'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "409":
+          description: 非法状态转换
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新订单状态
+      tags:
+      - orders
+  /orders/by-hotel:
+    get:
+      description: 根据酒店 ID 分页查询该酒店的全部订单
+      parameters:
+      - description: 酒店 ID (UUID)
+        in: query
+        name: hotelID
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Order'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 按酒店查询订单
+      tags:
+      - orders
+  /orders/by-user:
+    get:
+      description: 根据用户 ID 分页查询该用户的全部订单
+      parameters:
+      - description: 用户 ID (UUID)
+        in: query
+        name: userID
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Order'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 按用户查询订单
+      tags:
+      - orders
+  /persons:
+    get:
+      description: 分页查询人员列表，支持按姓名、身份证号等关键词搜索
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 搜索关键词
+        in: query
+        name: keyword
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Person'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 查询人员列表
+      tags:
+      - persons
+    post:
+      consumes:
+      - application/json
+      description: 创建新人员记录
+      parameters:
+      - description: 人员信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.Person'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Person'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 创建人员
+      tags:
+      - persons
+  /persons/{idCard}:
+    delete:
+      description: 根据身份证号删除人员记录
+      parameters:
+      - description: 身份证号
+        in: path
+        name: idCard
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除人员
+      tags:
+      - persons
+    get:
+      description: 根据身份证号查询单个人员信息
+      parameters:
+      - description: 身份证号
+        in: path
+        name: idCard
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Person'
+              type: object
+        "404":
+          description: 人员不存在
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 查询人员详情
+      tags:
+      - persons
+    put:
+      consumes:
+      - application/json
+      description: 根据身份证号更新人员信息
+      parameters:
+      - description: 身份证号
+        in: path
+        name: idCard
+        required: true
+        type: string
+      - description: 更新的人员信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.Person'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Person'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新人员信息
+      tags:
+      - persons
+  /regions:
+    get:
+      description: 查询全部地区列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Region'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 查询全部地区
+      tags:
+      - regions
+    post:
+      consumes:
+      - application/json
+      description: 创建新地区记录
+      parameters:
+      - description: 地区信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.Region'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Region'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 创建地区
+      tags:
+      - regions
+  /regions/{id}:
+    delete:
+      description: 根据地区 ID 删除地区记录
+      parameters:
+      - description: 地区 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除地区
+      tags:
+      - regions
+    get:
+      description: 根据地区 ID 查询单个地区信息
+      parameters:
+      - description: 地区 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Region'
+              type: object
+        "400":
+          description: 无效的地区 ID
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: 地区不存在
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 查询地区详情
+      tags:
+      - regions
+    put:
+      consumes:
+      - application/json
+      description: 根据地区 ID 更新地区信息
+      parameters:
+      - description: 地区 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 更新的地区信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.Region'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Region'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新地区信息
+      tags:
+      - regions
+  /regions/by-parent:
+    get:
+      description: 根据 parentID 查询下一级地区列表
+      parameters:
+      - description: 上级地区 ID
+        in: query
+        name: parentID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Region'
+                  type: array
+              type: object
+        "400":
+          description: 无效的 parentID
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 按上级查询子地区
+      tags:
+      - regions
+  /regions/provinces:
+    get:
+      description: 查询全部省级（顶层）地区列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Region'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 查询省级地区
+      tags:
+      - regions
+  /reports/guest-stats:
+    get:
+      description: 分页查询客人预订统计视图，支持按年龄组、性别、偏好城市筛选
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 年龄组
+        in: query
+        name: ageGroup
+        type: string
+      - description: 性别
+        in: query
+        name: gender
+        type: string
+      - description: 偏好城市
+        in: query
+        name: favCity
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.GuestBookingStats'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 客人预订统计
+      tags:
+      - reports
+  /reports/guest-stats/top:
+    get:
+      description: 查询消费金额最高的客人列表
+      parameters:
+      - default: 10
+        description: 返回数量
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.GuestBookingStats'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 消费排行
+      tags:
+      - reports
+  /reports/hotel-summaries:
+    get:
+      description: 分页查询酒店摘要视图，支持按省份、城市、区县、星级、价格范围筛选
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 省份
+        in: query
+        name: province
+        type: string
+      - description: 城市
+        in: query
+        name: city
+        type: string
+      - description: 区县
+        in: query
+        name: district
+        type: string
+      - description: 星级
+        in: query
+        name: starLevel
+        type: integer
+      - description: 最低价格
+        in: query
+        name: minPrice
+        type: number
+      - description: 最高价格
+        in: query
+        name: maxPrice
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.HotelSummary'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 酒店摘要报表
+      tags:
+      - reports
+  /reports/my-orders:
+    get:
+      description: 根据用户 ID 分页查询订单视图，支持按状态筛选
+      parameters:
+      - description: 用户 ID (UUID)
+        in: query
+        name: userID
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 订单状态筛选
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.MyOrders'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 我的订单
+      tags:
+      - reports
+  /reports/order-full/by-hotel:
+    get:
+      description: 根据酒店 ID 分页查询该酒店的订单完整视图
+      parameters:
+      - description: 酒店 ID (UUID)
+        in: query
+        name: hotelID
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.OrderFull'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 按酒店查询完整订单
+      tags:
+      - reports
+  /reports/order-full/by-user:
+    get:
+      description: 根据用户 ID 分页查询该用户的订单完整视图（含酒店、客房、入住人等信息）
+      parameters:
+      - description: 用户 ID (UUID)
+        in: query
+        name: userID
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.OrderFull'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 按用户查询完整订单
+      tags:
+      - reports
+  /reports/person-info:
+    get:
+      description: 分页查询人员信息视图，支持按性别、年龄范围筛选
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 性别筛选
+        in: query
+        name: gender
+        type: string
+      - description: 最小年龄
+        in: query
+        name: minAge
+        type: integer
+      - description: 最大年龄
+        in: query
+        name: maxAge
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.PersonInfo'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 人员信息报表
+      tags:
+      - reports
+  /reports/review-full/by-hotel:
+    get:
+      description: 根据酒店 ID 分页查询该酒店的评价完整视图
+      parameters:
+      - description: 酒店 ID (UUID)
+        in: query
+        name: hotelID
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.ReviewFull'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 按酒店查询完整评价
+      tags:
+      - reports
+  /reports/review-full/by-user:
+    get:
+      description: 根据用户 ID 分页查询该用户的评价完整视图
+      parameters:
+      - description: 用户 ID (UUID)
+        in: query
+        name: userID
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.ReviewFull'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 按用户查询完整评价
+      tags:
+      - reports
+  /reports/room-details:
+    get:
+      description: 分页查询客房详情视图，支持按省份、城市、区县、星级、价格范围筛选
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 省份
+        in: query
+        name: province
+        type: string
+      - description: 城市
+        in: query
+        name: city
+        type: string
+      - description: 区县
+        in: query
+        name: district
+        type: string
+      - description: 星级
+        in: query
+        name: starLevel
+        type: integer
+      - description: 最低价格
+        in: query
+        name: minPrice
+        type: number
+      - description: 最高价格
+        in: query
+        name: maxPrice
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.RoomDetails'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 客房详情报表
+      tags:
+      - reports
+  /reports/room-details/by-hotel:
+    get:
+      description: 根据酒店 ID 分页查询该酒店的客房详情
+      parameters:
+      - description: 酒店 ID (UUID)
+        in: query
+        name: hotelID
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.RoomDetails'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 按酒店查询客房详情
+      tags:
+      - reports
+  /reports/user-vip:
+    get:
+      description: 分页查询用户 VIP 视图，支持按角色筛选
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 角色筛选
+        in: query
+        name: role
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.UserVip'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 用户 VIP 报表
+      tags:
+      - reports
+  /reviews:
+    get:
+      description: 分页查询全部评价列表
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Review'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 查询全部评价
+      tags:
+      - reviews
+    post:
+      consumes:
+      - application/json
+      description: 创建新评价记录
+      parameters:
+      - description: 评价信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.Review'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Review'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 创建评价
+      tags:
+      - reviews
+  /reviews/{id}:
+    delete:
+      description: 根据 UUID 硬删除评价
+      parameters:
+      - description: 评价 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除评价
+      tags:
+      - reviews
+    get:
+      description: 根据 UUID 查询单个评价信息（含关联用户、酒店、订单）
+      parameters:
+      - description: 评价 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Review'
+              type: object
+        "400":
+          description: 无效的评价 ID
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: 评价不存在
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 查询评价详情
+      tags:
+      - reviews
+    put:
+      consumes:
+      - application/json
+      description: 根据 UUID 更新评价的评分和内容
+      parameters:
+      - description: 评价 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 评分和内容
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.updateReviewInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Review'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新评价
+      tags:
+      - reviews
+  /reviews/by-hotel:
+    get:
+      description: 根据酒店 ID 分页查询该酒店的全部评价
+      parameters:
+      - description: 酒店 ID (UUID)
+        in: query
+        name: hotelID
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Review'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 按酒店查询评价
+      tags:
+      - reviews
+  /reviews/by-user:
+    get:
+      description: 根据用户 ID 分页查询该用户的全部评价
+      parameters:
+      - description: 用户 ID (UUID)
+        in: query
+        name: userID
+        required: true
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Review'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 按用户查询评价
+      tags:
+      - reviews
+  /rooms:
+    get:
+      description: 分页查询客房列表，支持按酒店 ID 筛选
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 酒店 ID (UUID)
+        in: query
+        name: hotelID
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.Room'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 查询客房列表
+      tags:
+      - rooms
+    post:
+      consumes:
+      - application/json
+      description: 为指定酒店创建新房型
+      parameters:
+      - description: 客房信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.Room'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Room'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 创建客房
+      tags:
+      - rooms
+  /rooms/{id}:
+    delete:
+      description: 根据 UUID 软删除客房
+      parameters:
+      - description: 客房 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除客房
+      tags:
+      - rooms
+    get:
+      description: 根据 UUID 查询单个客房信息
+      parameters:
+      - description: 客房 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Room'
+              type: object
+        "400":
+          description: 无效的客房 ID
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: 客房不存在
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 查询客房详情
+      tags:
+      - rooms
+    put:
+      consumes:
+      - application/json
+      description: 根据 UUID 更新客房信息
+      parameters:
+      - description: 客房 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新的客房信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.Room'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.Room'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新客房信息
+      tags:
+      - rooms
+  /users:
+    get:
+      description: 分页查询用户列表，支持按角色筛选
+      parameters:
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      - description: 角色筛选
+        in: query
+        name: role
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_schema.User'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 查询用户列表
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: 创建新用户（管理员操作），密码自动 bcrypt 哈希
+      parameters:
+      - description: 用户信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.User'
+              type: object
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 创建用户
+      tags:
+      - users
+  /users/{id}:
+    delete:
+      description: 根据 UUID 软删除用户
+      parameters:
+      - description: 用户 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除用户
+      tags:
+      - users
+    get:
+      description: 根据 UUID 查询单个用户信息
+      parameters:
+      - description: 用户 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.User'
+              type: object
+        "400":
+          description: 无效的用户 ID
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: 用户不存在
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 查询用户详情
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: 根据 UUID 更新用户信息
+      parameters:
+      - description: 用户 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新的用户信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新用户信息
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    description: JWT Bearer Token，格式 "Bearer <token>"
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

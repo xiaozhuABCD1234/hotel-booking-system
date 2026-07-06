@@ -34,7 +34,18 @@ type statusBody struct {
 	Status model.OrderStatus `json:"status"`
 }
 
-// List 查询全部订单（分页）
+// List 查询全部订单（分页）。
+//
+//	@Summary		查询全部订单
+//	@Description	分页查询全部订单列表
+//	@Tags			orders
+//	@Produce		json
+//	@Param			page		query		int		false	"页码"			default(1)
+//	@Param			pageSize	query		int		false	"每页数量"		default(10)
+//	@Success		200			{object}	model.Response{data=[]model.Order}
+//	@Failure		500			{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/orders [get]
 func (h *OrderHandler) List(c fiber.Ctx) error {
 	var q paginationQuery
 	if err := c.Bind().Query(&q); err != nil {
@@ -56,7 +67,19 @@ func (h *OrderHandler) List(c fiber.Ctx) error {
 	return appmodel.SendSuccess(c, appmodel.WithData(orders), appmodel.WithPagination(total, q.Page, q.PageSize))
 }
 
-// GetByID 根据 ID 查询订单详情
+// GetByID 根据 ID 查询订单详情。
+//
+//	@Summary		查询订单详情
+//	@Description	根据 UUID 查询单个订单信息
+//	@Tags			orders
+//	@Produce		json
+//	@Param			id		path		string	true	"订单 ID (UUID)"
+//	@Success		200		{object}	model.Response{data=model.Order}
+//	@Failure		400		{object}	model.Response	"无效的订单 ID"
+//	@Failure		404		{object}	model.Response	"订单不存在"
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/orders/{id} [get]
 func (h *OrderHandler) GetByID(c fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -71,7 +94,19 @@ func (h *OrderHandler) GetByID(c fiber.Ctx) error {
 	return appmodel.SendSuccess(c, appmodel.WithData(order))
 }
 
-// Create 创建订单（事务，含入住人）
+// Create 创建订单（事务，含入住人），返回 201 Created。
+//
+//	@Summary		创建订单
+//	@Description	创建新订单（含入住人信息），返回 201 Created
+//	@Tags			orders
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		model.Order	true	"订单信息"
+//	@Success		201		{object}	model.Response{data=model.Order}
+//	@Failure		400		{object}	model.Response	"请求参数无效"
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/orders [post]
 func (h *OrderHandler) Create(c fiber.Ctx) error {
 	var order model.Order
 	if err := c.Bind().Body(&order); err != nil {
@@ -97,7 +132,22 @@ func (h *OrderHandler) Create(c fiber.Ctx) error {
 	})
 }
 
-// UpdateStatus 更新订单状态
+// UpdateStatus 更新订单状态。
+//
+//	@Summary		更新订单状态
+//	@Description	根据 UUID 更新订单状态（如已预订→已入住）
+//	@Tags			orders
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		string		true	"订单 ID (UUID)"
+//	@Param			body	body		statusBody	true	"状态更新请求"
+//	@Success		200		{object}	model.Response{data=model.Order}
+//	@Failure		400		{object}	model.Response
+//	@Failure		404		{object}	model.Response
+//	@Failure		409		{object}	model.Response	"非法状态转换"
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/orders/{id}/status [put]
 func (h *OrderHandler) UpdateStatus(c fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -124,7 +174,19 @@ func (h *OrderHandler) UpdateStatus(c fiber.Ctx) error {
 	return appmodel.SendSuccess(c, appmodel.WithData(order))
 }
 
-// Delete 硬删除订单
+// Delete 硬删除订单。
+//
+//	@Summary		删除订单
+//	@Description	根据 UUID 硬删除订单
+//	@Tags			orders
+//	@Produce		json
+//	@Param			id		path		string	true	"订单 ID (UUID)"
+//	@Success		200		{object}	model.Response
+//	@Failure		400		{object}	model.Response
+//	@Failure		404		{object}	model.Response
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/orders/{id} [delete]
 func (h *OrderHandler) Delete(c fiber.Ctx) error {
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
@@ -144,7 +206,20 @@ type userIDQuery struct {
 	paginationQuery
 }
 
-// ListByUserID 根据用户 ID 查询订单列表（分页）
+// ListByUserID 根据用户 ID 查询订单列表（分页）。
+//
+//	@Summary		按用户查询订单
+//	@Description	根据用户 ID 分页查询该用户的全部订单
+//	@Tags			orders
+//	@Produce		json
+//	@Param			userID		query		string	true	"用户 ID (UUID)"
+//	@Param			page		query		int		false	"页码"			default(1)
+//	@Param			pageSize	query		int		false	"每页数量"		default(10)
+//	@Success		200			{object}	model.Response{data=[]model.Order}
+//	@Failure		400			{object}	model.Response
+//	@Failure		500			{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/orders/by-user [get]
 func (h *OrderHandler) ListByUserID(c fiber.Ctx) error {
 	var q userIDQuery
 	if err := c.Bind().Query(&q); err != nil {
@@ -172,7 +247,20 @@ type hotelIDQuery struct {
 	paginationQuery
 }
 
-// ListByHotelID 根据酒店 ID 查询订单列表（分页）
+// ListByHotelID 根据酒店 ID 查询订单列表（分页）。
+//
+//	@Summary		按酒店查询订单
+//	@Description	根据酒店 ID 分页查询该酒店的全部订单
+//	@Tags			orders
+//	@Produce		json
+//	@Param			hotelID		query		string	true	"酒店 ID (UUID)"
+//	@Param			page		query		int		false	"页码"			default(1)
+//	@Param			pageSize	query		int		false	"每页数量"		default(10)
+//	@Success		200			{object}	model.Response{data=[]model.Order}
+//	@Failure		400			{object}	model.Response
+//	@Failure		500			{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/orders/by-hotel [get]
 func (h *OrderHandler) ListByHotelID(c fiber.Ctx) error {
 	var q hotelIDQuery
 	if err := c.Bind().Query(&q); err != nil {

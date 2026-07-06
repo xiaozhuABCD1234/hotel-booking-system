@@ -53,7 +53,17 @@ const passwordMinLen = 6
 
 // Register 用户注册，创建账户并返回 JWT 访问令牌。
 //
-//	POST /api/v1/auth/register
+//	@Summary		用户注册
+//	@Description	创建新账户并返回 JWT 访问令牌
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		registerRequest					true	"注册信息"
+//	@Success		200		{object}	model.Response{data=tokenResponse}
+//	@Failure		400		{object}	model.Response	"请求参数无效"
+//	@Failure		409		{object}	model.Response	"用户名已存在"
+//	@Failure		500		{object}	model.Response	"服务器错误"
+//	@Router			/auth/register [post]
 func (h *AuthHandler) Register(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -113,7 +123,17 @@ func (h *AuthHandler) Register(c fiber.Ctx) error {
 
 // Login 用户登录，验证凭据并返回 JWT 访问令牌。
 //
-//	POST /api/v1/auth/login
+//	@Summary		用户登录
+//	@Description	验证用户名密码并返回 JWT 访问令牌
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		loginRequest					true	"登录凭据"
+//	@Success		200		{object}	model.Response{data=tokenResponse}
+//	@Failure		400		{object}	model.Response	"请求参数无效"
+//	@Failure		401		{object}	model.Response	"用户名或密码错误"
+//	@Failure		500		{object}	model.Response	"服务器错误"
+//	@Router			/auth/login [post]
 func (h *AuthHandler) Login(c fiber.Ctx) error {
 	ctx := c.Context()
 
@@ -147,7 +167,13 @@ func (h *AuthHandler) Login(c fiber.Ctx) error {
 
 // Refresh 刷新令牌（暂未实现，保留接口待后续开发）。
 //
-//	POST /api/v1/auth/refresh
+//	@Summary		刷新令牌
+//	@Description	刷新访问令牌（暂未实现，返回 501）
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Success		501	{object}	model.Response	"暂未实现"
+//	@Router			/auth/refresh [post]
 func (h *AuthHandler) Refresh(c fiber.Ctx) error {
 	return model.SendError(c, http.StatusNotImplemented, "Refresh token not yet implemented")
 }
@@ -156,7 +182,12 @@ func (h *AuthHandler) Refresh(c fiber.Ctx) error {
 
 // Logout 登出（无状态 JWT，服务端不存储令牌，客户端自行丢弃令牌即可）。
 //
-//	POST /api/v1/auth/logout
+//	@Summary		登出
+//	@Description	登出当前用户（客户端自行丢弃 JWT 令牌）
+//	@Tags			auth
+//	@Produce		json
+//	@Success		200	{object}	model.Response
+//	@Router			/auth/logout [post]
 func (h *AuthHandler) Logout(c fiber.Ctx) error {
 	return model.SendSuccess(c, model.WithMessage("Logged out — discard your access token on the client"))
 }
