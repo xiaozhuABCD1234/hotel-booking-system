@@ -333,7 +333,7 @@ func TestGuestBookingStatsRepo_FindByIDCard(t *testing.T) {
 	ctx := context.Background()
 
 	// Create dependencies: VipLevel → User → Person → Region → Hotel → Room → Order → OrderGuest
-	if err := tx.WithContext(ctx).Exec("INSERT INTO vip_level_1718 (level, level_name, min_points, discount_rate) VALUES (?, ?, ?, ?)", 0, "普通会员", 0, 1.0).Error; err != nil {
+	if err := tx.WithContext(ctx).Exec("INSERT INTO vip_level_1718 (level, level_name, min_points, discount_rate) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING", 0, "普通会员", 0, 1.0).Error; err != nil {
 		t.Fatalf("Create vip level failed: %v", err)
 	}
 

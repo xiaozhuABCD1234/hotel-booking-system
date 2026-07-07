@@ -152,11 +152,14 @@ func TestHotelRepo_FindAll_Pagination(t *testing.T) {
 	repo := NewHotelRepo(tx)
 
 	region := createTestRegion(t, tx)
+
+	// 按 region 过滤，避免预存数据干扰分页测试
+	regionID := region.ID
 	for i := 0; i < 3; i++ {
-		createTestHotel(t, tx, region.ID, "Paginated Hotel")
+		createTestHotel(t, tx, regionID, "Paginated Hotel")
 	}
 
-	results, total, err := repo.FindAll(ctx, 0, 2, nil, nil, "")
+	results, total, err := repo.FindAll(ctx, 0, 2, &regionID, nil, "")
 	if err != nil {
 		t.Fatalf("FindAll(0,2) failed: %v", err)
 	}
@@ -167,7 +170,7 @@ func TestHotelRepo_FindAll_Pagination(t *testing.T) {
 		t.Errorf("page size mismatch: got %d, want 2", len(results))
 	}
 
-	results, total, err = repo.FindAll(ctx, 2, 2, nil, nil, "")
+	results, total, err = repo.FindAll(ctx, 2, 2, &regionID, nil, "")
 	if err != nil {
 		t.Fatalf("FindAll(2,2) failed: %v", err)
 	}

@@ -39,7 +39,7 @@ func createTestVipLevel(t *testing.T, tx *gorm.DB, level int16, name string, min
 		DiscountRate: discount,
 	}
 	if err := tx.Exec(
-		"INSERT INTO vip_level_1718 (level, level_name, min_points, discount_rate) VALUES (?, ?, ?, ?)",
+		"INSERT INTO vip_level_1718 (level, level_name, min_points, discount_rate) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING",
 		level, name, minPoints, discount,
 	).Error; err != nil {
 		t.Fatalf("failed to create test vip level: %v", err)
@@ -125,17 +125,26 @@ func TestUserRepo_FindAll_Pagination(t *testing.T) {
 	createTestVipLevel(t, tx, 0, "普通会员", 0, 1.0)
 
 	repo := NewUserRepo(tx)
+
+	// 获取数据库中已有用户数作为基线
+	_, baseline, err := repo.FindAll(context.Background(), 0, 0, nil)
+	if err != nil {
+		t.Fatalf("FindAll baseline failed: %v", err)
+	}
+
 	for i := 0; i < 5; i++ {
 		createTestUser(t, repo, "pagination_user_"+string(rune('a'+i)))
 	}
+
+	expectedTotal := baseline + 5
 
 	// Page 1: offset=0, limit=2
 	results, total, err := repo.FindAll(context.Background(), 0, 2, nil)
 	if err != nil {
 		t.Fatalf("FindAll page 1 failed: %v", err)
 	}
-	if total != 5 {
-		t.Errorf("total mismatch: got %d, want 5", total)
+	if total != expectedTotal {
+		t.Errorf("total mismatch: got %d, want %d", total, expectedTotal)
 	}
 	if len(results) != 2 {
 		t.Errorf("page 1 length mismatch: got %d, want 2", len(results))
@@ -155,11 +164,11 @@ func TestUserRepo_FindAll_Pagination(t *testing.T) {
 	if err != nil {
 		t.Fatalf("FindAll no pagination failed: %v", err)
 	}
-	if len(results) != 5 {
-		t.Errorf("no pagination length mismatch: got %d, want 5", len(results))
+	if int64(len(results)) != expectedTotal {
+		t.Errorf("no pagination length mismatch: got %d, want %d", len(results), expectedTotal)
 	}
-	if total != 5 {
-		t.Errorf("no pagination total mismatch: got %d, want 5", total)
+	if total != expectedTotal {
+		t.Errorf("no pagination total mismatch: got %d, want %d", total, expectedTotal)
 	}
 }
 
@@ -169,6 +178,14 @@ func TestUserRepo_FindAll_RoleFilter(t *testing.T) {
 	createTestVipLevel(t, tx, 0, "普通会员", 0, 1.0)
 
 	repo := NewUserRepo(tx)
+
+	// 获取数据库中已有 customer 用户数作为基线
+	role := model.RoleCustomer
+	_, baseline, err := repo.FindAll(context.Background(), 0, 0, &role)
+	if err != nil {
+		t.Fatalf("FindAll baseline failed: %v", err)
+	}
+
 	createTestUser(t, repo, "role_customer_1")
 	createTestUser(t, repo, "role_customer_2")
 	adminUser := &model.User{
@@ -183,16 +200,16 @@ func TestUserRepo_FindAll_RoleFilter(t *testing.T) {
 		t.Fatalf("failed to create admin user: %v", err)
 	}
 
-	role := model.RoleCustomer
+	expectedTotal := baseline + 2
 	results, total, err := repo.FindAll(context.Background(), 0, 0, &role)
 	if err != nil {
 		t.Fatalf("FindAll with role filter failed: %v", err)
 	}
-	if total != 2 {
-		t.Errorf("total mismatch: got %d, want 2", total)
+	if total != expectedTotal {
+		t.Errorf("total mismatch: got %d, want %d", total, expectedTotal)
 	}
-	if len(results) != 2 {
-		t.Errorf("results length mismatch: got %d, want 2", len(results))
+	if int64(len(results)) != expectedTotal {
+		t.Errorf("results length mismatch: got %d, want %d", len(results), expectedTotal)
 	}
 	for _, u := range results {
 		if u.Role != model.RoleCustomer {
@@ -281,21 +298,20 @@ func TestUserRepo_UpdatePoints(t *testing.T) {
 func TestVipLevelRepo_FindAll(t *testing.T) {
 	tx := txRepo(t)
 	repo := NewVipLevelRepo(tx)
-	createTestVipLevel(t, tx, 0, "普通会员", 0, 1.0)
-	createTestVipLevel(t, tx, 1, "黄金会员", 1000, 0.95)
 
 	results, err := repo.FindAll(context.Background())
 	if err != nil {
 		t.Fatalf("FindAll failed: %v", err)
 	}
-	if len(results) != 2 {
-		t.Fatalf("length mismatch: got %d, want 2", len(results))
+	// insert.sql 已预置 4 个等级（0~3）
+	if len(results) != 4 {
+		t.Fatalf("length mismatch: got %d, want 4", len(results))
 	}
 	if results[0].Level != 0 {
 		t.Errorf("first level mismatch: got %d, want 0", results[0].Level)
 	}
-	if results[1].Level != 1 {
-		t.Errorf("second level mismatch: got %d, want 1", results[1].Level)
+	if results[3].Level != 3 {
+		t.Errorf("last level mismatch: got %d, want 3", results[3].Level)
 	}
 }
 
@@ -303,25 +319,23 @@ func TestVipLevelRepo_FindAll(t *testing.T) {
 func TestVipLevelRepo_FindByMinPoints(t *testing.T) {
 	tx := txRepo(t)
 	repo := NewVipLevelRepo(tx)
-	createTestVipLevel(t, tx, 0, "普通会员", 0, 1.0)
-	createTestVipLevel(t, tx, 1, "黄金会员", 1000, 0.95)
 
-	// 500 points → level 0
+	// 500 points → level 2 (黄金会员, min_points=500)
 	vip, err := repo.FindByMinPoints(context.Background(), 500)
 	if err != nil {
 		t.Fatalf("FindByMinPoints(500) failed: %v", err)
 	}
-	if vip.Level != 0 {
-		t.Errorf("level mismatch for 500 points: got %d, want 0", vip.Level)
+	if vip.Level != 2 {
+		t.Errorf("level mismatch for 500 points: got %d, want 2", vip.Level)
 	}
 
-	// 2000 points → level 1
+	// 2000 points → level 3 (钻石会员, min_points=2000)
 	vip, err = repo.FindByMinPoints(context.Background(), 2000)
 	if err != nil {
 		t.Fatalf("FindByMinPoints(2000) failed: %v", err)
 	}
-	if vip.Level != 1 {
-		t.Errorf("level mismatch for 2000 points: got %d, want 1", vip.Level)
+	if vip.Level != 3 {
+		t.Errorf("level mismatch for 2000 points: got %d, want 3", vip.Level)
 	}
 }
 

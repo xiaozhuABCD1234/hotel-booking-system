@@ -29,7 +29,7 @@ func setupReviewDeps(t *testing.T, tx *gorm.DB) (*model.Region, *model.Hotel, *m
 	}
 	vip := &model.VipLevel{Level: 0, LevelName: "普通会员", MinPoints: 0, DiscountRate: 1.0}
 	if err := tx.Exec(
-		"INSERT INTO vip_level_1718 (level, level_name, min_points, discount_rate) VALUES (?, ?, ?, ?)",
+		"INSERT INTO vip_level_1718 (level, level_name, min_points, discount_rate) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING",
 		vip.Level, vip.LevelName, vip.MinPoints, vip.DiscountRate,
 	).Error; err != nil {
 		t.Fatalf("vip level: %v", err)
