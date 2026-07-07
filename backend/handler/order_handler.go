@@ -204,6 +204,9 @@ func (h *OrderHandler) Delete(c fiber.Ctx) error {
 	}
 
 	if err := h.orders.Delete(c.Context(), id); err != nil {
+		if isFKeyViolation(err) {
+			return appmodel.SendError(c, http.StatusConflict, "Cannot delete order with existing reviews, please delete reviews first")
+		}
 		return err
 	}
 

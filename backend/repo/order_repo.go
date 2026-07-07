@@ -28,7 +28,10 @@ func (r *OrderRepo) Create(ctx context.Context, order *model.Order) error {
 			return err
 		}
 		if len(order.Guests) > 0 {
-			if err := tx.CreateInBatches(order.Guests, len(order.Guests)).Error; err != nil {
+			for i := range order.Guests {
+				order.Guests[i].OrderID = order.ID
+			}
+			if err := tx.Omit("Order", "Person").CreateInBatches(order.Guests, len(order.Guests)).Error; err != nil {
 				return err
 			}
 		}
