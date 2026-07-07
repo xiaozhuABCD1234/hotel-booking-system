@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores'
-import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -16,7 +15,6 @@ import { Building2, LogOut, User, ShoppingBag, Hotel } from '@lucide/vue'
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
-const mobileMenuOpen = ref(false)
 
 const navLinks = [
   { to: '/', label: '首页', icon: Hotel },
