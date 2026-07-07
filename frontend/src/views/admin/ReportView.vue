@@ -121,11 +121,12 @@ async function fetchGuestData() {
   }
 }
 
-function handleTabChange(tab: string) {
-  activeTab.value = tab
-  if (tab === 'hotel' && hotelData.value.length === 0) fetchHotelSummaries()
-  if (tab === 'vip' && vipData.value.length === 0) fetchUserVip()
-  if (tab === 'guest' && topGuests.value.length === 0) fetchGuestData()
+function handleTabChange(tab: string | number) {
+  const t = String(tab)
+  activeTab.value = t
+  if (t === 'hotel' && hotelData.value.length === 0) fetchHotelSummaries()
+  if (t === 'vip' && vipData.value.length === 0) fetchUserVip()
+  if (t === 'guest' && topGuests.value.length === 0) fetchGuestData()
 }
 
 onMounted(() => {

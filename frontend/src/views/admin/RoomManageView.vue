@@ -278,7 +278,7 @@ onMounted(() => {
             <Label>所属酒店 *</Label>
             <Select
               :model-value="form.hotelId"
-              @update:model-value="form.hotelId = $event"
+              @update:model-value="(v) => form.hotelId = v as string"
             >
               <SelectTrigger>
                 <SelectValue placeholder="请选择酒店" />
@@ -305,7 +305,8 @@ onMounted(() => {
             <Input
               id="price"
               type="number"
-              v-model="form.price"
+              :model-value="form.price?.toString() ?? ''"
+              @update:model-value="(v) => form.price = v ? Number(v) : null"
               placeholder="请输入价格"
               :min="0"
               :step="0.01"
@@ -318,7 +319,8 @@ onMounted(() => {
               <Input
                 id="totalCount"
                 type="number"
-                v-model="form.totalCount"
+                :model-value="form.totalCount?.toString() ?? ''"
+                @update:model-value="(v) => form.totalCount = v ? Number(v) : null"
                 placeholder="总数"
                 :min="0"
               />
@@ -329,7 +331,8 @@ onMounted(() => {
               <Input
                 id="availableCount"
                 type="number"
-                v-model="form.availableCount"
+                :model-value="form.availableCount?.toString() ?? ''"
+                @update:model-value="(v) => form.availableCount = v ? Number(v) : null"
                 placeholder="可用数"
                 :min="0"
               />
