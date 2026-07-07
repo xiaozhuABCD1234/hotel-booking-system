@@ -114,22 +114,24 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	// 订单管理（需认证）
 	protectedOrders := protected.Group("/orders")
 	protectedOrders.Get("/", orderH.List)
+	// 静态路由必须在 :id 参数路由之前注册
+	protectedOrders.Get("/by-user", orderH.ListByUserID)
+	protectedOrders.Get("/by-hotel", orderH.ListByHotelID)
 	protectedOrders.Get("/:id", orderH.GetByID)
 	protectedOrders.Post("/", orderH.Create)
 	protectedOrders.Put("/:id/status", orderH.UpdateStatus)
 	protectedOrders.Delete("/:id", orderH.Delete)
-	protectedOrders.Get("/by-user", orderH.ListByUserID)
-	protectedOrders.Get("/by-hotel", orderH.ListByHotelID)
 
 	// 评价管理（需认证）
 	protectedReviews := protected.Group("/reviews")
 	protectedReviews.Get("/", reviewH.List)
+	// 静态路由必须在 :id 参数路由之前注册
+	protectedReviews.Get("/by-hotel", reviewH.ListByHotelID)
+	protectedReviews.Get("/by-user", reviewH.ListByUserID)
 	protectedReviews.Get("/:id", reviewH.GetByID)
 	protectedReviews.Post("/", reviewH.Create)
 	protectedReviews.Put("/:id", reviewH.Update)
 	protectedReviews.Delete("/:id", reviewH.Delete)
-	protectedReviews.Get("/by-hotel", reviewH.ListByHotelID)
-	protectedReviews.Get("/by-user", reviewH.ListByUserID)
 
 	// 人员管理（需认证）
 	protectedPersons := protected.Group("/persons")

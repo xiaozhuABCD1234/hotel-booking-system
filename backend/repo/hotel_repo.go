@@ -67,9 +67,9 @@ func (r *HotelRepo) FindAll(ctx context.Context, offset, limit int, regionID *in
 	return results, total, err
 }
 
-// Update 更新酒店记录，使用 FullSaveAssociations 自动处理关联图片的增删改。
+// Update 更新酒店记录（仅更新非零字段，不处理关联）。
 func (r *HotelRepo) Update(ctx context.Context, hotel *model.Hotel) error {
-	return r.db.WithContext(ctx).Session(&gorm.Session{FullSaveAssociations: true}).Save(hotel).Error
+	return r.db.WithContext(ctx).Save(hotel).Error
 }
 
 // Delete 软删除酒店记录，将 status 置为 0。
@@ -202,9 +202,9 @@ func (r *RoomRepo) FindAll(ctx context.Context, offset, limit int) ([]model.Room
 	return results, total, err
 }
 
-// Update 更新客房记录，使用 FullSaveAssociations 自动处理关联图片与设施的增删改。
+// Update 更新客房记录（仅更新非零字段，不处理关联）。
 func (r *RoomRepo) Update(ctx context.Context, room *model.Room) error {
-	return r.db.WithContext(ctx).Session(&gorm.Session{FullSaveAssociations: true}).Save(room).Error
+	return r.db.WithContext(ctx).Save(room).Error
 }
 
 // Delete 软删除客房记录，将 status 置为 0。

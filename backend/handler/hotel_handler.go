@@ -150,6 +150,16 @@ func (h *HotelHandler) Create(c fiber.Ctx) error {
 	})
 }
 
+// updateHotelInput 仅包含客户端可更新的酒店字段。
+type updateHotelInput struct {
+	HotelName   string  `json:"hotelName,omitempty"`
+	RegionID    *int    `json:"regionID,omitempty"`
+	Address     string  `json:"address,omitempty"`
+	Telephone   string  `json:"telephone,omitempty"`
+	StarLevel   *int16  `json:"starLevel,omitempty"`
+	Description *string `json:"description,omitempty"`
+}
+
 // Update 更新酒店信息。
 //
 //	@Summary		更新酒店信息
@@ -173,18 +183,40 @@ func (h *HotelHandler) Update(c fiber.Ctx) error {
 		return model.SendError(c, http.StatusBadRequest, "Invalid hotel ID")
 	}
 
-	var hotel schema.Hotel
-	if err := c.Bind().Body(&hotel); err != nil {
-		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
-	}
-
-	hotel.ID = id
-
-	if err := h.hotels.Update(ctx, &hotel); err != nil {
+	existing, err := h.hotels.FindByID(ctx, id)
+	if err != nil {
 		return err
 	}
 
-	return model.SendSuccess(c, model.WithData(hotel))
+	var input updateHotelInput
+	if err := c.Bind().Body(&input); err != nil {
+		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
+	}
+
+	if input.HotelName != "" {
+		existing.HotelName = input.HotelName
+	}
+	if input.RegionID != nil {
+		existing.RegionID = *input.RegionID
+	}
+	if input.Address != "" {
+		existing.Address = input.Address
+	}
+	if input.Telephone != "" {
+		existing.Telephone = input.Telephone
+	}
+	if input.StarLevel != nil {
+		existing.StarLevel = input.StarLevel
+	}
+	if input.Description != nil {
+		existing.Description = input.Description
+	}
+
+	if err := h.hotels.Update(ctx, existing); err != nil {
+		return err
+	}
+
+	return model.SendSuccess(c, model.WithData(existing))
 }
 
 // Delete 删除酒店（软删除）。
@@ -326,6 +358,17 @@ func (h *HotelHandler) CreateRoom(c fiber.Ctx) error {
 	})
 }
 
+// updateRoomInput 仅包含客户端可更新的客房字段。
+type updateRoomInput struct {
+	HotelID           *uuid.UUID `json:"hotelID,omitempty"`
+	TypeName          string     `json:"typeName,omitempty"`
+	TotalQuantity     *int32     `json:"totalQuantity,omitempty"`
+	AvailableQuantity *int32     `json:"availableQuantity,omitempty"`
+	Price             *float64   `json:"price,omitempty"`
+	WeekendPrice      *float64   `json:"weekendPrice,omitempty"`
+	Description       *string    `json:"description,omitempty"`
+}
+
 // UpdateRoom 更新客房信息。
 //
 //	@Summary		更新客房信息
@@ -349,18 +392,43 @@ func (h *HotelHandler) UpdateRoom(c fiber.Ctx) error {
 		return model.SendError(c, http.StatusBadRequest, "Invalid room ID")
 	}
 
-	var room schema.Room
-	if err := c.Bind().Body(&room); err != nil {
-		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
-	}
-
-	room.ID = id
-
-	if err := h.rooms.Update(ctx, &room); err != nil {
+	existing, err := h.rooms.FindByID(ctx, id)
+	if err != nil {
 		return err
 	}
 
-	return model.SendSuccess(c, model.WithData(room))
+	var input updateRoomInput
+	if err := c.Bind().Body(&input); err != nil {
+		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
+	}
+
+	if input.HotelID != nil {
+		existing.HotelID = *input.HotelID
+	}
+	if input.TypeName != "" {
+		existing.TypeName = input.TypeName
+	}
+	if input.TotalQuantity != nil {
+		existing.TotalQuantity = *input.TotalQuantity
+	}
+	if input.AvailableQuantity != nil {
+		existing.AvailableQuantity = *input.AvailableQuantity
+	}
+	if input.Price != nil {
+		existing.Price = *input.Price
+	}
+	if input.WeekendPrice != nil {
+		existing.WeekendPrice = input.WeekendPrice
+	}
+	if input.Description != nil {
+		existing.Description = input.Description
+	}
+
+	if err := h.rooms.Update(ctx, existing); err != nil {
+		return err
+	}
+
+	return model.SendSuccess(c, model.WithData(existing))
 }
 
 // DeleteRoom 删除客房（软删除）。

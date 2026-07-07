@@ -81,9 +81,9 @@ func (r *UserRepo) FindAll(ctx context.Context, offset, limit int, role *model.U
 	return results, total, err
 }
 
-// Update 更新用户指定字段，不修改 CreateAt。
+// Update 更新用户非零字段，不修改 CreateAt。
 func (r *UserRepo) Update(ctx context.Context, user *model.User) error {
-	return r.db.WithContext(ctx).Model(&model.User{}).Where("id = ?", user.ID).Select("username", "password", "phone", "email", "real_name", "id_card", "role", "points", "vip_level").Updates(user).Error
+	return r.db.WithContext(ctx).Model(&model.User{}).Where("id = ?", user.ID).Updates(user).Error
 }
 
 // UpdatePassword 更新用户密码。

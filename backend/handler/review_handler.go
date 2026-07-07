@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"backend/model"
@@ -115,6 +116,9 @@ func (h *ReviewHandler) Create(c fiber.Ctx) error {
 	}
 
 	if err := h.reviews.Create(ctx, &review); err != nil {
+		if strings.Contains(err.Error(), "violates foreign key constraint") {
+			return model.SendError(c, http.StatusBadRequest, "Referenced user, order, or hotel not found")
+		}
 		return err
 	}
 

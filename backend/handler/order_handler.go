@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	appmodel "backend/model"
@@ -32,6 +33,11 @@ type paginationQuery struct {
 // statusBody 状态更新请求体
 type statusBody struct {
 	Status model.OrderStatus `json:"status"`
+}
+
+// isFKeyViolation 判断 GORM 错误是否为外键约束违反。
+func isFKeyViolation(err error) bool {
+	return err != nil && strings.Contains(err.Error(), "violates foreign key constraint")
 }
 
 // List 查询全部订单（分页）。
@@ -122,7 +128,11 @@ func (h *OrderHandler) Create(c fiber.Ctx) error {
 	}
 
 	if err := h.orders.Create(c.Context(), &order); err != nil {
-		return err
+		if isFKeyViolation(err) {
+			return appmodel.SendError(c, http.StatusBadRequest, "Referenced user or room not found")
+		}
+		// Service 层校验错误（如无效状态、日期范围等）返回 400
+		return appmodel.SendError(c, http.StatusBadRequest, err.Error())
 	}
 
 	return c.Status(http.StatusCreated).JSON(appmodel.Response{

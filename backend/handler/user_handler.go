@@ -165,26 +165,68 @@ func (h *UserHandler) Create(c fiber.Ctx) error {
 //	@Failure		500		{object}	model.Response
 //	@Security		BearerAuth
 //	@Router			/users/{id} [put]
+// updateUserInput 仅包含客户端可更新的用户字段。
+type updateUserInput struct {
+	Username string  `json:"username,omitempty"`
+	Password string  `json:"password,omitempty"`
+	Phone    *string `json:"phone,omitempty"`
+	Email    *string `json:"email,omitempty"`
+	RealName *string `json:"realName,omitempty"`
+	IDCard   *string `json:"idCard,omitempty"`
+}
+
 func (h *UserHandler) Update(c fiber.Ctx) error {
 	ctx := c.Context()
 
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
+		return model.SendError(c, http.StatusBadRequest, "Invalid user ID")
+	}
+
+	// 查询已有记录
+	existing, err := h.users.FindByID(ctx, id)
+	if err != nil {
 		return err
 	}
 
-	var user schema.User
-	if err := c.Bind().Body(&user); err != nil {
+	// 绑定请求体中允许更新的字段
+	var input updateUserInput
+	if err := c.Bind().Body(&input); err != nil {
+		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
+	}
+
+	// 仅合并请求中显式提供的字段
+	if input.Username != "" {
+		existing.Username = input.Username
+	}
+	if input.Password != "" {
+		if len(input.Password) < passwordMinLen {
+			return model.SendError(c, http.StatusBadRequest, "Password must be at least 6 characters")
+		}
+		hashed, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
+		existing.Password = string(hashed)
+	}
+	if input.Phone != nil {
+		existing.Phone = input.Phone
+	}
+	if input.Email != nil {
+		existing.Email = input.Email
+	}
+	if input.RealName != nil {
+		existing.RealName = input.RealName
+	}
+	if input.IDCard != nil {
+		existing.IDCard = input.IDCard
+	}
+
+	if err := h.users.Update(ctx, existing); err != nil {
 		return err
 	}
 
-	user.ID = id
-
-	if err := h.users.Update(ctx, &user); err != nil {
-		return err
-	}
-
-	return model.SendSuccess(c, model.WithData(user))
+	return model.SendSuccess(c, model.WithData(existing))
 }
 
 // Delete 根据 ID 软删除用户。
