@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Hotel, DoorOpen, ShoppingBag, Users } from 'lucide-vue-next'
+import { Hotel, DoorOpen, ShoppingBag, Users } from '@lucide/vue'
 import { hotelApi, roomApi, orderApi, userApi } from '@/api'
 import type { Order, OrderStatus } from '@/types'
 

@@ -31,7 +31,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog'
-import { Users, Search, X } from 'lucide-vue-next'
+import { Users, Search, X } from '@lucide/vue'
 
 const users = ref<User[]>([])
 const loading = ref(false)

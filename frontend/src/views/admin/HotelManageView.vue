@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Plus, Pencil, Trash2, Star } from 'lucide-vue-next'
+import { Plus, Pencil, Trash2, Star } from '@lucide/vue'
 import { hotelApi, regionApi } from '@/api'
 import { toast } from 'vue-sonner'
 import type { Hotel, Region } from '@/types'

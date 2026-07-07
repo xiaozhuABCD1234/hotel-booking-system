@@ -39,7 +39,7 @@ import {
   Check,
   X,
   Calendar,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
 
 const orders = ref<Order[]>([])
 const loading = ref(false)
