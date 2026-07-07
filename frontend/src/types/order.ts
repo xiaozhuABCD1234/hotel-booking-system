@@ -1,3 +1,7 @@
+import type { Room } from './room'
+import type { Hotel } from './hotel'
+import type { User } from './user'
+
 export type OrderStatus = 'pending' | 'confirmed' | 'checked_in' | 'cancelled' | 'completed'
 
 export interface Order {

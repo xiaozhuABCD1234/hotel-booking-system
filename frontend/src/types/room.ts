@@ -1,3 +1,5 @@
+import type { Hotel } from './hotel'
+
 export interface Room {
   id: string
   hotelId: string

@@ -1,3 +1,6 @@
+import type { User } from './user'
+import type { Hotel } from './hotel'
+
 export interface Review {
   id: string
   userId: string

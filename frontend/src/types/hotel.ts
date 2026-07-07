@@ -1,3 +1,5 @@
+import type { Region } from './misc'
+
 export interface Hotel {
   id: string
   hotelName: string
