@@ -100,7 +100,7 @@ async function fetchOrders() {
   try {
     const res = await orderApi.list(currentPage.value, pageSize.value)
     if (res.data.data) {
-      orders.value = res.data.data.items
+      orders.value = res.data.data ?? []
       const p = res.data.pagination
       if (p) {
         totalPages.value = p.totalPages

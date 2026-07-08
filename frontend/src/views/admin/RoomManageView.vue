@@ -90,7 +90,7 @@ async function loadRooms() {
   loading.value = true
   try {
     const res = await roomApi.list({ page: currentPage.value, pageSize: pageSize.value })
-    rooms.value = res.data.data?.items ?? []
+    rooms.value = res.data.data ?? []
     totalPages.value = res.data.pagination?.totalPages ?? 1
   } catch (e: unknown) {
     console.error('Failed to load rooms:', e)
@@ -103,7 +103,7 @@ async function loadRooms() {
 async function loadHotels() {
   try {
     const res = await hotelApi.list({ page: 1, pageSize: 1000 })
-    hotels.value = res.data.data?.items ?? []
+    hotels.value = res.data.data ?? []
   } catch (e: unknown) {
     console.error('Failed to load hotels:', e)
   }

@@ -51,7 +51,7 @@ onMounted(async () => {
     roomCount.value = roomsRes.data.pagination?.totalItems ?? 0
     orderCount.value = ordersRes.data.pagination?.totalItems ?? 0
     userCount.value = usersRes.data.pagination?.totalItems ?? 0
-    recentOrders.value = ordersRes.data.data?.items ?? []
+    recentOrders.value = ordersRes.data.data ?? []
   } catch (error) {
     console.error('Failed to load dashboard data:', error)
   } finally {

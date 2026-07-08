@@ -93,7 +93,7 @@ async function loadHotels() {
   loading.value = true
   try {
     const res = await hotelApi.list({ page: currentPage.value, pageSize: pageSize.value })
-    hotels.value = res.data.data?.items ?? []
+    hotels.value = res.data.data ?? []
     totalPages.value = res.data.pagination?.totalPages ?? 1
   } catch (e: unknown) {
     console.error('Failed to load hotels:', e)

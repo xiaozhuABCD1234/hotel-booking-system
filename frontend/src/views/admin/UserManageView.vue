@@ -78,7 +78,7 @@ async function fetchUsers() {
   try {
     const res = await userApi.list(currentPage.value, pageSize.value)
     if (res.data.data) {
-      users.value = res.data.data.items
+      users.value = res.data.data ?? []
       const p = res.data.pagination
       if (p) {
         totalPages.value = p.totalPages
