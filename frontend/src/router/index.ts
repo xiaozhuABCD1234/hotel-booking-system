@@ -55,31 +55,37 @@ const router = createRouter({
           path: '',
           name: 'Dashboard',
           component: () => import('@/views/admin/DashboardView.vue'),
+          meta: { requiresAuth: true, requiresAdmin: true },
         },
         {
           path: 'hotels',
           name: 'HotelManage',
           component: () => import('@/views/admin/HotelManageView.vue'),
+          meta: { requiresAuth: true, requiresAdmin: true },
         },
         {
           path: 'rooms',
           name: 'RoomManage',
           component: () => import('@/views/admin/RoomManageView.vue'),
+          meta: { requiresAuth: true, requiresAdmin: true },
         },
         {
           path: 'orders',
           name: 'OrderManage',
           component: () => import('@/views/admin/OrderManageView.vue'),
+          meta: { requiresAuth: true, requiresAdmin: true },
         },
         {
           path: 'users',
           name: 'UserManage',
           component: () => import('@/views/admin/UserManageView.vue'),
+          meta: { requiresAuth: true, requiresAdmin: true },
         },
         {
           path: 'reports',
           name: 'Reports',
           component: () => import('@/views/admin/ReportView.vue'),
+          meta: { requiresAuth: true, requiresAdmin: true },
         },
       ],
     },
@@ -94,6 +100,8 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const auth = useAuthStore()
+
+  console.log('[Router]', 'to:', to.path, 'meta:', to.meta, 'isAdmin:', auth.isAdmin, 'user:', auth.user)
 
   // Guest-only routes (login/register): redirect to home if already logged in
   if (to.meta.guest && auth.isLoggedIn) {
