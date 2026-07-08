@@ -24,7 +24,7 @@ const recentOrders = ref<Order[]>([])
 
 const statusLabels: Record<OrderStatus, string> = {
   pending: '待确认',
-  confirmed: '已确认',
+  booked: '已预订',
   checked_in: '已入住',
   cancelled: '已取消',
   completed: '已完成',
@@ -32,7 +32,7 @@ const statusLabels: Record<OrderStatus, string> = {
 
 const statusVariants: Record<OrderStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   pending: 'secondary',
-  confirmed: 'default',
+  booked: 'default',
   checked_in: 'default',
   cancelled: 'destructive',
   completed: 'outline',

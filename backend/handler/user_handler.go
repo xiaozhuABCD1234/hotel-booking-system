@@ -168,12 +168,13 @@ func (h *UserHandler) Create(c fiber.Ctx) error {
 //
 // updateUserInput 仅包含客户端可更新的用户字段。
 type updateUserInput struct {
-	Username string  `json:"username,omitempty"`
-	Password string  `json:"password,omitempty"`
-	Phone    *string `json:"phone,omitempty"`
-	Email    *string `json:"email,omitempty"`
-	RealName *string `json:"realName,omitempty"`
-	IDCard   *string `json:"idCard,omitempty"`
+	Username string           `json:"username,omitempty"`
+	Password string           `json:"password,omitempty"`
+	Phone    *string          `json:"phone,omitempty"`
+	Email    *string          `json:"email,omitempty"`
+	RealName *string          `json:"realName,omitempty"`
+	IDCard   *string          `json:"idCard,omitempty"`
+	Role     *schema.UserRole `json:"role,omitempty"`
 }
 
 func (h *UserHandler) Update(c fiber.Ctx) error {
@@ -221,6 +222,9 @@ func (h *UserHandler) Update(c fiber.Ctx) error {
 	}
 	if input.IDCard != nil {
 		existing.IDCard = input.IDCard
+	}
+	if input.Role != nil {
+		existing.Role = *input.Role
 	}
 
 	if err := h.users.Update(ctx, existing); err != nil {

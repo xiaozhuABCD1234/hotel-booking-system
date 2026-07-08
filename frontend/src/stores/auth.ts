@@ -36,7 +36,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = {
       id: decoded.userId,
       username: '',
-      role: decoded.role as 'user' | 'admin',
+      role: decoded.role as 'customer' | 'vip' | 'hotel_manager' | 'admin',
       points: 0,
     }
 
@@ -50,7 +50,7 @@ export const useAuthStore = defineStore('auth', () => {
           username: u.username,
           phone: u.phone,
           email: u.email,
-          role: u.role as 'user' | 'admin',
+          role: u.role as 'customer' | 'vip' | 'hotel_manager' | 'admin',
           vipLevelId: u.vipLevelId,
           points: u.points,
         }

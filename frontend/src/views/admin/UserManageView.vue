@@ -43,19 +43,27 @@ const totalItems = ref(0)
 
 const editDialogOpen = ref(false)
 const editUser = ref<User | null>(null)
-const editRole = ref<'user' | 'admin'>('user')
+const editRole = ref<'customer' | 'vip' | 'hotel_manager' | 'admin'>('customer')
 
 const deleteDialogOpen = ref(false)
 const deleteTargetUser = ref<User | null>(null)
 
 const roleBadgeClass = (role: string): string => {
-  if (role === 'admin') return 'bg-purple-100 text-purple-800 border-purple-200'
-  return 'bg-gray-100 text-gray-800 border-gray-200'
+  switch (role) {
+    case 'admin': return 'bg-purple-100 text-purple-800 border-purple-200'
+    case 'hotel_manager': return 'bg-blue-100 text-blue-800 border-blue-200'
+    case 'vip': return 'bg-amber-100 text-amber-800 border-amber-200'
+    default: return 'bg-gray-100 text-gray-800 border-gray-200'
+  }
 }
 
 const roleLabel = (role: string): string => {
-  if (role === 'admin') return '管理员'
-  return '普通用户'
+  switch (role) {
+    case 'admin': return '系统管理员'
+    case 'hotel_manager': return '酒店管理员'
+    case 'vip': return 'VIP用户'
+    default: return '普通用户'
+  }
 }
 
 const statusBadgeClass = (status: number): string => {
@@ -284,8 +292,10 @@ onMounted(() => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="user">普通用户</SelectItem>
-                <SelectItem value="admin">管理员</SelectItem>
+                <SelectItem value="customer">普通用户</SelectItem>
+                <SelectItem value="vip">VIP用户</SelectItem>
+                <SelectItem value="hotel_manager">酒店管理员</SelectItem>
+                <SelectItem value="admin">系统管理员</SelectItem>
               </SelectContent>
             </Select>
           </div>

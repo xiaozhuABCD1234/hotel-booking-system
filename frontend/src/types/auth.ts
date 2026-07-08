@@ -30,7 +30,7 @@ export interface UserInfo {
   username: string
   phone?: string
   email?: string
-  role: 'user' | 'admin'
+  role: 'customer' | 'vip' | 'hotel_manager' | 'admin'
   vipLevelId?: number
   points: number
 }

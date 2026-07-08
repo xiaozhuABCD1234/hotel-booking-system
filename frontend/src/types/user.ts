@@ -3,7 +3,7 @@ export interface User {
   username: string
   phone?: string
   email?: string
-  role: 'user' | 'admin'
+  role: 'customer' | 'vip' | 'hotel_manager' | 'admin'
   vipLevelId?: number
   points: number
   createAt: string
@@ -29,11 +29,11 @@ export interface CreateUserRequest {
   password: string
   phone?: string
   email?: string
-  role?: 'user' | 'admin'
+  role?: 'customer' | 'vip' | 'hotel_manager' | 'admin'
 }
 
 export interface UpdateUserRequest {
   phone?: string
   email?: string
-  role?: 'user' | 'admin'
+  role?: 'customer' | 'vip' | 'hotel_manager' | 'admin'
 }

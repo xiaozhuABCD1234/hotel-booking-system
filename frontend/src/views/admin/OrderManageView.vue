@@ -62,7 +62,7 @@ const deleteTargetOrder = ref<Order | null>(null)
 const statusOptions: { value: string; label: string }[] = [
   { value: 'all', label: '全部状态' },
   { value: 'pending', label: '待确认' },
-  { value: 'confirmed', label: '已确认' },
+  { value: 'booked', label: '已预订' },
   { value: 'checked_in', label: '已入住' },
   { value: 'cancelled', label: '已取消' },
   { value: 'completed', label: '已完成' },
@@ -71,7 +71,7 @@ const statusOptions: { value: string; label: string }[] = [
 const statusBadgeClass = (status: OrderStatus): string => {
   const map: Record<OrderStatus, string> = {
     pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    confirmed: 'bg-blue-100 text-blue-800 border-blue-200',
+    booked: 'bg-blue-100 text-blue-800 border-blue-200',
     checked_in: 'bg-green-100 text-green-800 border-green-200',
     cancelled: 'bg-red-100 text-red-800 border-red-200',
     completed: 'bg-gray-100 text-gray-800 border-gray-200',
@@ -82,7 +82,7 @@ const statusBadgeClass = (status: OrderStatus): string => {
 const statusLabel = (status: OrderStatus): string => {
   const map: Record<OrderStatus, string> = {
     pending: '待确认',
-    confirmed: '已确认',
+    booked: '已预订',
     checked_in: '已入住',
     cancelled: '已取消',
     completed: '已完成',
@@ -410,7 +410,7 @@ onMounted(() => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="pending">待确认</SelectItem>
-                <SelectItem value="confirmed">已确认</SelectItem>
+                <SelectItem value="booked">已预订</SelectItem>
                 <SelectItem value="checked_in">已入住</SelectItem>
                 <SelectItem value="cancelled">已取消</SelectItem>
                 <SelectItem value="completed">已完成</SelectItem>
