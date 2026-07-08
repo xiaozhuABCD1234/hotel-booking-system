@@ -97,17 +97,17 @@ router.beforeEach((to, _from, next) => {
 
   // Guest-only routes (login/register): redirect to home if already logged in
   if (to.meta.guest && auth.isLoggedIn) {
-    return next({ name: 'Home' })
+    return next({ name: 'Home', replace: true })
   }
 
   // Auth-required routes
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
-    return next({ name: 'Login', query: { redirect: to.fullPath } })
+    return next({ name: 'Login', query: { redirect: to.fullPath }, replace: true })
   }
 
   // Admin-only routes
   if (to.meta.requiresAdmin && !auth.isAdmin) {
-    return next({ name: 'Home' })
+    return next({ name: 'Home', replace: true })
   }
 
   next()

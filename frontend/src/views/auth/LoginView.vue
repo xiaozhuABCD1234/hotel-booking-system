@@ -56,7 +56,7 @@ async function handleSubmit() {
     if (res.success) {
       // 管理员默认跳转后台，普通用户跳转首页
       const redirect = (route.query.redirect as string) || (auth.isAdmin ? '/admin' : '/')
-      await router.push(redirect)
+      await router.replace(redirect)
     } else {
       toast.error(res.error?.message || '登录失败，请重试')
     }
