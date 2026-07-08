@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { userApi } from '@/api/user'
 import type { User } from '@/types'
 import { toast } from 'vue-sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -84,8 +85,8 @@ async function fetchUsers() {
         totalItems.value = p.totalItems
       }
     }
-  } catch {
-    toast.error('获取用户列表失败')
+  } catch (e: unknown) {
+    toast.error(getApiErrorMessage(e, '获取用户列表失败'))
   } finally {
     loading.value = false
   }
@@ -104,8 +105,8 @@ async function confirmEdit() {
     toast.success('用户角色已更新')
     editDialogOpen.value = false
     await fetchUsers()
-  } catch {
-    toast.error('更新角色失败')
+  } catch (e: unknown) {
+    toast.error(getApiErrorMessage(e, '更新角色失败'))
   }
 }
 
@@ -121,8 +122,8 @@ async function confirmDelete() {
     toast.success('用户已删除')
     deleteDialogOpen.value = false
     await fetchUsers()
-  } catch {
-    toast.error('删除用户失败')
+  } catch (e: unknown) {
+    toast.error(getApiErrorMessage(e, '删除用户失败'))
   }
 }
 

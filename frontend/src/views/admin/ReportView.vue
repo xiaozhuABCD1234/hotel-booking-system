@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 import { reportApi } from '@/api/region'
 import type { GuestBookingStats } from '@/types'
 import { toast } from 'vue-sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -80,8 +81,8 @@ async function fetchHotelSummaries() {
     if (res.data.data) {
       hotelData.value = res.data.data as HotelSummaryRow[]
     }
-  } catch {
-    toast.error('获取酒店统计失败')
+  } catch (e: unknown) {
+    toast.error(getApiErrorMessage(e, '获取酒店统计失败'))
   } finally {
     hotelLoading.value = false
   }
@@ -94,8 +95,8 @@ async function fetchUserVip() {
     if (res.data.data) {
       vipData.value = res.data.data as UserVipRow[]
     }
-  } catch {
-    toast.error('获取用户VIP数据失败')
+  } catch (e: unknown) {
+    toast.error(getApiErrorMessage(e, '获取用户VIP数据失败'))
   } finally {
     vipLoading.value = false
   }
@@ -114,8 +115,8 @@ async function fetchGuestData() {
     if (topRes.data.data) {
       topGuests.value = topRes.data.data
     }
-  } catch {
-    toast.error('获取入住人分析数据失败')
+  } catch (e: unknown) {
+    toast.error(getApiErrorMessage(e, '获取入住人分析数据失败'))
   } finally {
     guestLoading.value = false
   }

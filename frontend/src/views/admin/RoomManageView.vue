@@ -31,6 +31,7 @@ import {
 import { Plus, Pencil, Trash2 } from '@lucide/vue'
 import { roomApi, hotelApi } from '@/api'
 import { toast } from 'vue-sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 import type { Room, Hotel } from '@/types'
 
 const loading = ref(true)
@@ -93,7 +94,7 @@ async function loadRooms() {
     totalPages.value = res.data.pagination?.totalPages ?? 1
   } catch (error) {
     console.error('Failed to load rooms:', error)
-    toast.error('加载客房列表失败')
+    toast.error(getApiErrorMessage(error, '加载客房列表失败'))
   } finally {
     loading.value = false
   }
@@ -138,7 +139,7 @@ async function handleSubmit() {
     await loadRooms()
   } catch (error) {
     console.error('Failed to save room:', error)
-    toast.error('保存客房失败')
+    toast.error(getApiErrorMessage(error, '保存客房失败'))
   } finally {
     submitting.value = false
   }
@@ -155,7 +156,7 @@ async function handleDelete(room: Room) {
     await loadRooms()
   } catch (error) {
     console.error('Failed to delete room:', error)
-    toast.error('删除客房失败')
+    toast.error(getApiErrorMessage(error, '删除房间失败'))
   }
 }
 

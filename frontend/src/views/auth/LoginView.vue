@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Building2, Loader2 } from '@lucide/vue'
 import { toast } from 'vue-sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 
 const router = useRouter()
 const route = useRoute()
@@ -59,11 +60,7 @@ async function handleSubmit() {
       toast.error(res.error?.message || '登录失败，请重试')
     }
   } catch (e: unknown) {
-    const err = e as { response?: { data?: { message?: string; error?: { message?: string } } } }
-    const msg = err?.response?.data?.message
-      || err?.response?.data?.error?.message
-      || '网络错误，请检查连接后重试'
-    toast.error(msg)
+    toast.error(getApiErrorMessage(e, '登录失败，请重试'))
   } finally {
     loading.value = false
   }

@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { orderApi } from '@/api/order'
 import type { Order, OrderStatus } from '@/types'
 import { toast } from 'vue-sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -106,8 +107,8 @@ async function fetchOrders() {
         totalItems.value = p.totalItems
       }
     }
-  } catch {
-    toast.error('获取订单列表失败')
+  } catch (e: unknown) {
+    toast.error(getApiErrorMessage(e, '获取订单列表失败'))
   } finally {
     loading.value = false
   }
@@ -133,8 +134,8 @@ async function confirmStatusUpdate() {
     toast.success('订单状态已更新')
     statusDialogOpen.value = false
     await fetchOrders()
-  } catch {
-    toast.error('更新状态失败')
+  } catch (e: unknown) {
+    toast.error(getApiErrorMessage(e, '更新状态失败'))
   }
 }
 
@@ -150,8 +151,8 @@ async function confirmDelete() {
     toast.success('订单已删除')
     deleteDialogOpen.value = false
     await fetchOrders()
-  } catch {
-    toast.error('删除订单失败')
+  } catch (e: unknown) {
+    toast.error(getApiErrorMessage(e, '删除订单失败'))
   }
 }
 

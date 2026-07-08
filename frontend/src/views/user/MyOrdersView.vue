@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from 'vue-sonner'
+import { getApiErrorMessage } from '@/lib/utils'
 import { ShoppingBag, ArrowLeft, AlertCircle } from '@lucide/vue'
 
 const router = useRouter()
@@ -67,8 +68,8 @@ async function confirmCancel() {
     } else {
       toast.error(res.message || '取消失败')
     }
-  } catch {
-    toast.error('操作失败，请重试')
+  } catch (e: unknown) {
+    toast.error(getApiErrorMessage(e, '操作失败，请重试'))
   } finally {
     cancellingId.value = null
     dialogOrderId.value = null
