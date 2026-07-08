@@ -96,8 +96,12 @@ async function handleSubmit() {
     } else {
       toast.error(res.message || '预订失败，请重试')
     }
-  } catch {
-    toast.error('网络错误，请稍后重试')
+  } catch (e: unknown) {
+    const err = e as { response?: { data?: { message?: string; error?: { message?: string } } } }
+    const msg = err?.response?.data?.message
+      || err?.response?.data?.error?.message
+      || '网络错误，请稍后重试'
+    toast.error(msg)
   } finally {
     submitting.value = false
   }

@@ -19,10 +19,10 @@ export interface TokenPair {
   expiresIn: number
 }
 
-/** Login response data */
+/** Login/Register response data (matches backend tokenResponse) */
 export interface LoginResponse {
-  tokens: TokenPair
-  user: UserInfo
+  accessToken: string
+  refreshToken: string
 }
 
 export interface UserInfo {

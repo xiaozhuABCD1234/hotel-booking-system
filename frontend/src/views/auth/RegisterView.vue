@@ -93,8 +93,12 @@ async function handleSubmit() {
     } else {
       toast.error(res.error?.message || '注册失败，请重试')
     }
-  } catch {
-    toast.error('网络错误，请检查连接后重试')
+  } catch (e: unknown) {
+    const err = e as { response?: { data?: { message?: string; error?: { message?: string } } } }
+    const msg = err?.response?.data?.message
+      || err?.response?.data?.error?.message
+      || '网络错误，请检查连接后重试'
+    toast.error(msg)
   } finally {
     loading.value = false
   }

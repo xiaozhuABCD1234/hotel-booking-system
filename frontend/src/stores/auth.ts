@@ -21,9 +21,8 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(data: LoginRequest) {
     const res = await authApi.login(data)
     if (res.data.success && res.data.data) {
-      const { tokens, user: userInfo } = res.data.data
-      setTokens(tokens.accessToken, tokens.refreshToken)
-      user.value = userInfo
+      const { accessToken, refreshToken } = res.data.data
+      setTokens(accessToken, refreshToken)
     }
     return res.data
   }
@@ -31,9 +30,8 @@ export const useAuthStore = defineStore('auth', () => {
   async function register(data: RegisterRequest) {
     const res = await authApi.register(data)
     if (res.data.success && res.data.data) {
-      const { tokens, user: userInfo } = res.data.data
-      setTokens(tokens.accessToken, tokens.refreshToken)
-      user.value = userInfo
+      const { accessToken, refreshToken } = res.data.data
+      setTokens(accessToken, refreshToken)
     }
     return res.data
   }
