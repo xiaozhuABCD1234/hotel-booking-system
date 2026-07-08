@@ -165,6 +165,7 @@ func (h *UserHandler) Create(c fiber.Ctx) error {
 //	@Failure		500		{object}	model.Response
 //	@Security		BearerAuth
 //	@Router			/users/{id} [put]
+//
 // updateUserInput 仅包含客户端可更新的用户字段。
 type updateUserInput struct {
 	Username string  `json:"username,omitempty"`

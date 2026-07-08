@@ -23,21 +23,21 @@ const (
 //
 // 注意：表级 CHECK (check_out_date > check_in_date) 在 BeforeSave 中校验。
 type Order struct {
-	ID           uuid.UUID    `gorm:"column:id;type:uuid;primaryKey;default:uuidv7()"`
-	UserID       uuid.UUID    `gorm:"column:user_id;type:uuid;not null;index:idx_order_user"`
-	User         User         `gorm:"foreignKey:UserID;references:ID"`
-	RoomID       uuid.UUID    `gorm:"column:room_id;type:uuid;not null;index:idx_order_room"`
-	Room         Room         `gorm:"foreignKey:RoomID;references:ID"`
-	Quantity     int32        `gorm:"column:quantity;type:integer;not null;check:quantity > 0"`
-	CheckInDate  time.Time    `gorm:"column:check_in_date;type:date;not null;index:idx_order_dates,priority:1"`
-	CheckOutDate time.Time    `gorm:"column:check_out_date;type:date;not null;index:idx_order_dates,priority:2"`
-	TotalPrice   float64      `gorm:"column:total_price;type:numeric(10,2);not null;check:total_price >= 0"`
-	Discount     float64      `gorm:"column:discount;type:numeric(10,2);not null;default:0;check:discount >= 0"`
-	ActualPrice  float64      `gorm:"column:actual_price;type:numeric(10,2);not null;check:actual_price >= 0"`
-	Status       OrderStatus  `gorm:"column:status;type:order_status;not null;default:pending;index:idx_order_status"`
-	CreateAt     time.Time    `gorm:"column:create_at;type:timestamptz;autoCreateTime;index:idx_order_create"`
-	UpdateAt     time.Time    `gorm:"column:update_at;type:timestamptz;autoUpdateTime"`
-	Guests       []OrderGuest `gorm:"foreignKey:OrderID;references:ID;constraint:OnDelete:CASCADE"`
+	ID           uuid.UUID    `json:"id"            gorm:"column:id;type:uuid;primaryKey;default:uuidv7()"`
+	UserID       uuid.UUID    `json:"userId"        gorm:"column:user_id;type:uuid;not null;index:idx_order_user"`
+	User         User         `json:"user"          gorm:"foreignKey:UserID;references:ID"`
+	RoomID       uuid.UUID    `json:"roomId"        gorm:"column:room_id;type:uuid;not null;index:idx_order_room"`
+	Room         Room         `json:"room"          gorm:"foreignKey:RoomID;references:ID"`
+	Quantity     int32        `json:"quantity"      gorm:"column:quantity;type:integer;not null;check:quantity > 0"`
+	CheckInDate  time.Time    `json:"checkInDate"   gorm:"column:check_in_date;type:date;not null;index:idx_order_dates,priority:1"`
+	CheckOutDate time.Time    `json:"checkOutDate"  gorm:"column:check_out_date;type:date;not null;index:idx_order_dates,priority:2"`
+	TotalPrice   float64      `json:"totalPrice"    gorm:"column:total_price;type:numeric(10,2);not null;check:total_price >= 0"`
+	Discount     float64      `json:"discount"      gorm:"column:discount;type:numeric(10,2);not null;default:0;check:discount >= 0"`
+	ActualPrice  float64      `json:"actualPrice"   gorm:"column:actual_price;type:numeric(10,2);not null;check:actual_price >= 0"`
+	Status       OrderStatus  `json:"status"        gorm:"column:status;type:order_status;not null;default:pending;index:idx_order_status"`
+	CreateAt     time.Time    `json:"createAt"      gorm:"column:create_at;type:timestamptz;autoCreateTime;index:idx_order_create"`
+	UpdateAt     time.Time    `json:"updateAt"      gorm:"column:update_at;type:timestamptz;autoUpdateTime"`
+	Guests       []OrderGuest `json:"guests"        gorm:"foreignKey:OrderID;references:ID;constraint:OnDelete:CASCADE"`
 }
 
 func (Order) TableName() string {
@@ -53,10 +53,10 @@ func (o *Order) BeforeSave(tx *gorm.DB) error {
 
 // OrderGuest 入住人员关联表（订单 ↔ 入住人，多对多），对应表 order_guest_1718
 type OrderGuest struct {
-	OrderID uuid.UUID `gorm:"column:order_id;type:uuid;primaryKey"`
-	IDCard  string    `gorm:"column:id_card;type:varchar(18);primaryKey;index:idx_order_guest_id_card"`
-	Order   Order     `gorm:"foreignKey:OrderID;references:ID;constraint:OnDelete:CASCADE"`
-	Person  Person    `gorm:"foreignKey:IDCard;references:IDCard"`
+	OrderID uuid.UUID `json:"orderId" gorm:"column:order_id;type:uuid;primaryKey"`
+	IDCard  string    `json:"idCard"  gorm:"column:id_card;type:varchar(18);primaryKey;index:idx_order_guest_id_card"`
+	Order   Order     `json:"-"       gorm:"foreignKey:OrderID;references:ID;constraint:OnDelete:CASCADE"`
+	Person  Person    `json:"person"  gorm:"foreignKey:IDCard;references:IDCard"`
 }
 
 func (OrderGuest) TableName() string {
