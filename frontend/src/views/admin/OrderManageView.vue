@@ -32,7 +32,7 @@ import {
 	DialogFooter,
 	DialogDescription,
 } from "@/components/ui/dialog";
-import { ShoppingBag, Filter, Search, Check, X } from "@lucide/vue";
+import { ShoppingBag, Filter, Search, Check, Trash2 } from "@lucide/vue";
 
 const orders = ref<Order[]>([]);
 const loading = ref(false);
@@ -215,7 +215,9 @@ onMounted(() => {
 								<TableHead class="whitespace-nowrap">离店日期</TableHead>
 								<TableHead class="text-right whitespace-nowrap">总价</TableHead>
 								<TableHead class="whitespace-nowrap w-[80px]">状态</TableHead>
-								<TableHead class="text-right whitespace-nowrap w-[120px]">操作</TableHead>
+								<TableHead class="text-right whitespace-nowrap w-[120px]"
+									>操作</TableHead
+								>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -238,12 +240,18 @@ onMounted(() => {
 								<TableCell class="whitespace-nowrap">{{
 									order.room?.hotel?.hotelName ?? order.user?.realName ?? "-"
 								}}</TableCell>
-								<TableCell class="whitespace-nowrap">{{ order.room?.typeName ?? "-" }}</TableCell>
+								<TableCell class="whitespace-nowrap">{{
+									order.room?.typeName ?? "-"
+								}}</TableCell>
 								<TableCell class="whitespace-nowrap">{{
 									order.user?.realName || order.user?.username || "-"
 								}}</TableCell>
-								<TableCell class="whitespace-nowrap">{{ formatDate(order.checkInDate) }}</TableCell>
-								<TableCell class="whitespace-nowrap">{{ formatDate(order.checkOutDate) }}</TableCell>
+								<TableCell class="whitespace-nowrap">{{
+									formatDate(order.checkInDate)
+								}}</TableCell>
+								<TableCell class="whitespace-nowrap">{{
+									formatDate(order.checkOutDate)
+								}}</TableCell>
 								<TableCell class="text-right font-medium whitespace-nowrap">
 									¥{{ order.totalPrice.toFixed(2) }}
 								</TableCell>
@@ -257,11 +265,10 @@ onMounted(() => {
 									</Badge>
 								</TableCell>
 								<TableCell class="text-right whitespace-nowrap">
-									<div class="flex items-center justify-end gap-1">
+									<div class="flex justify-end gap-1">
 										<Button
 											variant="ghost"
 											size="icon"
-											class="h-8 w-8"
 											@click="openDetail(order)"
 										>
 											<Search class="h-4 w-4" />
@@ -269,7 +276,6 @@ onMounted(() => {
 										<Button
 											variant="ghost"
 											size="icon"
-											class="h-8 w-8"
 											@click="openStatusUpdate(order)"
 										>
 											<Check class="h-4 w-4" />
@@ -277,10 +283,9 @@ onMounted(() => {
 										<Button
 											variant="ghost"
 											size="icon"
-											class="h-8 w-8"
 											@click="openDelete(order)"
 										>
-											<X class="h-4 w-4 text-destructive" />
+											<Trash2 class="h-4 w-4 text-destructive" />
 										</Button>
 									</div>
 								</TableCell>
