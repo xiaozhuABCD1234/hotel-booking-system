@@ -90,7 +90,9 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     try {
-      await authApi.logout()
+      await authApi.logout(accessToken.value!, refreshToken.value!)
+    } catch {
+      // Ignore API errors — state cleanup happens in finally
     } finally {
       user.value = null
       accessToken.value = null

@@ -44,9 +44,9 @@ function isActive(path: string) {
   return route.path.startsWith(path)
 }
 
-function handleLogout() {
-  auth.logout()
-  router.push('/login')
+async function handleLogout() {
+  await auth.logout()
+  router.push('/')
 }
 </script>
 

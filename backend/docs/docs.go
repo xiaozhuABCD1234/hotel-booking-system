@@ -85,6 +85,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/logout": {
+            "post": {
+                "description": "将 access token 和 refresh token 加入黑名单，使其立即失效",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "登出",
+                "parameters": [
+                    {
+                        "description": "access token 与 refresh token",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.logoutRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "请求参数无效",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "令牌无效或已过期",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/refresh": {
             "post": {
                 "description": "用刷新令牌换取新的访问令牌和刷新令牌",
@@ -3625,80 +3671,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "put": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "根据 UUID 更新用户信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "users"
-                ],
-                "summary": "更新用户信息",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "用户 ID (UUID)",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "更新的用户信息",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/backend_model_schema.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/model.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/backend_model_schema.User"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/model.Response"
-                        }
-                    }
-                }
-            },
             "delete": {
                 "security": [
                     {
@@ -3779,7 +3751,7 @@ const docTemplate = `{
                 "region": {
                     "$ref": "#/definitions/backend_model_schema.Region"
                 },
-                "regionID": {
+                "regionId": {
                     "type": "integer"
                 },
                 "starLevel": {
@@ -3799,13 +3771,10 @@ const docTemplate = `{
         "backend_model_schema.HotelImage": {
             "type": "object",
             "properties": {
-                "hotel": {
-                    "$ref": "#/definitions/backend_model_schema.Hotel"
-                },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
-                "imageURL": {
+                "imageUrl": {
                     "type": "string"
                 }
             }
@@ -3843,7 +3812,7 @@ const docTemplate = `{
                 "room": {
                     "$ref": "#/definitions/backend_model_schema.Room"
                 },
-                "roomID": {
+                "roomId": {
                     "type": "string"
                 },
                 "status": {
@@ -3858,7 +3827,7 @@ const docTemplate = `{
                 "user": {
                     "$ref": "#/definitions/backend_model_schema.User"
                 },
-                "userID": {
+                "userId": {
                     "type": "string"
                 }
             }
@@ -3866,13 +3835,10 @@ const docTemplate = `{
         "backend_model_schema.OrderGuest": {
             "type": "object",
             "properties": {
-                "idcard": {
+                "idCard": {
                     "type": "string"
                 },
-                "order": {
-                    "$ref": "#/definitions/backend_model_schema.Order"
-                },
-                "orderID": {
+                "orderId": {
                     "type": "string"
                 },
                 "person": {
@@ -3900,7 +3866,7 @@ const docTemplate = `{
         "backend_model_schema.Person": {
             "type": "object",
             "properties": {
-                "idcard": {
+                "idCard": {
                     "type": "string"
                 },
                 "name": {
@@ -3920,7 +3886,7 @@ const docTemplate = `{
                 "parent": {
                     "$ref": "#/definitions/backend_model_schema.Region"
                 },
-                "parentsID": {
+                "parentsId": {
                     "type": "integer"
                 },
                 "regionName": {
@@ -3940,7 +3906,7 @@ const docTemplate = `{
                 "hotel": {
                     "$ref": "#/definitions/backend_model_schema.Hotel"
                 },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
                 "id": {
@@ -3949,7 +3915,7 @@ const docTemplate = `{
                 "order": {
                     "$ref": "#/definitions/backend_model_schema.Order"
                 },
-                "orderID": {
+                "orderId": {
                     "type": "string"
                 },
                 "rating": {
@@ -3961,7 +3927,7 @@ const docTemplate = `{
                 "user": {
                     "$ref": "#/definitions/backend_model_schema.User"
                 },
-                "userID": {
+                "userId": {
                     "type": "string"
                 }
             }
@@ -3987,7 +3953,7 @@ const docTemplate = `{
                 "hotel": {
                     "$ref": "#/definitions/backend_model_schema.Hotel"
                 },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
                 "id": {
@@ -4025,10 +3991,7 @@ const docTemplate = `{
                 "facilityName": {
                     "type": "string"
                 },
-                "room": {
-                    "$ref": "#/definitions/backend_model_schema.Room"
-                },
-                "roomID": {
+                "roomId": {
                     "type": "string"
                 }
             }
@@ -4036,13 +3999,10 @@ const docTemplate = `{
         "backend_model_schema.RoomImage": {
             "type": "object",
             "properties": {
-                "imageURL": {
+                "imageUrl": {
                     "type": "string"
                 },
-                "room": {
-                    "$ref": "#/definitions/backend_model_schema.Room"
-                },
-                "roomID": {
+                "roomId": {
                     "type": "string"
                 }
             }
@@ -4059,10 +4019,7 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "idcard": {
-                    "type": "string"
-                },
-                "password": {
+                "idCard": {
                     "type": "string"
                 },
                 "phone": {
@@ -4089,7 +4046,7 @@ const docTemplate = `{
                 "vipLevel": {
                     "$ref": "#/definitions/backend_model_schema.VipLevel"
                 },
-                "vipLevelID": {
+                "vipLevelId": {
                     "type": "integer"
                 }
             }
@@ -4524,6 +4481,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.logoutRequest": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "refreshToken": {
                     "type": "string"
                 }
             }

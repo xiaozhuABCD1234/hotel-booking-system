@@ -14,7 +14,7 @@ export const authApi = {
     return api.post<ApiResponse<TokenPair>>('/auth/refresh', { refreshToken })
   },
 
-  logout() {
-    return api.post<ApiResponse>('/auth/logout')
+  logout(accessToken: string, refreshToken: string) {
+    return api.post<ApiResponse>('/auth/logout', { accessToken, refreshToken })
   },
 }

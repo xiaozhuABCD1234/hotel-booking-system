@@ -18,7 +18,7 @@ definitions:
         type: array
       region:
         $ref: '#/definitions/backend_model_schema.Region'
-      regionID:
+      regionId:
         type: integer
       starLevel:
         type: integer
@@ -31,11 +31,9 @@ definitions:
     type: object
   backend_model_schema.HotelImage:
     properties:
-      hotel:
-        $ref: '#/definitions/backend_model_schema.Hotel'
-      hotelID:
+      hotelId:
         type: string
-      imageURL:
+      imageUrl:
         type: string
     type: object
   backend_model_schema.Order:
@@ -60,7 +58,7 @@ definitions:
         type: integer
       room:
         $ref: '#/definitions/backend_model_schema.Room'
-      roomID:
+      roomId:
         type: string
       status:
         $ref: '#/definitions/backend_model_schema.OrderStatus'
@@ -70,16 +68,14 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/backend_model_schema.User'
-      userID:
+      userId:
         type: string
     type: object
   backend_model_schema.OrderGuest:
     properties:
-      idcard:
+      idCard:
         type: string
-      order:
-        $ref: '#/definitions/backend_model_schema.Order'
-      orderID:
+      orderId:
         type: string
       person:
         $ref: '#/definitions/backend_model_schema.Person'
@@ -100,7 +96,7 @@ definitions:
     - OrderCancelled
   backend_model_schema.Person:
     properties:
-      idcard:
+      idCard:
         type: string
       name:
         type: string
@@ -113,7 +109,7 @@ definitions:
         type: integer
       parent:
         $ref: '#/definitions/backend_model_schema.Region'
-      parentsID:
+      parentsId:
         type: integer
       regionName:
         type: string
@@ -126,13 +122,13 @@ definitions:
         type: string
       hotel:
         $ref: '#/definitions/backend_model_schema.Hotel'
-      hotelID:
+      hotelId:
         type: string
       id:
         type: string
       order:
         $ref: '#/definitions/backend_model_schema.Order'
-      orderID:
+      orderId:
         type: string
       rating:
         type: integer
@@ -140,7 +136,7 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/backend_model_schema.User'
-      userID:
+      userId:
         type: string
     type: object
   backend_model_schema.Room:
@@ -157,7 +153,7 @@ definitions:
         type: array
       hotel:
         $ref: '#/definitions/backend_model_schema.Hotel'
-      hotelID:
+      hotelId:
         type: string
       id:
         type: string
@@ -182,18 +178,14 @@ definitions:
     properties:
       facilityName:
         type: string
-      room:
-        $ref: '#/definitions/backend_model_schema.Room'
-      roomID:
+      roomId:
         type: string
     type: object
   backend_model_schema.RoomImage:
     properties:
-      imageURL:
+      imageUrl:
         type: string
-      room:
-        $ref: '#/definitions/backend_model_schema.Room'
-      roomID:
+      roomId:
         type: string
     type: object
   backend_model_schema.User:
@@ -204,9 +196,7 @@ definitions:
         type: string
       id:
         type: string
-      idcard:
-        type: string
-      password:
+      idCard:
         type: string
       phone:
         type: string
@@ -224,7 +214,7 @@ definitions:
         type: string
       vipLevel:
         $ref: '#/definitions/backend_model_schema.VipLevel'
-      vipLevelID:
+      vipLevelId:
         type: integer
     type: object
   backend_model_schema.UserRole:
@@ -515,6 +505,13 @@ definitions:
       username:
         type: string
     type: object
+  handler.logoutRequest:
+    properties:
+      accessToken:
+        type: string
+      refreshToken:
+        type: string
+    type: object
   handler.refreshRequest:
     properties:
       refreshToken:
@@ -637,6 +634,36 @@ paths:
           schema:
             $ref: '#/definitions/model.Response'
       summary: 用户登录
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: 将 access token 和 refresh token 加入黑名单，使其立即失效
+      parameters:
+      - description: access token 与 refresh token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handler.logoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: 令牌无效或已过期
+          schema:
+            $ref: '#/definitions/model.Response'
+      summary: 登出
       tags:
       - auth
   /auth/refresh:
@@ -2827,51 +2854,6 @@ paths:
       security:
       - BearerAuth: []
       summary: 查询用户详情
-      tags:
-      - users
-    put:
-      consumes:
-      - application/json
-      description: 根据 UUID 更新用户信息
-      parameters:
-      - description: 用户 ID (UUID)
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: 更新的用户信息
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/backend_model_schema.User'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/model.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/backend_model_schema.User'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/model.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/model.Response'
-      security:
-      - BearerAuth: []
-      summary: 更新用户信息
       tags:
       - users
 securityDefinitions:

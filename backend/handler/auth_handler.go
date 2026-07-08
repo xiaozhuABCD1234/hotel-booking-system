@@ -53,7 +53,8 @@ type refreshRequest struct {
 }
 
 type logoutRequest struct {
-	AccessToken string `json:"accessToken"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 // passwordMinLen 注册密码最小长度。
@@ -203,19 +204,27 @@ func (h *AuthHandler) Refresh(c fiber.Ctx) error {
 		return model.SendError(c, http.StatusUnauthorized, "Invalid or expired refresh token")
 	}
 
+	exists, err := h.blacklist.Exists(c.Context(), claims.ID)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return model.SendError(c, http.StatusUnauthorized, "Refresh token has been revoked")
+	}
+
 	return h.issueTokens(c, claims.UserID, claims.Role)
 }
 
 // ─── Logout ────────────────────────────────────────────────────
 
-// Logout 登出，将当前访问令牌加入黑名单，使其立即失效。
+// Logout 登出，将 access token 和 refresh token 加入黑名单，使其立即失效。
 //
 //	@Summary		登出
-//	@Description	将当前访问令牌加入黑名单，使其立即失效
+//	@Description	将 access token 和 refresh token 加入黑名单，使其立即失效
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		logoutRequest				true	"访问令牌"
+//	@Param			body	body		logoutRequest				true	"access token 与 refresh token"
 //	@Success		200		{object}	model.Response
 //	@Failure		400		{object}	model.Response	"请求参数无效"
 //	@Failure		401		{object}	model.Response	"令牌无效或已过期"
@@ -228,18 +237,28 @@ func (h *AuthHandler) Logout(c fiber.Ctx) error {
 	if req.AccessToken == "" {
 		return model.SendError(c, http.StatusBadRequest, "accessToken is required")
 	}
-
-	claims, err := auth.ParseAccessToken(req.AccessToken)
-	if err != nil {
-		return model.SendError(c, http.StatusUnauthorized, "Invalid or expired token")
+	if req.RefreshToken == "" {
+		return model.SendError(c, http.StatusBadRequest, "refreshToken is required")
 	}
 
-	// 校验 token 类型：accessToken 有效期 15 分钟，refreshToken 7 天
-	if claims.ExpiresAt.Time.After(time.Now().Add(1 * time.Hour)) {
+	accessClaims, err := auth.ParseAccessToken(req.AccessToken)
+	if err != nil {
+		return model.SendError(c, http.StatusUnauthorized, "Invalid or expired access token")
+	}
+
+	if accessClaims.ExpiresAt.Time.After(time.Now().Add(1 * time.Hour)) {
 		return model.SendError(c, http.StatusBadRequest, "expected an access token, not a refresh token")
 	}
 
-	if err := h.blacklist.Insert(c.Context(), claims.ID, claims.ExpiresAt.Time); err != nil {
+	refreshClaims, err := auth.ParseAccessToken(req.RefreshToken)
+	if err != nil {
+		return model.SendError(c, http.StatusUnauthorized, "Invalid or expired refresh token")
+	}
+
+	if err := h.blacklist.Insert(c.Context(), accessClaims.ID, accessClaims.ExpiresAt.Time); err != nil {
+		return err
+	}
+	if err := h.blacklist.Insert(c.Context(), refreshClaims.ID, refreshClaims.ExpiresAt.Time); err != nil {
 		return err
 	}
 

@@ -21,8 +21,8 @@ const navLinks = [
   { to: '/orders', label: '我的订单', icon: ShoppingBag },
 ]
 
-function handleLogout() {
-  auth.logout()
+async function handleLogout() {
+  await auth.logout()
   router.push('/login')
 }
 </script>
