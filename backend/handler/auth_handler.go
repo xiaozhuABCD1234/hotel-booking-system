@@ -3,6 +3,7 @@ package handler
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -168,6 +169,8 @@ func (h *AuthHandler) Login(c fiber.Ctx) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		return model.SendError(c, http.StatusUnauthorized, "Invalid username or password")
 	}
+
+	log.Printf("[Auth] 用户登录成功: username=%s role=%s id=%s", user.Username, user.Role, user.ID.String())
 
 	return h.issueTokens(c, user.ID.String(), string(user.Role))
 }
