@@ -93,7 +93,7 @@ async function handleSubmit() {
     const res = await orderStore.createOrder(data)
     if (res.success) {
       toast.success('预订成功！')
-      router.push('/orders')
+      await router.push('/orders')
     } else {
       toast.error(res.message || '预订失败，请重试')
     }

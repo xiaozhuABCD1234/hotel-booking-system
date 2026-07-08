@@ -55,7 +55,7 @@ async function handleSubmit() {
     const res = await auth.login(form)
     if (res.success) {
       const redirect = (route.query.redirect as string) || '/'
-      router.push(redirect)
+      await router.push(redirect)
     } else {
       toast.error(res.error?.message || '登录失败，请重试')
     }
