@@ -98,27 +98,25 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to, _from) => {
   const auth = useAuthStore()
 
   console.log('[Router]', 'to:', to.path, 'meta:', to.meta, 'isAdmin:', auth.isAdmin, 'user:', auth.user)
 
   // Guest-only routes (login/register): redirect to home if already logged in
   if (to.meta.guest && auth.isLoggedIn) {
-    return next({ name: 'Home', replace: true })
+    return { name: 'Home', replace: true }
   }
 
   // Auth-required routes
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
-    return next({ name: 'Login', query: { redirect: to.fullPath }, replace: true })
+    return { name: 'Login', query: { redirect: to.fullPath }, replace: true }
   }
 
   // Admin-only routes
   if (to.meta.requiresAdmin && !auth.isAdmin) {
-    return next({ name: 'Home', replace: true })
+    return { name: 'Home', replace: true }
   }
-
-  next()
 })
 
 export default router
