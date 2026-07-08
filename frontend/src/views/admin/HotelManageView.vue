@@ -95,9 +95,9 @@ async function loadHotels() {
     const res = await hotelApi.list({ page: currentPage.value, pageSize: pageSize.value })
     hotels.value = res.data.data?.items ?? []
     totalPages.value = res.data.pagination?.totalPages ?? 1
-  } catch (error) {
-    console.error('Failed to load hotels:', error)
-    toast.error(getApiErrorMessage(error, '加载酒店列表失败'))
+  } catch (e: unknown) {
+    console.error('Failed to load hotels:', e)
+    toast.error(getApiErrorMessage(e, '加载酒店列表失败'))
   } finally {
     loading.value = false
   }
@@ -107,8 +107,8 @@ async function loadRegions() {
   try {
     const res = await regionApi.list()
     regions.value = (res.data.data as Region[] | undefined) ?? []
-  } catch (error) {
-    console.error('Failed to load regions:', error)
+  } catch (e: unknown) {
+    console.error('Failed to load regions:', e)
   }
 }
 
@@ -139,9 +139,9 @@ async function handleSubmit() {
 
     dialogOpen.value = false
     await loadHotels()
-  } catch (error) {
-    console.error('Failed to save hotel:', error)
-    toast.error(getApiErrorMessage(error, '保存酒店失败'))
+  } catch (e: unknown) {
+    console.error('Failed to save hotel:', e)
+    toast.error(getApiErrorMessage(e, '保存酒店失败'))
   } finally {
     submitting.value = false
   }
@@ -156,9 +156,9 @@ async function handleDelete(hotel: Hotel) {
     await hotelApi.delete(hotel.id)
     toast.success('酒店删除成功')
     await loadHotels()
-  } catch (error) {
-    console.error('Failed to delete hotel:', error)
-    toast.error(getApiErrorMessage(error, '删除酒店失败'))
+  } catch (e: unknown) {
+    console.error('Failed to delete hotel:', e)
+    toast.error(getApiErrorMessage(e, '删除酒店失败'))
   }
 }
 

@@ -1,10 +1,10 @@
 import api from './client'
-import type { ApiResponse, Room, RoomSearchParams, PaginatedList } from '@/types'
+import type { ApiResponse, Room, RoomSearchParams } from '@/types'
 
 export const roomApi = {
   /** Public: list rooms with filters */
   list(params?: RoomSearchParams) {
-    return api.get<ApiResponse<PaginatedList<Room>>>('/rooms', { params })
+    return api.get<ApiResponse<Room[]>>('/rooms', { params })
   },
 
   /** Public: get room by ID */

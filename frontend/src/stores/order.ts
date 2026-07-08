@@ -13,9 +13,15 @@ export const useOrderStore = defineStore('order', () => {
     try {
       const res = await orderApi.listByUser(userId, page, pageSize)
       if (res.data.success && res.data.data) {
-        orders.value = res.data.data.items
+        orders.value = res.data.data
         pagination.value = res.data.pagination ?? null
+      } else {
+        orders.value = []
+        pagination.value = null
       }
+    } catch {
+      orders.value = []
+      pagination.value = null
     } finally {
       loading.value = false
     }
@@ -26,9 +32,15 @@ export const useOrderStore = defineStore('order', () => {
     try {
       const res = await orderApi.list(page, pageSize)
       if (res.data.success && res.data.data) {
-        orders.value = res.data.data.items
+        orders.value = res.data.data
         pagination.value = res.data.pagination ?? null
+      } else {
+        orders.value = []
+        pagination.value = null
       }
+    } catch {
+      orders.value = []
+      pagination.value = null
     } finally {
       loading.value = false
     }

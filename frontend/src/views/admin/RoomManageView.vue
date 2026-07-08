@@ -92,9 +92,9 @@ async function loadRooms() {
     const res = await roomApi.list({ page: currentPage.value, pageSize: pageSize.value })
     rooms.value = res.data.data?.items ?? []
     totalPages.value = res.data.pagination?.totalPages ?? 1
-  } catch (error) {
-    console.error('Failed to load rooms:', error)
-    toast.error(getApiErrorMessage(error, '加载客房列表失败'))
+  } catch (e: unknown) {
+    console.error('Failed to load rooms:', e)
+    toast.error(getApiErrorMessage(e, '加载客房列表失败'))
   } finally {
     loading.value = false
   }
@@ -104,8 +104,8 @@ async function loadHotels() {
   try {
     const res = await hotelApi.list({ page: 1, pageSize: 1000 })
     hotels.value = res.data.data?.items ?? []
-  } catch (error) {
-    console.error('Failed to load hotels:', error)
+  } catch (e: unknown) {
+    console.error('Failed to load hotels:', e)
   }
 }
 
@@ -137,9 +137,9 @@ async function handleSubmit() {
 
     dialogOpen.value = false
     await loadRooms()
-  } catch (error) {
-    console.error('Failed to save room:', error)
-    toast.error(getApiErrorMessage(error, '保存客房失败'))
+  } catch (e: unknown) {
+    console.error('Failed to save room:', e)
+    toast.error(getApiErrorMessage(e, '保存客房失败'))
   } finally {
     submitting.value = false
   }
@@ -154,9 +154,9 @@ async function handleDelete(room: Room) {
     await roomApi.delete(room.id)
     toast.success('客房删除成功')
     await loadRooms()
-  } catch (error) {
-    console.error('Failed to delete room:', error)
-    toast.error(getApiErrorMessage(error, '删除房间失败'))
+  } catch (e: unknown) {
+    console.error('Failed to delete room:', e)
+    toast.error(getApiErrorMessage(e, '删除客房失败'))
   }
 }
 

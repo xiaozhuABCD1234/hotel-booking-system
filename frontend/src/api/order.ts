@@ -1,10 +1,10 @@
 import api from './client'
-import type { ApiResponse, Order, CreateOrderRequest, UpdateOrderStatusRequest, PaginatedList, OrderFull, MyOrder } from '@/types'
+import type { ApiResponse, Order, CreateOrderRequest, UpdateOrderStatusRequest, OrderFull, MyOrder } from '@/types'
 
 export const orderApi = {
   /** Get all orders with pagination */
   list(page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<Order>>>('/orders', { params: { page, pageSize } })
+    return api.get<ApiResponse<Order[]>>('/orders', { params: { page, pageSize } })
   },
 
   /** Get one order by ID */
@@ -29,26 +29,26 @@ export const orderApi = {
 
   /** Get orders by current user */
   listByUser(userId: string, page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<Order>>>(`/orders/by-user`, { params: { userID: userId, page, pageSize } })
+    return api.get<ApiResponse<Order[]>>(`/orders/by-user`, { params: { userID: userId, page, pageSize } })
   },
 
   /** Get orders by hotel */
   listByHotel(hotelId: string, page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<Order>>>(`/orders/by-hotel`, { params: { hotelID: hotelId, page, pageSize } })
+    return api.get<ApiResponse<Order[]>>(`/orders/by-hotel`, { params: { hotelID: hotelId, page, pageSize } })
   },
 
   /** Report: order full by user */
   orderFullByUser(userId: string, page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<OrderFull>>>(`/reports/order-full/by-user`, { params: { userID: userId, page, pageSize } })
+    return api.get<ApiResponse<OrderFull[]>>(`/reports/order-full/by-user`, { params: { userID: userId, page, pageSize } })
   },
 
   /** Report: order full by hotel */
   orderFullByHotel(hotelId: string, page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<OrderFull>>>(`/reports/order-full/by-hotel`, { params: { hotelID: hotelId, page, pageSize } })
+    return api.get<ApiResponse<OrderFull[]>>(`/reports/order-full/by-hotel`, { params: { hotelID: hotelId, page, pageSize } })
   },
 
   /** Report: my orders */
   myOrders(userId: string, page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<MyOrder>>>(`/reports/my-orders`, { params: { userID: userId, page, pageSize } })
+    return api.get<ApiResponse<MyOrder[]>>(`/reports/my-orders`, { params: { userID: userId, page, pageSize } })
   },
 }

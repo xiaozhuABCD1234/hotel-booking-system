@@ -15,9 +15,15 @@ export const useHotelStore = defineStore('hotel', () => {
     try {
       const res = await hotelApi.list({ page: 1, pageSize: 12, ...params })
       if (res.data.success && res.data.data) {
-        hotels.value = res.data.data.items
+        hotels.value = res.data.data
         pagination.value = res.data.pagination ?? null
+      } else {
+        hotels.value = []
+        pagination.value = null
       }
+    } catch {
+      hotels.value = []
+      pagination.value = null
     } finally {
       loading.value = false
     }
@@ -32,9 +38,15 @@ export const useHotelStore = defineStore('hotel', () => {
   }
 
   async function fetchRooms(hotelId: string) {
-    const res = await roomApi.list({ hotelId, pageSize: 100 })
-    if (res.data.success && res.data.data) {
-      rooms.value = res.data.data.items
+    try {
+      const res = await roomApi.list({ hotelId, pageSize: 100 })
+      if (res.data.success && res.data.data) {
+        rooms.value = res.data.data
+      } else {
+        rooms.value = []
+      }
+    } catch {
+      rooms.value = []
     }
     return res.data
   }

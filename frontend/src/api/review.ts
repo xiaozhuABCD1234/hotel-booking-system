@@ -1,9 +1,9 @@
 import api from './client'
-import type { ApiResponse, Review, CreateReviewRequest, UpdateReviewRequest, PaginatedList, ReviewFull } from '@/types'
+import type { ApiResponse, Review, CreateReviewRequest, UpdateReviewRequest, ReviewFull } from '@/types'
 
 export const reviewApi = {
   list(page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<Review>>>('/reviews', { params: { page, pageSize } })
+    return api.get<ApiResponse<Review[]>>('/reviews', { params: { page, pageSize } })
   },
 
   getById(id: string) {
@@ -23,19 +23,19 @@ export const reviewApi = {
   },
 
   listByHotel(hotelId: string, page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<Review>>>(`/reviews/by-hotel`, { params: { hotelID: hotelId, page, pageSize } })
+    return api.get<ApiResponse<Review[]>>(`/reviews/by-hotel`, { params: { hotelID: hotelId, page, pageSize } })
   },
 
   listByUser(userId: string, page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<Review>>>(`/reviews/by-user`, { params: { userID: userId, page, pageSize } })
+    return api.get<ApiResponse<Review[]>>(`/reviews/by-user`, { params: { userID: userId, page, pageSize } })
   },
 
   // Report endpoints
   reviewFullByHotel(hotelId: string, page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<ReviewFull>>>(`/reports/review-full/by-hotel`, { params: { hotelID: hotelId, page, pageSize } })
+    return api.get<ApiResponse<ReviewFull[]>>(`/reports/review-full/by-hotel`, { params: { hotelID: hotelId, page, pageSize } })
   },
 
   reviewFullByUser(userId: string, page = 1, pageSize = 10) {
-    return api.get<ApiResponse<PaginatedList<ReviewFull>>>(`/reports/review-full/by-user`, { params: { userID: userId, page, pageSize } })
+    return api.get<ApiResponse<ReviewFull[]>>(`/reports/review-full/by-user`, { params: { userID: userId, page, pageSize } })
   },
 }
