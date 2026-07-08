@@ -162,18 +162,18 @@ onMounted(() => {
         <div v-if="loading" class="space-y-3">
           <Skeleton v-for="i in 5" :key="i" class="h-12 w-full" />
         </div>
-        <div v-else class="rounded-md border">
-          <Table>
+        <div v-else class="rounded-md border overflow-x-auto">
+          <Table class="w-full">
             <TableHeader>
               <TableRow>
-                <TableHead>用户名</TableHead>
-                <TableHead>手机号</TableHead>
-                <TableHead>邮箱</TableHead>
-                <TableHead>角色</TableHead>
-                <TableHead class="text-right">积分</TableHead>
-                <TableHead>VIP等级</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead class="text-right">操作</TableHead>
+                <TableHead class="whitespace-nowrap">用户名</TableHead>
+                <TableHead class="whitespace-nowrap">手机号</TableHead>
+                <TableHead class="whitespace-nowrap">邮箱</TableHead>
+                <TableHead class="whitespace-nowrap">角色</TableHead>
+                <TableHead class="text-right whitespace-nowrap">积分</TableHead>
+                <TableHead class="whitespace-nowrap">VIP等级</TableHead>
+                <TableHead class="whitespace-nowrap">状态</TableHead>
+                <TableHead class="text-right whitespace-nowrap w-[100px]">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -187,10 +187,10 @@ onMounted(() => {
                 :key="user.id"
                 class="hover:bg-muted/50"
               >
-                <TableCell class="font-medium">{{ user.username }}</TableCell>
-                <TableCell>{{ user.phone ?? '-' }}</TableCell>
-                <TableCell>{{ user.email ?? '-' }}</TableCell>
-                <TableCell>
+                <TableCell class="font-medium whitespace-nowrap">{{ user.username }}</TableCell>
+                <TableCell class="whitespace-nowrap">{{ user.phone ?? '-' }}</TableCell>
+                <TableCell class="whitespace-nowrap">{{ user.email ?? '-' }}</TableCell>
+                <TableCell class="whitespace-nowrap">
                   <Badge
                     :class="roleBadgeClass(user.role)"
                     variant="outline"
@@ -198,13 +198,13 @@ onMounted(() => {
                     {{ roleLabel(user.role) }}
                   </Badge>
                 </TableCell>
-                <TableCell class="text-right font-medium">
+                <TableCell class="text-right font-medium whitespace-nowrap">
                   {{ user.points }}
                 </TableCell>
-                <TableCell>
-                  <span class="text-sm">{{ vipLevelLabel(user.vipLevelId) }}</span>
+                <TableCell class="whitespace-nowrap">
+                  <span class="text-sm whitespace-nowrap">{{ vipLevelLabel(user.vipLevelId) }}</span>
                 </TableCell>
-                <TableCell>
+                <TableCell class="whitespace-nowrap">
                   <Badge
                     :class="statusBadgeClass(user.status)"
                     variant="outline"
@@ -212,18 +212,20 @@ onMounted(() => {
                     {{ statusLabel(user.status) }}
                   </Badge>
                 </TableCell>
-                <TableCell class="text-right">
+                <TableCell class="text-right whitespace-nowrap">
                   <div class="flex items-center justify-end gap-1">
                     <Button
                       variant="ghost"
-                      size="icon-sm"
+                      size="icon"
+                      class="h-8 w-8"
                       @click="openEdit(user)"
                     >
                       <Search class="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
-                      size="icon-sm"
+                      size="icon"
+                      class="h-8 w-8"
                       @click="openDelete(user)"
                     >
                       <X class="h-4 w-4 text-destructive" />

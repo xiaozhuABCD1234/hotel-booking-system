@@ -187,14 +187,15 @@ onMounted(() => {
 
     <Card class="shadow-sm">
       <CardContent class="pt-6">
-        <Table>
+        <div class="rounded-md border overflow-x-auto">
+        <Table class="w-full">
           <TableHeader>
             <TableRow>
-              <TableHead>酒店名称</TableHead>
-              <TableHead>客房类型</TableHead>
-              <TableHead>价格</TableHead>
-              <TableHead>可用/总数</TableHead>
-              <TableHead class="text-right">操作</TableHead>
+              <TableHead class="whitespace-nowrap">酒店名称</TableHead>
+              <TableHead class="whitespace-nowrap">客房类型</TableHead>
+              <TableHead class="whitespace-nowrap">价格</TableHead>
+              <TableHead class="whitespace-nowrap">可用/总数</TableHead>
+              <TableHead class="text-right whitespace-nowrap w-[140px]">操作</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -214,16 +215,16 @@ onMounted(() => {
             </template>
             <template v-else>
               <TableRow v-for="room in rooms" :key="room.id">
-                <TableCell class="font-medium">{{ getHotelName(room.hotelId) }}</TableCell>
-                <TableCell>{{ room.roomType }}</TableCell>
-                <TableCell>{{ formatPrice(room.price) }}</TableCell>
-                <TableCell>
+                <TableCell class="font-medium whitespace-nowrap">{{ getHotelName(room.hotelId) }}</TableCell>
+                <TableCell class="whitespace-nowrap">{{ room.roomType }}</TableCell>
+                <TableCell class="whitespace-nowrap">{{ formatPrice(room.price) }}</TableCell>
+                <TableCell class="whitespace-nowrap">
                   <span :class="room.availableCount > 0 ? 'text-green-600' : 'text-red-600'">
                     {{ room.availableCount }}
                   </span>
                   / {{ room.totalCount }}
                 </TableCell>
-                <TableCell class="text-right">
+                <TableCell class="text-right whitespace-nowrap">
                   <div class="flex justify-end gap-2">
                     <Button variant="outline" size="sm" @click="openEditDialog(room)">
                       <Pencil class="mr-1 h-3 w-3" />
@@ -239,6 +240,7 @@ onMounted(() => {
             </template>
           </TableBody>
         </Table>
+        </div>
 
         <!-- Pagination -->
         <div v-if="!loading && rooms.length > 0" class="mt-4 flex items-center justify-between">

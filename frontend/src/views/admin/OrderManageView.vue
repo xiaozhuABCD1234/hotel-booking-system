@@ -149,6 +149,12 @@ async function confirmDelete() {
 	}
 }
 
+function formatDate(dateStr: string): string {
+	if (!dateStr) return "-";
+	const d = new Date(dateStr);
+	return d.toLocaleDateString("zh-CN");
+}
+
 function goToPage(page: number) {
 	currentPage.value = page;
 	fetchOrders();
@@ -197,19 +203,19 @@ onMounted(() => {
 				<div v-if="loading" class="space-y-3">
 					<Skeleton v-for="i in 5" :key="i" class="h-12 w-full" />
 				</div>
-				<div v-else class="rounded-md border">
-					<Table>
+				<div v-else class="rounded-md border overflow-x-auto">
+					<Table class="w-full">
 						<TableHeader>
 							<TableRow>
-								<TableHead class="w-[100px]">订单ID</TableHead>
-								<TableHead>酒店</TableHead>
-								<TableHead>房型</TableHead>
-								<TableHead>入住人</TableHead>
-								<TableHead>入住日期</TableHead>
-								<TableHead>离店日期</TableHead>
-								<TableHead class="text-right">总价</TableHead>
-								<TableHead>状态</TableHead>
-								<TableHead class="text-right">操作</TableHead>
+								<TableHead class="w-[90px] whitespace-nowrap">订单ID</TableHead>
+								<TableHead class="whitespace-nowrap">酒店</TableHead>
+								<TableHead class="whitespace-nowrap">房型</TableHead>
+								<TableHead class="whitespace-nowrap">入住人</TableHead>
+								<TableHead class="whitespace-nowrap">入住日期</TableHead>
+								<TableHead class="whitespace-nowrap">离店日期</TableHead>
+								<TableHead class="text-right whitespace-nowrap">总价</TableHead>
+								<TableHead class="whitespace-nowrap w-[80px]">状态</TableHead>
+								<TableHead class="text-right whitespace-nowrap w-[120px]">操作</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
@@ -226,49 +232,52 @@ onMounted(() => {
 								:key="order.id"
 								class="hover:bg-muted/50"
 							>
-								<TableCell class="font-mono text-xs">
+								<TableCell class="font-mono text-xs whitespace-nowrap">
 									{{ order.id.slice(0, 8) }}
 								</TableCell>
-								<TableCell>{{
+								<TableCell class="whitespace-nowrap">{{
 									order.room?.hotel?.hotelName ?? order.user?.realName ?? "-"
 								}}</TableCell>
-								<TableCell>{{ order.room?.typeName ?? "-" }}</TableCell>
-								<TableCell>{{
+								<TableCell class="whitespace-nowrap">{{ order.room?.typeName ?? "-" }}</TableCell>
+								<TableCell class="whitespace-nowrap">{{
 									order.user?.realName || order.user?.username || "-"
 								}}</TableCell>
-								<TableCell>{{ order.checkInDate }}</TableCell>
-								<TableCell>{{ order.checkOutDate }}</TableCell>
-								<TableCell class="text-right font-medium">
+								<TableCell class="whitespace-nowrap">{{ formatDate(order.checkInDate) }}</TableCell>
+								<TableCell class="whitespace-nowrap">{{ formatDate(order.checkOutDate) }}</TableCell>
+								<TableCell class="text-right font-medium whitespace-nowrap">
 									¥{{ order.totalPrice.toFixed(2) }}
 								</TableCell>
-								<TableCell>
+								<TableCell class="whitespace-nowrap">
 									<Badge
 										:class="statusBadgeClass(order.status)"
 										variant="outline"
-                    class="whitespace-nowrap"
+										class="whitespace-nowrap"
 									>
 										{{ statusLabel(order.status) }}
 									</Badge>
 								</TableCell>
-								<TableCell class="text-right">
+								<TableCell class="text-right whitespace-nowrap">
 									<div class="flex items-center justify-end gap-1">
 										<Button
 											variant="ghost"
-											size="icon-sm"
+											size="icon"
+											class="h-8 w-8"
 											@click="openDetail(order)"
 										>
 											<Search class="h-4 w-4" />
 										</Button>
 										<Button
 											variant="ghost"
-											size="icon-sm"
+											size="icon"
+											class="h-8 w-8"
 											@click="openStatusUpdate(order)"
 										>
 											<Check class="h-4 w-4" />
 										</Button>
 										<Button
 											variant="ghost"
-											size="icon-sm"
+											size="icon"
+											class="h-8 w-8"
 											@click="openDelete(order)"
 										>
 											<X class="h-4 w-4 text-destructive" />

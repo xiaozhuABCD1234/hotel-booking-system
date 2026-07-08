@@ -185,15 +185,16 @@ onMounted(() => {
 
     <Card class="shadow-sm">
       <CardContent class="pt-6">
-        <Table>
+        <div class="rounded-md border overflow-x-auto">
+        <Table class="w-full">
           <TableHeader>
             <TableRow>
-              <TableHead>酒店名称</TableHead>
-              <TableHead>地区</TableHead>
-              <TableHead>星级</TableHead>
-              <TableHead>地址</TableHead>
-              <TableHead>电话</TableHead>
-              <TableHead class="text-right">操作</TableHead>
+              <TableHead class="whitespace-nowrap">酒店名称</TableHead>
+              <TableHead class="whitespace-nowrap">地区</TableHead>
+              <TableHead class="whitespace-nowrap">星级</TableHead>
+              <TableHead class="whitespace-nowrap">地址</TableHead>
+              <TableHead class="whitespace-nowrap">电话</TableHead>
+              <TableHead class="text-right whitespace-nowrap w-[140px]">操作</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -213,17 +214,17 @@ onMounted(() => {
             </template>
             <template v-else>
               <TableRow v-for="hotel in hotels" :key="hotel.id">
-                <TableCell class="font-medium">{{ hotel.hotelName }}</TableCell>
-                <TableCell>{{ getRegionName(hotel.regionId) }}</TableCell>
-                <TableCell>
+                <TableCell class="font-medium whitespace-nowrap">{{ hotel.hotelName }}</TableCell>
+                <TableCell class="whitespace-nowrap">{{ getRegionName(hotel.regionId) }}</TableCell>
+                <TableCell class="whitespace-nowrap">
                   <Badge v-if="hotel.starLevel" variant="secondary">
                     <Star class="mr-1 h-3 w-3" />
                     {{ hotel.starLevel }}星
                   </Badge>
                 </TableCell>
-                <TableCell>{{ hotel.address }}</TableCell>
-                <TableCell>{{ hotel.telephone }}</TableCell>
-                <TableCell class="text-right">
+                <TableCell class="whitespace-nowrap">{{ hotel.address }}</TableCell>
+                <TableCell class="whitespace-nowrap">{{ hotel.telephone }}</TableCell>
+                <TableCell class="text-right whitespace-nowrap">
                   <div class="flex justify-end gap-2">
                     <Button variant="outline" size="sm" @click="openEditDialog(hotel)">
                       <Pencil class="mr-1 h-3 w-3" />
@@ -239,6 +240,7 @@ onMounted(() => {
             </template>
           </TableBody>
         </Table>
+        </div>
 
         <!-- Pagination -->
         <div v-if="!loading && hotels.length > 0" class="mt-4 flex items-center justify-between">
