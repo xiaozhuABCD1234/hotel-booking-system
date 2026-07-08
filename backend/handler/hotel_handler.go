@@ -8,6 +8,7 @@ import (
 	"backend/model"
 	schema "backend/model/schema"
 	"backend/repo"
+	"backend/service"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
@@ -21,15 +22,19 @@ type PageQuery struct {
 
 // HotelHandler 酒店与客房 HTTP 处理器
 type HotelHandler struct {
-	hotels repo.HotelRepository
-	rooms  repo.RoomRepository
+	hotels      repo.HotelRepository
+	rooms       repo.RoomRepository
+	hotelImages *repo.HotelImageRepo
+	cos         *service.COSService
 }
 
 // NewHotelHandler 创建 HotelHandler 实例
-func NewHotelHandler(hotelRepo repo.HotelRepository, roomRepo repo.RoomRepository) *HotelHandler {
+func NewHotelHandler(hotelRepo repo.HotelRepository, roomRepo repo.RoomRepository, hotelImageRepo *repo.HotelImageRepo, cosSvc *service.COSService) *HotelHandler {
 	return &HotelHandler{
-		hotels: hotelRepo,
-		rooms:  roomRepo,
+		hotels:      hotelRepo,
+		rooms:       roomRepo,
+		hotelImages: hotelImageRepo,
+		cos:         cosSvc,
 	}
 }
 
@@ -457,4 +462,91 @@ func (h *HotelHandler) DeleteRoom(c fiber.Ctx) error {
 	}
 
 	return model.SendSuccess(c, model.WithMessage("Room deleted"))
+}
+
+// UploadImage 上传酒店图片到 COS 并保存记录。
+//
+//	@Summary		上传酒店图片
+//	@Description	上传图片到腾讯云 COS 并关联到指定酒店。
+//	@Tags			hotels
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Param			id		path		string	true	"酒店 ID (UUID)"
+//	@Param			file	formData	file	true	"图片文件"
+//	@Success		200		{object}	model.Response{data=object{url=string,key=string}}
+//	@Failure		400		{object}	model.Response
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/hotels/{id}/images [post]
+func (h *HotelHandler) UploadImage(c fiber.Ctx) error {
+	ctx := c.Context()
+
+	hotelID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return model.SendError(c, http.StatusBadRequest, "Invalid hotel ID")
+	}
+
+	file, err := c.FormFile("file")
+	if err != nil {
+		return model.SendError(c, http.StatusBadRequest, "file is required")
+	}
+
+	result, err := h.cos.Upload(ctx, file)
+	if err != nil {
+		return model.SendError(c, http.StatusInternalServerError, "upload failed: "+err.Error())
+	}
+
+	if err := h.hotelImages.Create(ctx, &schema.HotelImage{
+		HotelID:  hotelID,
+		ImageURL: result.URL,
+	}); err != nil {
+		return model.SendError(c, http.StatusInternalServerError, "failed to save image record: "+err.Error())
+	}
+
+	return model.SendSuccess(c, model.WithData(fiber.Map{
+		"url": result.URL,
+		"key": result.Key,
+	}))
+}
+
+// DeleteImage 删除酒店图片（从 COS 和数据库中同时删除）。
+//
+//	@Summary		删除酒店图片
+//	@Description	根据酒店 ID 和图片 URL 删除酒店图片（同时删除 COS 对象和数据库记录）。
+//	@Tags			hotels
+//	@Produce		json
+//	@Param			id			path		string	true	"酒店 ID (UUID)"
+//	@Param			imageUrl	query		string	true	"图片 URL"
+//	@Success		200			{object}	model.Response
+//	@Failure		400			{object}	model.Response
+//	@Failure		500			{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/hotels/{id}/images [delete]
+func (h *HotelHandler) DeleteImage(c fiber.Ctx) error {
+	ctx := c.Context()
+
+	hotelID, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return model.SendError(c, http.StatusBadRequest, "Invalid hotel ID")
+	}
+
+	imageURL := c.Query("imageUrl")
+	if imageURL == "" {
+		return model.SendError(c, http.StatusBadRequest, "imageUrl is required")
+	}
+
+	// 先删 COS 对象
+	key := service.KeyFromURL(imageURL)
+	if key != "" {
+		if err := h.cos.Delete(ctx, key); err != nil {
+			return model.SendError(c, http.StatusInternalServerError, "failed to delete COS object: "+err.Error())
+		}
+	}
+
+	// 再删数据库记录
+	if err := h.hotelImages.Delete(ctx, hotelID, imageURL); err != nil {
+		return model.SendError(c, http.StatusInternalServerError, "failed to delete image record: "+err.Error())
+	}
+
+	return model.SendSuccess(c, model.WithMessage("Image deleted"))
 }

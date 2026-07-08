@@ -26,4 +26,22 @@ export const hotelApi = {
   delete(id: string) {
     return api.delete<ApiResponse>(`/hotels/${id}`)
   },
+
+  /** Admin: upload hotel image to COS */
+  uploadImage(hotelId: string, file: File) {
+    const form = new FormData()
+    form.append('file', file)
+    return api.post<ApiResponse<{ url: string; key: string }>>(
+      `/hotels/${hotelId}/images`,
+      form,
+      { headers: { 'Content-Type': undefined } },
+    )
+  },
+
+  /** Admin: delete hotel image */
+  deleteImage(hotelId: string, imageUrl: string) {
+    return api.delete<ApiResponse>(`/hotels/${hotelId}/images`, {
+      params: { imageUrl },
+    })
+  },
 }

@@ -63,7 +63,7 @@ func (r *HotelRepo) FindAll(ctx context.Context, offset, limit int, regionID *in
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Find(&results).Error
+	err := query.Preload("Images").Find(&results).Error
 	return results, total, err
 }
 

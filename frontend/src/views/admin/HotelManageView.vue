@@ -29,11 +29,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Star } from "@lucide/vue";
+import { Plus, Pencil, Trash2, Star, Image, X } from "@lucide/vue";
 import { hotelApi, regionApi } from "@/api";
 import { toast } from "vue-sonner";
 import { getApiErrorMessage } from "@/lib/utils";
-import type { Hotel, Region } from "@/types";
+import type { Hotel, Region, HotelImage } from "@/types";
 
 const loading = ref(true);
 const hotels = ref<Hotel[]>([]);
@@ -59,6 +59,52 @@ const isEditing = computed(() => editingHotel.value !== null);
 
 const starLevels = [1, 2, 3, 4, 5];
 
+// ─── Image upload ─────────────────────────────────────────────
+const uploadingImage = ref(false);
+const hotelImages = ref<HotelImage[]>([]);
+
+async function handleImageUpload(event: Event) {
+	const input = event.target as HTMLInputElement;
+	const file = input.files?.[0];
+	if (!file || !editingHotel.value) return;
+
+	uploadingImage.value = true;
+	try {
+		const res = await hotelApi.uploadImage(editingHotel.value.id, file);
+		if (res.data.success && res.data.data) {
+			hotelImages.value.push({
+				hotelId: editingHotel.value.id,
+				imageUrl: res.data.data.url,
+			});
+			toast.success("图片上传成功");
+		} else {
+			toast.error(res.data.message ?? "上传失败");
+		}
+	} catch (e: unknown) {
+		toast.error(getApiErrorMessage(e, "图片上传失败"));
+	} finally {
+		uploadingImage.value = false;
+		input.value = "";
+	}
+}
+
+async function handleDeleteImage(image: HotelImage) {
+	if (!editingHotel.value) return;
+	try {
+		await hotelApi.deleteImage(editingHotel.value.id, image.imageUrl);
+		hotelImages.value = hotelImages.value.filter(
+			(i) => i.imageUrl !== image.imageUrl,
+		);
+		toast.success("图片已删除");
+	} catch (e: unknown) {
+		toast.error(getApiErrorMessage(e, "删除图片失败"));
+	}
+}
+
+function loadHotelImages(hotel: Hotel) {
+	hotelImages.value = hotel.images ?? [];
+}
+
 function resetForm() {
 	form.value = {
 		hotelName: "",
@@ -73,10 +119,11 @@ function resetForm() {
 function openCreateDialog() {
 	editingHotel.value = null;
 	resetForm();
+	hotelImages.value = [];
 	dialogOpen.value = true;
 }
 
-function openEditDialog(hotel: Hotel) {
+async function openEditDialog(hotel: Hotel) {
 	editingHotel.value = hotel;
 	form.value = {
 		hotelName: hotel.hotelName,
@@ -86,6 +133,16 @@ function openEditDialog(hotel: Hotel) {
 		telephone: hotel.telephone,
 		description: hotel.description ?? "",
 	};
+	// 重新获取酒店详情，确保拿到最新的 images
+	try {
+		const res = await hotelApi.getById(hotel.id);
+		if (res.data.success && res.data.data) {
+			editingHotel.value = res.data.data;
+			loadHotelImages(res.data.data);
+		}
+	} catch {
+		loadHotelImages(hotel);
+	}
 	dialogOpen.value = true;
 }
 
@@ -385,6 +442,42 @@ onMounted(() => {
 							placeholder="请输入酒店描述"
 							:rows="3"
 						/>
+					</div>
+					<!-- Hotel Images -->
+					<div v-if="isEditing" class="grid gap-2">
+						<Label>酒店图片</Label>
+						<div class="flex flex-wrap gap-2">
+							<div
+								v-for="img in hotelImages"
+								:key="img.imageUrl"
+								class="group relative h-20 w-28 overflow-hidden rounded-md border"
+							>
+								<img
+									:src="img.imageUrl"
+									class="h-full w-full object-cover"
+									alt=""
+								/>
+								<button
+									class="absolute right-1 top-1 hidden rounded-full bg-destructive/80 p-1 text-white group-hover:block"
+									@click="handleDeleteImage(img)"
+								>
+									<X class="h-3 w-3" />
+								</button>
+							</div>
+							<label
+								class="flex h-20 w-28 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed text-muted-foreground hover:bg-accent"
+							>
+								<Image v-if="!uploadingImage" class="h-5 w-5" />
+								<span v-else class="text-xs">上传中...</span>
+								<input
+									type="file"
+									accept="image/*"
+									class="hidden"
+									:disabled="uploadingImage"
+									@change="handleImageUpload"
+								/>
+							</label>
+						</div>
 					</div>
 				</div>
 

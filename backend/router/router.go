@@ -24,6 +24,7 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	personRepo := repo.NewPersonRepo(db)
 	regionRepo := repo.NewRegionRepo(db)
 	blacklistRepo := repo.NewBlacklistRepo(db)
+	hotelImageRepo := repo.NewHotelImageRepo(db)
 
 	// 视图 repos
 	hotelSummaryRepo := repo.NewHotelSummaryRepo(db)
@@ -37,11 +38,12 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 
 	// ─── 创建 services ───────────────────────────────────────
 	orderSvc := service.NewOrderService(orderRepo)
+	cosSvc := service.NewCOSService()
 
 	// ─── 创建 handlers ─────────────────────────────────────────
 	authH := handler.NewAuthHandler(userRepo, blacklistRepo)
 	userH := handler.NewUserHandler(userRepo, vipLevelRepo)
-	hotelH := handler.NewHotelHandler(hotelRepo, roomRepo)
+	hotelH := handler.NewHotelHandler(hotelRepo, roomRepo, hotelImageRepo, cosSvc)
 	orderH := handler.NewOrderHandler(orderSvc)
 	reviewH := handler.NewReviewHandler(reviewRepo)
 	personH := handler.NewPersonHandler(personRepo)
@@ -105,6 +107,10 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	protectedHotels.Post("/", hotelH.Create)
 	protectedHotels.Put("/:id", hotelH.Update)
 	protectedHotels.Delete("/:id", hotelH.Delete)
+	if cosSvc != nil {
+		protectedHotels.Post("/:id/images", hotelH.UploadImage)
+		protectedHotels.Delete("/:id/images", hotelH.DeleteImage)
+	}
 
 	protectedRooms := protected.Group("/rooms")
 	protectedRooms.Post("/", hotelH.CreateRoom)

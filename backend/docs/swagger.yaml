@@ -940,6 +940,85 @@ paths:
       summary: 更新酒店信息
       tags:
       - hotels
+  /hotels/{id}/images:
+    delete:
+      description: 根据酒店 ID 和图片 URL 删除酒店图片（同时删除 COS 对象和数据库记录）。
+      parameters:
+      - description: 酒店 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 图片 URL
+        in: query
+        name: imageUrl
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除酒店图片
+      tags:
+      - hotels
+    post:
+      consumes:
+      - multipart/form-data
+      description: 上传图片到腾讯云 COS 并关联到指定酒店。
+      parameters:
+      - description: 酒店 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 图片文件
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  properties:
+                    key:
+                      type: string
+                    url:
+                      type: string
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 上传酒店图片
+      tags:
+      - hotels
   /orders:
     get:
       description: 分页查询全部订单列表
