@@ -21,8 +21,6 @@ export interface UserVip {
   vipLevelName?: string
   discountRate?: number
   points: number
-  orderCount: number
-  totalSpent: number
 }
 
 export interface CreateUserRequest {

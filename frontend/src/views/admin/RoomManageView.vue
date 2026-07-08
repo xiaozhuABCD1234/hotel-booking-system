@@ -47,10 +47,10 @@ const submitting = ref(false)
 
 const form = ref({
   hotelId: null as string | null,
-  roomType: '',
+  typeName: '',
   price: null as number | null,
-  totalCount: null as number | null,
-  availableCount: null as number | null,
+  totalQuantity: null as number | null,
+  availableQuantity: null as number | null,
   description: '',
 })
 
@@ -59,10 +59,10 @@ const isEditing = computed(() => editingRoom.value !== null)
 function resetForm() {
   form.value = {
     hotelId: null,
-    roomType: '',
+    typeName: '',
     price: null,
-    totalCount: null,
-    availableCount: null,
+    totalQuantity: null,
+    availableQuantity: null,
     description: '',
   }
 }
@@ -77,10 +77,10 @@ function openEditDialog(room: Room) {
   editingRoom.value = room
   form.value = {
     hotelId: room.hotelId,
-    roomType: room.roomType,
+    typeName: room.typeName,
     price: room.price,
-    totalCount: room.totalCount,
-    availableCount: room.availableCount,
+    totalQuantity: room.totalQuantity,
+    availableQuantity: room.availableQuantity,
     description: room.description ?? '',
   }
   dialogOpen.value = true
@@ -110,8 +110,8 @@ async function loadHotels() {
 }
 
 async function handleSubmit() {
-  if (!form.value.hotelId || !form.value.roomType || form.value.price === null || 
-      form.value.totalCount === null || form.value.availableCount === null) {
+  if (!form.value.hotelId || !form.value.typeName || form.value.price === null || 
+      form.value.totalQuantity === null || form.value.availableQuantity === null) {
     toast.error('请填写必填字段')
     return
   }
@@ -120,10 +120,10 @@ async function handleSubmit() {
   try {
     const data = {
       hotelId: form.value.hotelId,
-      roomType: form.value.roomType,
+      typeName: form.value.typeName,
       price: form.value.price,
-      totalCount: form.value.totalCount,
-      availableCount: form.value.availableCount,
+      totalQuantity: form.value.totalQuantity,
+      availableQuantity: form.value.availableQuantity,
       description: form.value.description,
     }
 
@@ -146,7 +146,7 @@ async function handleSubmit() {
 }
 
 async function handleDelete(room: Room) {
-  if (!confirm(`确定要删除客房"${room.roomType}"吗？`)) {
+  if (!confirm(`确定要删除客房"${room.typeName}"吗？`)) {
     return
   }
 
@@ -216,13 +216,13 @@ onMounted(() => {
             <template v-else>
               <TableRow v-for="room in rooms" :key="room.id">
                 <TableCell class="font-medium whitespace-nowrap">{{ getHotelName(room.hotelId) }}</TableCell>
-                <TableCell class="whitespace-nowrap">{{ room.roomType }}</TableCell>
+                <TableCell class="whitespace-nowrap">{{ room.typeName }}</TableCell>
                 <TableCell class="whitespace-nowrap">{{ formatPrice(room.price) }}</TableCell>
                 <TableCell class="whitespace-nowrap">
-                  <span :class="room.availableCount > 0 ? 'text-green-600' : 'text-red-600'">
-                    {{ room.availableCount }}
+                  <span :class="room.availableQuantity > 0 ? 'text-green-600' : 'text-red-600'">
+                    {{ room.availableQuantity }}
                   </span>
-                  / {{ room.totalCount }}
+                  / {{ room.totalQuantity }}
                 </TableCell>
                 <TableCell class="text-right whitespace-nowrap">
                   <div class="flex justify-end gap-2">
@@ -295,10 +295,10 @@ onMounted(() => {
           </div>
 
           <div class="grid gap-2">
-            <Label for="roomType">客房类型 *</Label>
+            <Label for="typeName">客房类型 *</Label>
             <Input
-              id="roomType"
-              v-model="form.roomType"
+              id="typeName"
+              v-model="form.typeName"
               placeholder="请输入客房类型"
             />
           </div>
@@ -318,24 +318,24 @@ onMounted(() => {
 
           <div class="grid grid-cols-2 gap-4">
             <div class="grid gap-2">
-              <Label for="totalCount">总数 *</Label>
+              <Label for="totalQuantity">总数 *</Label>
               <Input
-                id="totalCount"
+                id="totalQuantity"
                 type="number"
-                :model-value="form.totalCount?.toString() ?? ''"
-                @update:model-value="(v) => form.totalCount = v ? Number(v) : null"
+                :model-value="form.totalQuantity?.toString() ?? ''"
+                @update:model-value="(v) => form.totalQuantity = v ? Number(v) : null"
                 placeholder="总数"
                 :min="0"
               />
             </div>
 
             <div class="grid gap-2">
-              <Label for="availableCount">可用数 *</Label>
+              <Label for="availableQuantity">可用数 *</Label>
               <Input
-                id="availableCount"
+                id="availableQuantity"
                 type="number"
-                :model-value="form.availableCount?.toString() ?? ''"
-                @update:model-value="(v) => form.availableCount = v ? Number(v) : null"
+                :model-value="form.availableQuantity?.toString() ?? ''"
+                @update:model-value="(v) => form.availableQuantity = v ? Number(v) : null"
                 placeholder="可用数"
                 :min="0"
               />

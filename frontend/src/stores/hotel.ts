@@ -45,10 +45,11 @@ export const useHotelStore = defineStore('hotel', () => {
       } else {
         rooms.value = []
       }
+      return res.data
     } catch {
       rooms.value = []
+      return undefined
     }
-    return res.data
   }
 
   async function createHotel(data: Partial<Hotel>) {

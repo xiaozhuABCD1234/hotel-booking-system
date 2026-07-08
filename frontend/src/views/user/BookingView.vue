@@ -199,7 +199,7 @@ onMounted(async () => {
                     type="number"
                     v-model.number="form.roomCount"
                     :min="1"
-                    :max="room.availableCount"
+                    :max="room.availableQuantity"
                   />
                 </div>
 
@@ -247,7 +247,7 @@ onMounted(async () => {
               <CardContent class="space-y-4">
                 <!-- Room Summary -->
                 <div>
-                  <p class="font-medium text-gray-900">{{ room.roomType }}</p>
+                  <p class="font-medium text-gray-900">{{ room.typeName }}</p>
                   <p class="text-sm text-gray-500">
                     ¥{{ room.price }} / 晚
                   </p>

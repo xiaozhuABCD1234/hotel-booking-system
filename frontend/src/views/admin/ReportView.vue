@@ -40,8 +40,6 @@ interface UserVipRow {
   vipLevelName?: string
   discountRate?: number
   points: number
-  orderCount: number
-  totalSpent: number
 }
 
 const activeTab = ref('hotel')
@@ -245,8 +243,6 @@ onMounted(() => {
                     <TableHead>VIP等级</TableHead>
                     <TableHead class="text-center">折扣率</TableHead>
                     <TableHead class="text-right">积分</TableHead>
-                    <TableHead class="text-center">订单数</TableHead>
-                    <TableHead class="text-right">累计消费</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -275,10 +271,6 @@ onMounted(() => {
                       {{ user.discountRate ? `${(user.discountRate * 100).toFixed(0)}%` : '-' }}
                     </TableCell>
                     <TableCell class="text-right font-medium">{{ user.points }}</TableCell>
-                    <TableCell class="text-center">{{ user.orderCount }}</TableCell>
-                    <TableCell class="text-right font-medium">
-                      ¥{{ user.totalSpent.toFixed(2) }}
-                    </TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -310,7 +302,7 @@ onMounted(() => {
               </CardHeader>
               <CardContent>
                 <div class="text-2xl font-bold">
-                  {{ guestStats.reduce((sum, g) => sum + g.bookingCount, 0) }}
+                  {{ guestStats.reduce((sum, g) => sum + g.totalOrders, 0) }}
                 </div>
               </CardContent>
             </Card>
@@ -322,7 +314,7 @@ onMounted(() => {
               </CardHeader>
               <CardContent>
                 <div class="text-2xl font-bold">
-                  ¥{{ guestStats.reduce((sum, g) => sum + g.totalSpent, 0).toFixed(0) }}
+                  ¥{{ guestStats.reduce((sum, g) => sum + g.totalAmount, 0).toFixed(0) }}
                 </div>
               </CardContent>
             </Card>
@@ -354,26 +346,26 @@ onMounted(() => {
                   </TableHeader>
                   <TableBody>
                     <TableRow v-if="topGuests.length === 0">
-                      <TableCell colspan="6" class="text-center py-8 text-muted-foreground">
+                    <TableCell colspan="4" class="text-center py-8 text-muted-foreground">
                         暂无数据
                       </TableCell>
                     </TableRow>
                     <TableRow
                       v-for="(guest, index) in topGuests"
-                      :key="guest.personId"
+                      :key="guest.personIdCard"
                       class="hover:bg-muted/50"
                     >
                       <TableCell class="font-medium text-muted-foreground">
                         {{ index + 1 }}
                       </TableCell>
-                      <TableCell class="font-medium">{{ guest.name }}</TableCell>
+                      <TableCell class="font-medium">{{ guest.personName }}</TableCell>
                       <TableCell>{{ guest.gender }}</TableCell>
                       <TableCell class="text-center">{{ guest.age }}</TableCell>
                       <TableCell class="text-center font-medium">
-                        {{ guest.bookingCount }}
+                        {{ guest.totalOrders }}
                       </TableCell>
                       <TableCell class="text-right font-medium">
-                        ¥{{ guest.totalSpent.toFixed(2) }}
+                        ¥{{ guest.totalAmount.toFixed(2) }}
                       </TableCell>
                     </TableRow>
                   </TableBody>

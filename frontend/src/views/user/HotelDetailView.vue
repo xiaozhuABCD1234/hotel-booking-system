@@ -229,7 +229,7 @@ onMounted(async () => {
                   <img
                     v-if="room.imageUrl"
                     :src="room.imageUrl"
-                    :alt="room.roomType"
+                    :alt="room.typeName"
                     class="h-full w-full object-cover"
                   />
                   <div
@@ -245,13 +245,13 @@ onMounted(async () => {
                   <div>
                     <div class="mb-1 flex items-center gap-2">
                       <h3 class="text-base font-semibold text-gray-900">
-                        {{ room.roomType }}
+                        {{ room.typeName }}
                       </h3>
                       <Badge
-                        :variant="room.availableCount > 0 ? 'default' : 'secondary'"
-                        :class="room.availableCount > 0 ? 'bg-green-100 text-green-700 hover:bg-green-100' : ''"
+                        :variant="room.availableQuantity > 0 ? 'default' : 'secondary'"
+                        :class="room.availableQuantity > 0 ? 'bg-green-100 text-green-700 hover:bg-green-100' : ''"
                       >
-                        {{ room.availableCount > 0 ? `剩余 ${room.availableCount} 间` : '已满' }}
+                        {{ room.availableQuantity > 0 ? `剩余 ${room.availableQuantity} 间` : '已满' }}
                       </Badge>
                     </div>
                     <p v-if="room.description" class="mb-2 text-sm text-gray-500">
@@ -267,7 +267,7 @@ onMounted(async () => {
                     <Button
                       size="sm"
                       class="bg-blue-900 hover:bg-blue-800"
-                      :disabled="room.availableCount <= 0"
+                      :disabled="room.availableQuantity <= 0"
                       @click="goToBooking(room)"
                     >
                       预订

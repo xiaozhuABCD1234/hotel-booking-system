@@ -8,7 +8,6 @@ export interface Review {
   hotelId: string
   rating: number
   content?: string
-  images?: string[]
   createAt: string
   updateAt: string
   user?: User

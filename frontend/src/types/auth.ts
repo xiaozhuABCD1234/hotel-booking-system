@@ -10,13 +10,13 @@ export interface RegisterRequest {
   password: string
   phone?: string
   email?: string
+  realName?: string
 }
 
 /** Auth tokens */
 export interface TokenPair {
   accessToken: string
   refreshToken: string
-  expiresIn: number
 }
 
 /** Login/Register response data (matches backend tokenResponse) */

@@ -4,10 +4,9 @@ export interface Room {
   id: string
   hotelId: string
   typeName: string
-  roomType: string
   price: number
-  totalCount: number
-  availableCount: number
+  totalQuantity: number
+  availableQuantity: number
   description?: string
   imageUrl?: string
   createAt: string
@@ -20,17 +19,14 @@ export interface RoomDetails {
   roomId: string
   hotelId: string
   hotelName: string
-  roomType: string
+  typeName: string
   price: number
-  totalCount: number
-  availableCount: number
-  description?: string
-  imageUrl?: string
+  totalQuantity: number
+  availableQuantity: number
+  roomDescription?: string
   province?: string
   city?: string
   district?: string
-  hotelStatus: number
-  roomStatus: number
 }
 
 export interface RoomSearchParams {

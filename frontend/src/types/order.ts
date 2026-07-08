@@ -40,11 +40,10 @@ export interface OrderFull {
   checkInDate: string
   checkOutDate: string
   guestName: string
-  guestPhone: string
   guestIdCard: string
-  roomCount: number
+  quantity: number
   totalPrice: number
-  status: OrderStatus
+  orderStatus: string
   createAt: string
 }
 
@@ -52,15 +51,11 @@ export interface MyOrder {
   orderId: string
   hotelName: string
   roomType: string
-  price: number
   checkInDate: string
   checkOutDate: string
-  guestName: string
-  guestPhone: string
-  guestIdCard: string
-  roomCount: number
-  totalPrice: number
-  status: OrderStatus
+  quantity: number
+  actualPrice: number
+  orderStatus: string
   createAt: string
 }
 

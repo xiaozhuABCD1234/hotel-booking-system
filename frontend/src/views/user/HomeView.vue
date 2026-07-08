@@ -108,7 +108,7 @@ onMounted(async () => {
                       :key="region.id"
                       :value="String(region.id)"
                     >
-                      {{ region.name }}
+                      {{ region.regionName }}
                     </SelectItem>
                   </SelectContent>
                 </Select>

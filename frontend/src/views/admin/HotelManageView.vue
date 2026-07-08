@@ -164,7 +164,7 @@ async function handleDelete(hotel: Hotel) {
 
 function getRegionName(regionId: number): string {
   const region = regions.value.find((r) => r.id === regionId)
-  return region?.name ?? String(regionId)
+  return region?.regionName ?? String(regionId)
 }
 
 onMounted(() => {
@@ -297,7 +297,7 @@ onMounted(() => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem v-for="region in regions" :key="region.id" :value="region.id.toString()">
-                  {{ region.name }}
+                  {{ region.regionName }}
                 </SelectItem>
               </SelectContent>
             </Select>

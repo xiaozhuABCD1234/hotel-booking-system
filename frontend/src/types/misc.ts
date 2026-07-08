@@ -1,18 +1,14 @@
 export interface Region {
   id: number
-  name: string
-  parentId?: number
-  level: number
+  regionName: string
+  parentsId?: number
 }
 
 export interface GuestStats {
   ageGroup: string
   gender: string
-  occupation?: string
-  education?: string
-  income?: string
-  bookingCount: number
-  totalSpent: number
+  totalOrders: number
+  totalAmount: number
 }
 
 export interface PersonInfo {
@@ -20,17 +16,13 @@ export interface PersonInfo {
   name: string
   gender: string
   age: number
-  occupation?: string
-  education?: string
-  income?: string
 }
 
 export interface GuestBookingStats {
-  personId: string
-  name: string
+  personIdCard: string
+  personName: string
   gender: string
   age: number
-  occupation?: string
-  bookingCount: number
-  totalSpent: number
+  totalOrders: number
+  totalAmount: number
 }
