@@ -230,11 +230,11 @@ onMounted(() => {
 									{{ order.id.slice(0, 8) }}
 								</TableCell>
 								<TableCell>{{
-									order.room?.hotel?.hotelName ?? order.user?.username ?? "-"
+									order.room?.hotel?.hotelName ?? order.user?.realName ?? "-"
 								}}</TableCell>
-								<TableCell>{{ order.room?.roomType ?? "-" }}</TableCell>
+								<TableCell>{{ order.room?.typeName ?? "-" }}</TableCell>
 								<TableCell>{{
-									order.user?.username || "-"
+									order.user?.realName || order.user?.username || "-"
 								}}</TableCell>
 								<TableCell>{{ order.checkInDate }}</TableCell>
 								<TableCell>{{ order.checkOutDate }}</TableCell>
@@ -329,14 +329,16 @@ onMounted(() => {
 						<div>
 							<Label class="text-muted-foreground">房型</Label>
 							<p class="font-medium">
-								{{ selectedOrder.room?.roomType ?? "-" }}
+								{{ selectedOrder.room?.typeName ?? "-" }}
 							</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">入住人</Label>
 							<p class="font-medium">
 								{{
-									selectedOrder.user?.username || "-"
+									selectedOrder.user?.realName ||
+									selectedOrder.user?.username ||
+									"-"
 								}}
 							</p>
 						</div>

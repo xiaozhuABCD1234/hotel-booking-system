@@ -1,6 +1,7 @@
 export interface User {
   id: string
   username: string
+  realName?: string
   phone?: string
   email?: string
   role: 'customer' | 'vip' | 'hotel_manager' | 'admin'

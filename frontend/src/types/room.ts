@@ -3,6 +3,7 @@ import type { Hotel } from './hotel'
 export interface Room {
   id: string
   hotelId: string
+  typeName: string
   roomType: string
   price: number
   totalCount: number
