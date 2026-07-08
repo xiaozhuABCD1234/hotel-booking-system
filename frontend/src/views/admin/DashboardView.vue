@@ -120,7 +120,7 @@ const stats = [
             </template>
             <template v-else>
               <TableRow v-for="order in recentOrders" :key="order.id">
-                <TableCell>{{ order.guestName }}</TableCell>
+                <TableCell>{{ order.user?.realName || order.user?.username || '-' }}</TableCell>
                 <TableCell>{{ order.checkInDate }}</TableCell>
                 <TableCell>{{ order.checkOutDate }}</TableCell>
                 <TableCell>¥{{ order.totalPrice.toFixed(2) }}</TableCell>

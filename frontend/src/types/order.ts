@@ -1,5 +1,4 @@
 import type { Room } from './room'
-import type { Hotel } from './hotel'
 import type { User } from './user'
 
 export type OrderStatus = 'pending' | 'booked' | 'checked_in' | 'cancelled' | 'completed'
@@ -8,20 +7,28 @@ export interface Order {
   id: string
   userId: string
   roomId: string
-  hotelId: string
+  quantity: number
   checkInDate: string
   checkOutDate: string
-  guestName: string
-  guestPhone: string
-  guestIdCard: string
-  roomCount: number
   totalPrice: number
+  discount: number
+  actualPrice: number
   status: OrderStatus
   createAt: string
   updateAt: string
   room?: Room
-  hotel?: Hotel
   user?: User
+  guests?: OrderGuest[]
+}
+
+export interface OrderGuest {
+  orderId: string
+  idCard: string
+  person?: {
+    idCard: string
+    name: string
+    phone?: string
+  }
 }
 
 export interface OrderFull {

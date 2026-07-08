@@ -44,7 +44,7 @@ func (r *OrderRepo) FindByID(ctx context.Context, id uuid.UUID) (*model.Order, e
 	var order model.Order
 	err := r.db.WithContext(ctx).
 		Preload("User").
-		Preload("Room").
+		Preload("Room.Hotel").
 		Preload("Guests").
 		Preload("Guests.Person").
 		First(&order, "id = ?", id).Error
@@ -54,7 +54,7 @@ func (r *OrderRepo) FindByID(ctx context.Context, id uuid.UUID) (*model.Order, e
 	return &order, nil
 }
 
-// FindByUserID 根据用户 ID 查询订单列表，预加载 Room，按 create_at 降序。
+// FindByUserID 根据用户 ID 查询订单列表，JOIN 加载 User、Room，按 create_at 降序。
 func (r *OrderRepo) FindByUserID(ctx context.Context, userID uuid.UUID, offset, limit int) ([]model.Order, int64, error) {
 	var results []model.Order
 	var total int64
@@ -65,11 +65,11 @@ func (r *OrderRepo) FindByUserID(ctx context.Context, userID uuid.UUID, offset, 
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("Room").Order("create_at DESC").Find(&results).Error
+	err := query.Joins("User").Joins("Room").Preload("Room.Hotel").Order("create_at DESC").Find(&results).Error
 	return results, total, err
 }
 
-// FindByUserIDAndStatus 根据用户 ID 和状态查询订单列表，预加载 Room，按 create_at 降序。
+// FindByUserIDAndStatus 根据用户 ID 和状态查询订单列表，JOIN 加载 User、Room，按 create_at 降序。
 func (r *OrderRepo) FindByUserIDAndStatus(ctx context.Context, userID uuid.UUID, status model.OrderStatus, offset, limit int) ([]model.Order, int64, error) {
 	var results []model.Order
 	var total int64
@@ -80,11 +80,11 @@ func (r *OrderRepo) FindByUserIDAndStatus(ctx context.Context, userID uuid.UUID,
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("Room").Order("create_at DESC").Find(&results).Error
+	err := query.Joins("User").Joins("Room").Preload("Room.Hotel").Order("create_at DESC").Find(&results).Error
 	return results, total, err
 }
 
-// FindByHotelID 根据酒店 ID 查询订单列表，通过 room_1718 关联，预加载 User，按 create_at 降序。
+// FindByHotelID 根据酒店 ID 查询订单列表，JOIN 加载 User、Room，按 create_at 降序。
 func (r *OrderRepo) FindByHotelID(ctx context.Context, hotelID uuid.UUID, offset, limit int) ([]model.Order, int64, error) {
 	var results []model.Order
 	var total int64
@@ -97,11 +97,11 @@ func (r *OrderRepo) FindByHotelID(ctx context.Context, hotelID uuid.UUID, offset
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("User").Order("create_at DESC").Find(&results).Error
+	err := query.Joins("User").Joins("Room").Preload("Room.Hotel").Order("create_at DESC").Find(&results).Error
 	return results, total, err
 }
 
-// FindAll 查询全部订单，预加载 User、Room，按 create_at 降序。
+// FindAll 查询全部订单，JOIN 加载 User 和 Room，按 create_at 降序。
 func (r *OrderRepo) FindAll(ctx context.Context, offset, limit int) ([]model.Order, int64, error) {
 	var results []model.Order
 	var total int64
@@ -112,7 +112,7 @@ func (r *OrderRepo) FindAll(ctx context.Context, offset, limit int) ([]model.Ord
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("User").Preload("Room").Order("create_at DESC").Find(&results).Error
+	err := query.Joins("User").Joins("Room").Preload("Room.Hotel").Order("create_at DESC").Find(&results).Error
 	return results, total, err
 }
 

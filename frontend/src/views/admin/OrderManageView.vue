@@ -233,9 +233,9 @@ onMounted(() => {
                 <TableCell class="font-mono text-xs">
                   {{ order.id.slice(0, 8) }}
                 </TableCell>
-                <TableCell>{{ order.hotel?.hotelName ?? '-' }}</TableCell>
-                <TableCell>{{ order.room?.roomType ?? '-' }}</TableCell>
-                <TableCell>{{ order.guestName }}</TableCell>
+                <TableCell>{{ order.room?.hotel?.hotelName ?? order.user?.realName ?? '-' }}</TableCell>
+                <TableCell>{{ order.room?.typeName ?? '-' }}</TableCell>
+                <TableCell>{{ order.user?.realName || order.user?.username || '-' }}</TableCell>
                 <TableCell>
                   <div class="flex items-center gap-1">
                     <Calendar class="h-3 w-3 text-muted-foreground" />
@@ -324,27 +324,27 @@ onMounted(() => {
           <div class="grid grid-cols-2 gap-4">
             <div>
               <Label class="text-muted-foreground">酒店</Label>
-              <p class="font-medium">{{ selectedOrder.hotel?.hotelName ?? '-' }}</p>
+              <p class="font-medium">{{ selectedOrder.room?.hotel?.hotelName ?? '-' }}</p>
             </div>
             <div>
               <Label class="text-muted-foreground">房型</Label>
-              <p class="font-medium">{{ selectedOrder.room?.roomType ?? '-' }}</p>
+              <p class="font-medium">{{ selectedOrder.room?.typeName ?? '-' }}</p>
             </div>
             <div>
               <Label class="text-muted-foreground">入住人</Label>
-              <p class="font-medium">{{ selectedOrder.guestName }}</p>
+              <p class="font-medium">{{ selectedOrder.user?.realName || selectedOrder.user?.username || '-' }}</p>
             </div>
             <div>
               <Label class="text-muted-foreground">联系电话</Label>
-              <p class="font-medium">{{ selectedOrder.guestPhone }}</p>
+              <p class="font-medium">{{ selectedOrder.user?.phone ?? '-' }}</p>
             </div>
             <div>
               <Label class="text-muted-foreground">身份证号</Label>
-              <p class="font-medium">{{ selectedOrder.guestIdCard }}</p>
+              <p class="font-medium">{{ selectedOrder.guests?.[0]?.idCard ?? '-' }}</p>
             </div>
             <div>
               <Label class="text-muted-foreground">房间数</Label>
-              <p class="font-medium">{{ selectedOrder.roomCount }}</p>
+              <p class="font-medium">{{ selectedOrder.quantity }}</p>
             </div>
             <div>
               <Label class="text-muted-foreground">入住日期</Label>

@@ -155,10 +155,10 @@ onMounted(() => {
               <TableBody>
                 <TableRow v-for="order in orders" :key="order.id">
                   <TableCell class="font-medium">
-                    {{ order.hotel?.hotelName ?? '—' }}
+                    {{ order.room?.hotel?.hotelName ?? '—' }}
                   </TableCell>
                   <TableCell>
-                    {{ order.room?.roomType ?? '—' }}
+                    {{ order.room?.typeName ?? '—' }}
                   </TableCell>
                   <TableCell>
                     <div class="text-sm">
@@ -168,11 +168,11 @@ onMounted(() => {
                   </TableCell>
                   <TableCell>
                     <div class="text-sm">
-                      <div>{{ order.guestName }}</div>
-                      <div class="text-gray-400">{{ order.guestPhone }}</div>
+                      <div>{{ order.user?.realName || order.user?.username || '—' }}</div>
+                      <div class="text-gray-400">{{ order.user?.phone ?? '—' }}</div>
                     </div>
                   </TableCell>
-                  <TableCell>{{ order.roomCount }}</TableCell>
+                  <TableCell>{{ order.quantity }}</TableCell>
                   <TableCell class="font-medium">
                     ¥{{ order.totalPrice.toFixed(2) }}
                   </TableCell>
