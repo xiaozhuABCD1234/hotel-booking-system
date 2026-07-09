@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"backend/middleware"
 	appmodel "backend/model"
 	model "backend/model/schema"
 	_ "backend/model/view"
-	"backend/middleware"
 	"backend/service"
 
 	"github.com/gofiber/fiber/v3"

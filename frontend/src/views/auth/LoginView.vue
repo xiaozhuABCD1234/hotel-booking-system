@@ -1,75 +1,85 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores'
-import type { LoginRequest } from '@/types'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Building2, Loader2 } from '@lucide/vue'
-import { toast } from 'vue-sonner'
-import { getApiErrorMessage } from '@/lib/utils'
+import { ref, reactive } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "@/stores";
+import type { LoginRequest } from "@/types";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Building2, Loader2 } from "@lucide/vue";
+import { toast } from "vue-sonner";
+import { getApiErrorMessage } from "@/lib/utils";
 
-const router = useRouter()
-const route = useRoute()
-const auth = useAuthStore()
+const router = useRouter();
+const route = useRoute();
+const auth = useAuthStore();
 
 const form = reactive<LoginRequest>({
-  username: '',
-  password: '',
-})
+  username: "",
+  password: "",
+});
 
 const errors = reactive({
-  username: '',
-  password: '',
-})
+  username: "",
+  password: "",
+});
 
-const loading = ref(false)
+const loading = ref(false);
 
 function validate(): boolean {
-  errors.username = ''
-  errors.password = ''
-  let valid = true
+  errors.username = "";
+  errors.password = "";
+  let valid = true;
 
   if (!form.username.trim()) {
-    errors.username = '请输入用户名'
-    valid = false
+    errors.username = "请输入用户名";
+    valid = false;
   }
   if (!form.password) {
-    errors.password = '请输入密码'
-    valid = false
+    errors.password = "请输入密码";
+    valid = false;
   } else if (form.password.length < 6) {
-    errors.password = '密码至少6个字符'
-    valid = false
+    errors.password = "密码至少6个字符";
+    valid = false;
   }
 
-  return valid
+  return valid;
 }
 
 async function handleSubmit() {
-  if (!validate()) return
+  if (!validate()) return;
 
-  loading.value = true
+  loading.value = true;
   try {
-    const res = await auth.login(form)
+    const res = await auth.login(form);
     if (res.success) {
       // 管理员默认跳转后台，普通用户跳转首页
-      const redirect = (route.query.redirect as string) || (auth.isAdmin ? '/admin' : '/')
-      await router.replace(redirect)
+      const redirect =
+        (route.query.redirect as string) || (auth.isAdmin ? "/admin" : "/");
+      await router.replace(redirect);
     } else {
-      toast.error(res.error?.message || '登录失败，请重试')
+      toast.error(res.error?.message || "登录失败，请重试");
     }
   } catch (e: unknown) {
-    toast.error(getApiErrorMessage(e, '登录失败，请重试'))
+    toast.error(getApiErrorMessage(e, "登录失败，请重试"));
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>
 
 <template>
-  <div class="flex min-h-dvh items-center justify-center bg-background px-4 py-12">
+  <div
+    class="flex min-h-dvh items-center justify-center bg-background px-4 py-12"
+  >
     <div class="w-full max-w-md">
       <!-- Logo -->
       <div class="mb-8 flex flex-col items-center gap-2">
@@ -125,7 +135,7 @@ async function handleSubmit() {
           <CardFooter class="flex flex-col gap-4">
             <Button type="submit" class="w-full" :disabled="loading">
               <Loader2 v-if="loading" class="mr-2 h-4 w-4 animate-spin" />
-              {{ loading ? '登录中...' : '登录' }}
+              {{ loading ? "登录中..." : "登录" }}
             </Button>
             <p class="text-sm text-muted-foreground">
               没有账号？

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
+import { ref, onMounted } from "vue";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -10,33 +10,36 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Hotel, DoorOpen, ShoppingBag, Users } from '@lucide/vue'
-import { hotelApi, roomApi, orderApi, userApi } from '@/api'
-import type { OrderStatus, OrderSummary } from '@/types'
+} from "@/components/ui/table";
+import { Hotel, DoorOpen, ShoppingBag, Users } from "@lucide/vue";
+import { hotelApi, roomApi, orderApi, userApi } from "@/api";
+import type { OrderStatus, OrderSummary } from "@/types";
 
-const loading = ref(true)
-const hotelCount = ref(0)
-const roomCount = ref(0)
-const orderCount = ref(0)
-const userCount = ref(0)
-const recentOrders = ref<OrderSummary[]>([])
+const loading = ref(true);
+const hotelCount = ref(0);
+const roomCount = ref(0);
+const orderCount = ref(0);
+const userCount = ref(0);
+const recentOrders = ref<OrderSummary[]>([]);
 
 const statusLabels: Record<OrderStatus, string> = {
-  pending: '待确认',
-  booked: '已预订',
-  checked_in: '已入住',
-  cancelled: '已取消',
-  completed: '已完成',
-}
+  pending: "待确认",
+  booked: "已预订",
+  checked_in: "已入住",
+  cancelled: "已取消",
+  completed: "已完成",
+};
 
-const statusVariants: Record<OrderStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  pending: 'secondary',
-  booked: 'default',
-  checked_in: 'default',
-  cancelled: 'destructive',
-  completed: 'outline',
-}
+const statusVariants: Record<
+  OrderStatus,
+  "default" | "secondary" | "destructive" | "outline"
+> = {
+  pending: "secondary",
+  booked: "default",
+  checked_in: "default",
+  cancelled: "destructive",
+  completed: "outline",
+};
 
 onMounted(async () => {
   try {
@@ -45,26 +48,46 @@ onMounted(async () => {
       roomApi.list({ page: 1, pageSize: 1 }),
       orderApi.list(1, 5),
       userApi.list(1, 1),
-    ])
+    ]);
 
-    hotelCount.value = hotelsRes.data.pagination?.totalItems ?? 0
-    roomCount.value = roomsRes.data.pagination?.totalItems ?? 0
-    orderCount.value = ordersRes.data.pagination?.totalItems ?? 0
-    userCount.value = usersRes.data.pagination?.totalItems ?? 0
-    recentOrders.value = ordersRes.data.data ?? []
+    hotelCount.value = hotelsRes.data.pagination?.totalItems ?? 0;
+    roomCount.value = roomsRes.data.pagination?.totalItems ?? 0;
+    orderCount.value = ordersRes.data.pagination?.totalItems ?? 0;
+    userCount.value = usersRes.data.pagination?.totalItems ?? 0;
+    recentOrders.value = ordersRes.data.data ?? [];
   } catch (error) {
-    console.error('Failed to load dashboard data:', error)
+    console.error("Failed to load dashboard data:", error);
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-})
+});
 
 const stats = [
-  { title: '酒店数量', value: () => hotelCount.value, icon: Hotel, color: 'text-blue-600' },
-  { title: '客房数量', value: () => roomCount.value, icon: DoorOpen, color: 'text-green-600' },
-  { title: '订单数量', value: () => orderCount.value, icon: ShoppingBag, color: 'text-orange-600' },
-  { title: '用户数量', value: () => userCount.value, icon: Users, color: 'text-purple-600' },
-]
+  {
+    title: "酒店数量",
+    value: () => hotelCount.value,
+    icon: Hotel,
+    color: "text-blue-600",
+  },
+  {
+    title: "客房数量",
+    value: () => roomCount.value,
+    icon: DoorOpen,
+    color: "text-green-600",
+  },
+  {
+    title: "订单数量",
+    value: () => orderCount.value,
+    icon: ShoppingBag,
+    color: "text-orange-600",
+  },
+  {
+    title: "用户数量",
+    value: () => userCount.value,
+    icon: Users,
+    color: "text-purple-600",
+  },
+];
 </script>
 
 <template>
@@ -113,14 +136,17 @@ const stats = [
             </template>
             <template v-else-if="recentOrders.length === 0">
               <TableRow>
-                <TableCell :colspan="5" class="text-center text-muted-foreground">
+                <TableCell
+                  :colspan="5"
+                  class="text-center text-muted-foreground"
+                >
                   暂无数据
                 </TableCell>
               </TableRow>
             </template>
             <template v-else>
               <TableRow v-for="order in recentOrders" :key="order.orderId">
-                <TableCell>{{ order.orderUserName || '-' }}</TableCell>
+                <TableCell>{{ order.orderUserName || "-" }}</TableCell>
                 <TableCell>{{ order.checkInDate }}</TableCell>
                 <TableCell>{{ order.checkOutDate }}</TableCell>
                 <TableCell>¥{{ order.actualPrice.toFixed(2) }}</TableCell>

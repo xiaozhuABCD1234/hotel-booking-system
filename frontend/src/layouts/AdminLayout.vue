@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores'
-import { ref } from 'vue'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
+import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "@/stores";
+import { ref } from "vue";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from "@/components/ui/dropdown-menu";
 import {
   LayoutDashboard,
   Hotel,
@@ -23,30 +23,30 @@ import {
   Building2,
   Menu,
   X,
-} from '@lucide/vue'
+} from "@lucide/vue";
 
-const router = useRouter()
-const route = useRoute()
-const auth = useAuthStore()
-const sidebarOpen = ref(false)
+const router = useRouter();
+const route = useRoute();
+const auth = useAuthStore();
+const sidebarOpen = ref(false);
 
 const navItems = [
-  { to: '/admin', label: '仪表盘', icon: LayoutDashboard },
-  { to: '/admin/hotels', label: '酒店管理', icon: Hotel },
-  { to: '/admin/rooms', label: '客房管理', icon: DoorOpen },
-  { to: '/admin/orders', label: '订单管理', icon: ShoppingBag },
-  { to: '/admin/users', label: '用户管理', icon: Users },
-  { to: '/admin/reports', label: '数据报表', icon: BarChart3 },
-]
+  { to: "/admin", label: "仪表盘", icon: LayoutDashboard },
+  { to: "/admin/hotels", label: "酒店管理", icon: Hotel },
+  { to: "/admin/rooms", label: "客房管理", icon: DoorOpen },
+  { to: "/admin/orders", label: "订单管理", icon: ShoppingBag },
+  { to: "/admin/users", label: "用户管理", icon: Users },
+  { to: "/admin/reports", label: "数据报表", icon: BarChart3 },
+];
 
 function isActive(path: string) {
-  if (path === '/admin') return route.path === '/admin'
-  return route.path.startsWith(path)
+  if (path === "/admin") return route.path === "/admin";
+  return route.path.startsWith(path);
 }
 
 async function handleLogout() {
-  await auth.logout()
-  router.push('/')
+  await auth.logout();
+  router.push("/");
 }
 </script>
 
@@ -68,7 +68,12 @@ async function handleLogout() {
       <div class="flex h-16 items-center gap-2 px-6 border-b">
         <Building2 class="h-6 w-6 text-primary" />
         <span class="font-semibold">后台管理</span>
-        <Button variant="ghost" size="icon" class="ml-auto lg:hidden" @click="sidebarOpen = false">
+        <Button
+          variant="ghost"
+          size="icon"
+          class="ml-auto lg:hidden"
+          @click="sidebarOpen = false"
+        >
           <X class="h-4 w-4" />
         </Button>
       </div>
@@ -80,7 +85,11 @@ async function handleLogout() {
           :key="item.to"
           :to="item.to"
           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors"
-          :class="isActive(item.to) ? 'bg-primary/10 text-primary font-medium' : 'text-muted-foreground hover:text-foreground hover:bg-accent'"
+          :class="
+            isActive(item.to)
+              ? 'bg-primary/10 text-primary font-medium'
+              : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+          "
           @click="sidebarOpen = false"
         >
           <component :is="item.icon" class="h-4 w-4" />
@@ -96,7 +105,7 @@ async function handleLogout() {
             <Button variant="ghost" class="w-full justify-start gap-3 px-2">
               <Avatar class="h-8 w-8">
                 <AvatarFallback class="bg-primary/10 text-primary text-xs">
-                  {{ auth.user?.username?.charAt(0)?.toUpperCase() || 'A' }}
+                  {{ auth.user?.username?.charAt(0)?.toUpperCase() || "A" }}
                 </AvatarFallback>
               </Avatar>
               <div class="flex flex-col items-start text-sm">
@@ -123,8 +132,15 @@ async function handleLogout() {
     <!-- Main content -->
     <div class="lg:pl-64">
       <!-- Top bar -->
-      <header class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur px-4 lg:px-6">
-        <Button variant="ghost" size="icon" class="lg:hidden" @click="sidebarOpen = true">
+      <header
+        class="sticky top-0 z-30 flex h-16 items-center gap-4 border-b bg-background/95 backdrop-blur px-4 lg:px-6"
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          class="lg:hidden"
+          @click="sidebarOpen = true"
+        >
           <Menu class="h-5 w-5" />
         </Button>
         <div class="flex-1" />
