@@ -35,9 +35,6 @@ type OrderFull struct {
 	GuestName        *string   `gorm:"column:guest_name;type:text;->"`
 	GuestGender      *string   `gorm:"column:guest_gender;type:text;->"`
 	GuestAge         *int      `gorm:"column:guest_age;type:integer;->"`
-	GuestOccupation  *string   `gorm:"column:guest_occupation;type:text;->"`
-	GuestEducation   *string   `gorm:"column:guest_education;type:text;->"`
-	GuestIncome      *string   `gorm:"column:guest_income;type:text;->"`
 	CreateAt         time.Time `gorm:"column:create_at;type:timestamptz;->"`
 }
 

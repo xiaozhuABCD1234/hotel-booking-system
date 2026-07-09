@@ -94,15 +94,9 @@ definitions:
     - OrderCancelled
   backend_model_schema.Person:
     properties:
-      education:
-        type: string
       idCard:
         type: string
-      income:
-        type: string
       name:
-        type: string
-      occupation:
         type: string
       phone:
         type: string
@@ -196,11 +190,17 @@ definitions:
     properties:
       createAt:
         type: string
+      education:
+        type: string
       email:
         type: string
       id:
         type: string
       idCard:
+        type: string
+      income:
+        type: number
+      occupation:
         type: string
       phone:
         type: string
@@ -252,8 +252,6 @@ definitions:
         type: string
       avgOrderAmount:
         type: number
-      education:
-        type: string
       favCity:
         type: string
       favHotel:
@@ -262,11 +260,7 @@ definitions:
         type: string
       gender:
         type: string
-      income:
-        type: string
       lastOrderDate:
-        type: string
-      occupation:
         type: string
       personIDCard:
         type: string
@@ -398,17 +392,11 @@ definitions:
         type: string
       guestAge:
         type: integer
-      guestEducation:
-        type: string
       guestGender:
         type: string
       guestIDCard:
         type: string
-      guestIncome:
-        type: string
       guestName:
-        type: string
-      guestOccupation:
         type: string
       hotelID:
         type: string
@@ -474,17 +462,11 @@ definitions:
         type: integer
       birthDate:
         type: string
-      education:
-        type: string
       gender:
         type: string
       idcard:
         type: string
-      income:
-        type: string
       name:
-        type: string
-      occupation:
         type: string
       phone:
         type: string
@@ -583,6 +565,27 @@ definitions:
         type: integer
       vipLevelName:
         type: string
+    type: object
+  handler.createOrderRequest:
+    properties:
+      actualPrice:
+        type: number
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      guestIdCard:
+        type: string
+      guestName:
+        type: string
+      guestPhone:
+        type: string
+      roomCount:
+        type: integer
+      roomId:
+        type: string
+      totalPrice:
+        type: number
     type: object
   handler.loginRequest:
     properties:
@@ -1152,7 +1155,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/backend_model_schema.Order'
+          $ref: '#/definitions/handler.createOrderRequest'
       produces:
       - application/json
       responses:
@@ -1167,6 +1170,10 @@ paths:
               type: object
         "400":
           description: 请求参数无效
+          schema:
+            $ref: '#/definitions/model.Response'
+        "401":
+          description: 未认证
           schema:
             $ref: '#/definitions/model.Response'
         "500":
@@ -1890,7 +1897,7 @@ paths:
       - regions
   /reports/guest-stats:
     get:
-      description: 分页查询客人预订统计视图，支持按年龄组、性别、偏好城市、职业、学历、收入范围筛选
+      description: 分页查询客人预订统计视图，支持按年龄组、性别、偏好城市筛选
       parameters:
       - default: 1
         description: 页码
@@ -1914,22 +1921,6 @@ paths:
         in: query
         name: favCity
         type: string
-      - description: 职业筛选
-        in: query
-        name: occupation
-        type: string
-      - description: 学历筛选
-        in: query
-        name: education
-        type: string
-      - description: 最低收入
-        in: query
-        name: minIncome
-        type: number
-      - description: 最高收入
-        in: query
-        name: maxIncome
-        type: number
       produces:
       - application/json
       responses:
@@ -2198,7 +2189,7 @@ paths:
       - reports
   /reports/person-info:
     get:
-      description: 分页查询人员信息视图，支持按性别、年龄、职业、学历、收入范围筛选
+      description: 分页查询人员信息视图，支持按性别、年龄筛选
       parameters:
       - default: 1
         description: 页码
@@ -2214,22 +2205,6 @@ paths:
         in: query
         name: gender
         type: string
-      - description: 职业筛选
-        in: query
-        name: occupation
-        type: string
-      - description: 学历筛选
-        in: query
-        name: education
-        type: string
-      - description: 最低收入
-        in: query
-        name: minIncome
-        type: number
-      - description: 最高收入
-        in: query
-        name: maxIncome
-        type: number
       - description: 最小年龄
         in: query
         name: minAge

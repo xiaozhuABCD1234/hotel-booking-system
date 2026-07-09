@@ -63,9 +63,6 @@ CREATE OR REPLACE VIEW view_person_info_1718 AS
 SELECT id_card,
     name,
     phone,
-    occupation,
-    education,
-    income,
     TO_DATE(SUBSTRING(id_card, 7, 8), 'YYYYMMDD') AS birth_date,
     CASE
         WHEN SUBSTRING(id_card, 17, 1) ~ '\d'
@@ -211,9 +208,6 @@ SELECT vpi.id_card AS person_id_card,
     vpi.name AS person_name,
     vpi.gender,
     vpi.age,
-    vpi.occupation,
-    vpi.education,
-    vpi.income,
     CASE
         WHEN vpi.age < 18 THEN '18岁以下'
         WHEN vpi.age BETWEEN 18 AND 25 THEN '18-25岁'
@@ -279,10 +273,7 @@ FROM view_person_info_1718 vpi
 GROUP BY vpi.id_card,
     vpi.name,
     vpi.gender,
-    vpi.age,
-    vpi.occupation,
-    vpi.education,
-    vpi.income;
+    vpi.age;
 -- 订单详情（下单人与入住人明确区分，入住人聚合）
 CREATE OR REPLACE VIEW view_order_detail_1718 AS
 SELECT o.id AS order_id,
@@ -374,9 +365,6 @@ SELECT o.id AS order_id,
     p.name AS guest_name,
     vpi.gender AS guest_gender,
     vpi.age AS guest_age,
-    vpi.occupation AS guest_occupation,
-    vpi.education AS guest_education,
-    vpi.income AS guest_income,
     o.create_at
 FROM order_1718 o
     JOIN user_1718 u ON u.id = o.user_id

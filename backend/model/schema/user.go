@@ -28,6 +28,9 @@ type User struct {
 	Role       UserRole  `json:"role"       gorm:"column:role;type:user_role;not null;default:customer;index:idx_user_role"`
 	Points     int32     `json:"points"     gorm:"column:points;type:integer;not null;default:0;check:points >= 0;index:idx_user_points,sort:desc"`
 	VipLevelID int16     `json:"vipLevelId" gorm:"column:vip_level;type:smallint;not null;default:0"`
+	Occupation *string   `json:"occupation" gorm:"column:occupation;type:text"`
+	Education  *string   `json:"education"  gorm:"column:education;type:education_level"`
+	Income     *float64  `json:"income"     gorm:"column:income;type:numeric(10,2)"`
 	VipLevel   VipLevel  `json:"vipLevel"   gorm:"foreignKey:VipLevelID;references:Level"`
 	CreateAt   time.Time `json:"createAt"   gorm:"column:create_at;type:timestamptz;autoCreateTime"`
 	UpdateAt   time.Time `json:"updateAt"   gorm:"column:update_at;type:timestamptz;autoUpdateTime"`

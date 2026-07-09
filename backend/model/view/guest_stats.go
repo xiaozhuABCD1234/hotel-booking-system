@@ -15,9 +15,6 @@ type GuestBookingStats struct {
 	Gender         *string    `gorm:"column:gender;type:text;->"`
 	Age            *int       `gorm:"column:age;type:integer;->"`
 	AgeGroup       string     `gorm:"column:age_group;type:text;->"`
-	Occupation     *string    `gorm:"column:occupation;type:text;->"`
-	Education      *string    `gorm:"column:education;type:text;->"`
-	Income         *string    `gorm:"column:income;type:text;->"`
 	TotalOrders    int64      `gorm:"column:total_orders;type:bigint;->"`
 	TotalNights    int64      `gorm:"column:total_nights;type:bigint;->"`
 	TotalAmount    float64    `gorm:"column:total_amount;type:numeric;->"`

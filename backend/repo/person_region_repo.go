@@ -55,7 +55,7 @@ func (r *PersonRepo) FindAll(ctx context.Context, offset, limit int, keyword str
 }
 
 func (r *PersonRepo) Update(ctx context.Context, person *model.Person) error {
-	return r.db.WithContext(ctx).Select("name", "phone", "occupation", "education", "income").Where("id_card = ?", person.IDCard).Updates(person).Error
+	return r.db.WithContext(ctx).Select("name", "phone").Where("id_card = ?", person.IDCard).Updates(person).Error
 }
 
 func (r *PersonRepo) Delete(ctx context.Context, idCard string) error {
@@ -65,7 +65,7 @@ func (r *PersonRepo) Delete(ctx context.Context, idCard string) error {
 func (r *PersonRepo) Upsert(ctx context.Context, person *model.Person) error {
 	return r.db.WithContext(ctx).Clauses(clause.OnConflict{
 		Columns:   []clause.Column{{Name: "id_card"}},
-		DoUpdates: clause.AssignmentColumns([]string{"name", "phone", "occupation", "education", "income"}),
+		DoUpdates: clause.AssignmentColumns([]string{"name", "phone"}),
 	}).Create(person).Error
 }
 
@@ -141,23 +141,11 @@ func (r *PersonInfoRepo) FindByIDCard(ctx context.Context, idCard string) (*view
 	return &info, nil
 }
 
-func (r *PersonInfoRepo) FindAll(ctx context.Context, offset, limit int, gender, occupation, education string, minIncome, maxIncome *float64, minAge, maxAge *int) ([]view.PersonInfo, int64, error) {
+func (r *PersonInfoRepo) FindAll(ctx context.Context, offset, limit int, gender string, minAge, maxAge *int) ([]view.PersonInfo, int64, error) {
 	var total int64
 	query := r.db.WithContext(ctx).Model(&view.PersonInfo{})
 	if gender != "" {
 		query = query.Where("gender = ?", gender)
-	}
-	if occupation != "" {
-		query = query.Where("occupation ILIKE ?", "%"+occupation+"%")
-	}
-	if education != "" {
-		query = query.Where("education::text ILIKE ?", "%"+education+"%")
-	}
-	if minIncome != nil {
-		query = query.Where("lower(income) >= ?", *minIncome)
-	}
-	if maxIncome != nil {
-		query = query.Where("upper(income) <= ?", *maxIncome)
 	}
 	if minAge != nil {
 		query = query.Where("age >= ?", *minAge)
@@ -199,7 +187,7 @@ func (r *GuestBookingStatsRepo) FindByIDCard(ctx context.Context, idCard string)
 	return &stats, nil
 }
 
-func (r *GuestBookingStatsRepo) FindAll(ctx context.Context, offset, limit int, ageGroup, gender, favCity, occupation, education string, minIncome, maxIncome *float64) ([]view.GuestBookingStats, int64, error) {
+func (r *GuestBookingStatsRepo) FindAll(ctx context.Context, offset, limit int, ageGroup, gender, favCity string) ([]view.GuestBookingStats, int64, error) {
 	var total int64
 	query := r.db.WithContext(ctx).Model(&view.GuestBookingStats{})
 	if ageGroup != "" {
@@ -210,18 +198,6 @@ func (r *GuestBookingStatsRepo) FindAll(ctx context.Context, offset, limit int, 
 	}
 	if favCity != "" {
 		query = query.Where("fav_city ILIKE ?", "%"+favCity+"%")
-	}
-	if occupation != "" {
-		query = query.Where("occupation ILIKE ?", "%"+occupation+"%")
-	}
-	if education != "" {
-		query = query.Where("education::text ILIKE ?", "%"+education+"%")
-	}
-	if minIncome != nil {
-		query = query.Where("lower(income) >= ?", *minIncome)
-	}
-	if maxIncome != nil {
-		query = query.Where("upper(income) <= ?", *maxIncome)
 	}
 	if err := query.Count(&total).Error; err != nil {
 		return nil, 0, err

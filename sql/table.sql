@@ -36,6 +36,9 @@ CREATE TABLE user_1718 (
     role user_role NOT NULL DEFAULT 'customer',
     points INT NOT NULL DEFAULT 0 CHECK (points >= 0),
     vip_level SMALLINT NOT NULL DEFAULT 0 REFERENCES vip_level_1718 (level),
+    occupation TEXT,
+    education education_level,
+    income NUMERIC(10,2),
     create_at TIMESTAMPTZ DEFAULT now (),
     update_at TIMESTAMPTZ DEFAULT now (),
     status SMALLINT NOT NULL DEFAULT 1
@@ -99,12 +102,7 @@ CREATE TABLE person_1718 (
     id_card CHAR(18) PRIMARY KEY CHECK (id_card ~ '^\d{17}[\dXx]$'),
     name TEXT NOT NULL,
     phone VARCHAR(20) CHECK (phone ~ '^\+?[0-9\-]+$'),
-    occupation TEXT,
-    education education_level,
-    income numrange
 );
--- 收入范围 GiST 索引（支持范围查询）
-CREATE INDEX idx_person_1718_income ON person_1718 USING GIST (income);
 -- 订单
 CREATE TABLE order_1718 (
     id UUID PRIMARY KEY DEFAULT uuidv7 (),
@@ -152,6 +150,7 @@ CREATE TABLE jwt_blacklist_1718 (
 CREATE INDEX idx_user_phone_1718 ON user_1718 (phone);
 CREATE INDEX idx_user_role_1718 ON user_1718 (role);
 CREATE INDEX idx_user_points_1718 ON user_1718 (points DESC);
+CREATE INDEX idx_user_income_1718 ON user_1718 (income);
 -- 地区
 CREATE INDEX idx_region_parents_1718 ON region_1718 (parents_id);
 -- 酒店
