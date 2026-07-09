@@ -4461,7 +4461,7 @@ const docTemplate = `{
                 "lastOrderDate": {
                     "type": "string"
                 },
-                "personIDCard": {
+                "personIdCard": {
                     "type": "string"
                 },
                 "personName": {
@@ -4496,7 +4496,7 @@ const docTemplate = `{
                 "district": {
                     "type": "string"
                 },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
                 "hotelName": {
@@ -4558,7 +4558,7 @@ const docTemplate = `{
                 "nights": {
                     "type": "integer"
                 },
-                "orderID": {
+                "orderId": {
                     "type": "string"
                 },
                 "orderStatus": {
@@ -4570,7 +4570,7 @@ const docTemplate = `{
                 "roomType": {
                     "type": "string"
                 },
-                "userID": {
+                "userId": {
                     "type": "string"
                 }
             }
@@ -4661,13 +4661,13 @@ const docTemplate = `{
                 "guestGender": {
                     "type": "string"
                 },
-                "guestIDCard": {
+                "guestIdCard": {
                     "type": "string"
                 },
                 "guestName": {
                     "type": "string"
                 },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
                 "hotelName": {
@@ -4679,7 +4679,7 @@ const docTemplate = `{
                 "nights": {
                     "type": "integer"
                 },
-                "orderID": {
+                "orderId": {
                     "type": "string"
                 },
                 "orderStatus": {
@@ -4688,7 +4688,7 @@ const docTemplate = `{
                 "quantity": {
                     "type": "integer"
                 },
-                "roomID": {
+                "roomId": {
                     "type": "string"
                 },
                 "roomType": {
@@ -4697,7 +4697,7 @@ const docTemplate = `{
                 "totalPrice": {
                     "type": "number"
                 },
-                "userID": {
+                "userId": {
                     "type": "string"
                 },
                 "userPhone": {
@@ -4767,7 +4767,7 @@ const docTemplate = `{
                 "gender": {
                     "type": "string"
                 },
-                "idcard": {
+                "idCard": {
                     "type": "string"
                 },
                 "name": {
@@ -4793,25 +4793,25 @@ const docTemplate = `{
                 "createAt": {
                     "type": "string"
                 },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
                 "hotelName": {
                     "type": "string"
                 },
-                "orderID": {
+                "orderId": {
                     "type": "string"
                 },
                 "rating": {
                     "type": "integer"
                 },
-                "reviewID": {
+                "reviewId": {
                     "type": "string"
                 },
                 "roomType": {
                     "type": "string"
                 },
-                "userID": {
+                "userId": {
                     "type": "string"
                 },
                 "username": {
@@ -4840,7 +4840,7 @@ const docTemplate = `{
                 "facilities": {
                     "type": "string"
                 },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
                 "hotelName": {
@@ -4861,7 +4861,7 @@ const docTemplate = `{
                 "roomDescription": {
                     "type": "string"
                 },
-                "roomID": {
+                "roomId": {
                     "type": "string"
                 },
                 "starLevel": {
@@ -4890,7 +4890,7 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "idcard": {
+                "idCard": {
                     "type": "string"
                 },
                 "phone": {
@@ -4908,7 +4908,7 @@ const docTemplate = `{
                 "role": {
                     "type": "string"
                 },
-                "userID": {
+                "userId": {
                     "type": "string"
                 },
                 "username": {

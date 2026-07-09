@@ -262,7 +262,7 @@ definitions:
         type: string
       lastOrderDate:
         type: string
-      personIDCard:
+      personIdCard:
         type: string
       personName:
         type: string
@@ -285,7 +285,7 @@ definitions:
         type: string
       district:
         type: string
-      hotelID:
+      hotelId:
         type: string
       hotelName:
         type: string
@@ -326,7 +326,7 @@ definitions:
         type: string
       nights:
         type: integer
-      orderID:
+      orderId:
         type: string
       orderStatus:
         type: string
@@ -334,7 +334,7 @@ definitions:
         type: integer
       roomType:
         type: string
-      userID:
+      userId:
         type: string
     type: object
   backend_model_view.OrderDetail:
@@ -394,11 +394,11 @@ definitions:
         type: integer
       guestGender:
         type: string
-      guestIDCard:
+      guestIdCard:
         type: string
       guestName:
         type: string
-      hotelID:
+      hotelId:
         type: string
       hotelName:
         type: string
@@ -406,19 +406,19 @@ definitions:
         type: string
       nights:
         type: integer
-      orderID:
+      orderId:
         type: string
       orderStatus:
         type: string
       quantity:
         type: integer
-      roomID:
+      roomId:
         type: string
       roomType:
         type: string
       totalPrice:
         type: number
-      userID:
+      userId:
         type: string
       userPhone:
         type: string
@@ -464,7 +464,7 @@ definitions:
         type: string
       gender:
         type: string
-      idcard:
+      idCard:
         type: string
       name:
         type: string
@@ -481,19 +481,19 @@ definitions:
         type: string
       createAt:
         type: string
-      hotelID:
+      hotelId:
         type: string
       hotelName:
         type: string
-      orderID:
+      orderId:
         type: string
       rating:
         type: integer
-      reviewID:
+      reviewId:
         type: string
       roomType:
         type: string
-      userID:
+      userId:
         type: string
       username:
         type: string
@@ -512,7 +512,7 @@ definitions:
         type: string
       facilities:
         type: string
-      hotelID:
+      hotelId:
         type: string
       hotelName:
         type: string
@@ -526,7 +526,7 @@ definitions:
         type: integer
       roomDescription:
         type: string
-      roomID:
+      roomId:
         type: string
       starLevel:
         type: integer
@@ -545,7 +545,7 @@ definitions:
         type: number
       email:
         type: string
-      idcard:
+      idCard:
         type: string
       phone:
         type: string
@@ -557,7 +557,7 @@ definitions:
         type: string
       role:
         type: string
-      userID:
+      userId:
         type: string
       username:
         type: string

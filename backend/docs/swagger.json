@@ -4455,7 +4455,7 @@
                 "lastOrderDate": {
                     "type": "string"
                 },
-                "personIDCard": {
+                "personIdCard": {
                     "type": "string"
                 },
                 "personName": {
@@ -4490,7 +4490,7 @@
                 "district": {
                     "type": "string"
                 },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
                 "hotelName": {
@@ -4552,7 +4552,7 @@
                 "nights": {
                     "type": "integer"
                 },
-                "orderID": {
+                "orderId": {
                     "type": "string"
                 },
                 "orderStatus": {
@@ -4564,7 +4564,7 @@
                 "roomType": {
                     "type": "string"
                 },
-                "userID": {
+                "userId": {
                     "type": "string"
                 }
             }
@@ -4655,13 +4655,13 @@
                 "guestGender": {
                     "type": "string"
                 },
-                "guestIDCard": {
+                "guestIdCard": {
                     "type": "string"
                 },
                 "guestName": {
                     "type": "string"
                 },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
                 "hotelName": {
@@ -4673,7 +4673,7 @@
                 "nights": {
                     "type": "integer"
                 },
-                "orderID": {
+                "orderId": {
                     "type": "string"
                 },
                 "orderStatus": {
@@ -4682,7 +4682,7 @@
                 "quantity": {
                     "type": "integer"
                 },
-                "roomID": {
+                "roomId": {
                     "type": "string"
                 },
                 "roomType": {
@@ -4691,7 +4691,7 @@
                 "totalPrice": {
                     "type": "number"
                 },
-                "userID": {
+                "userId": {
                     "type": "string"
                 },
                 "userPhone": {
@@ -4761,7 +4761,7 @@
                 "gender": {
                     "type": "string"
                 },
-                "idcard": {
+                "idCard": {
                     "type": "string"
                 },
                 "name": {
@@ -4787,25 +4787,25 @@
                 "createAt": {
                     "type": "string"
                 },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
                 "hotelName": {
                     "type": "string"
                 },
-                "orderID": {
+                "orderId": {
                     "type": "string"
                 },
                 "rating": {
                     "type": "integer"
                 },
-                "reviewID": {
+                "reviewId": {
                     "type": "string"
                 },
                 "roomType": {
                     "type": "string"
                 },
-                "userID": {
+                "userId": {
                     "type": "string"
                 },
                 "username": {
@@ -4834,7 +4834,7 @@
                 "facilities": {
                     "type": "string"
                 },
-                "hotelID": {
+                "hotelId": {
                     "type": "string"
                 },
                 "hotelName": {
@@ -4855,7 +4855,7 @@
                 "roomDescription": {
                     "type": "string"
                 },
-                "roomID": {
+                "roomId": {
                     "type": "string"
                 },
                 "starLevel": {
@@ -4884,7 +4884,7 @@
                 "email": {
                     "type": "string"
                 },
-                "idcard": {
+                "idCard": {
                     "type": "string"
                 },
                 "phone": {
@@ -4902,7 +4902,7 @@
                 "role": {
                     "type": "string"
                 },
-                "userID": {
+                "userId": {
                     "type": "string"
                 },
                 "username": {
