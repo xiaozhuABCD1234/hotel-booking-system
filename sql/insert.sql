@@ -59,12 +59,32 @@ VALUES ('北京市', NULL),
     ('台湾省', NULL),
     ('香港特别行政区', NULL),
     ('澳门特别行政区', NULL);
--- 区级 — 上海市 → 浦东新区
+-- 区级 — 上海市下辖全部区县（数据来源：https://cn.quhua.net/31/310000000000.htm）
 INSERT INTO region_1718 (region_name, parents_id)
-SELECT '浦东新区',
-    id
-FROM region_1718
-WHERE region_name = '上海市';
+SELECT m.name,
+    sh.id
+FROM region_1718 sh
+    CROSS JOIN (
+        VALUES ('黄浦区'),
+            ('卢湾区'),
+            ('徐汇区'),
+            ('长宁区'),
+            ('静安区'),
+            ('普陀区'),
+            ('闸北区'),
+            ('虹口区'),
+            ('杨浦区'),
+            ('闵行区'),
+            ('宝山区'),
+            ('嘉定区'),
+            ('浦东新区'),
+            ('金山区'),
+            ('松江区'),
+            ('青浦区'),
+            ('奉贤区'),
+            ('崇明县')
+    ) AS m(name)
+WHERE sh.region_name = '上海市';
 -- 街道/镇级 — 浦东新区下辖
 INSERT INTO region_1718 (region_name, parents_id)
 SELECT m.name,
