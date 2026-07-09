@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { orderApi } from "@/api/order";
-import type { Order, OrderStatus, OrderSummary } from "@/types";
+import type { OrderDetail, OrderStatus, OrderSummary } from "@/types";
 import { toast } from "vue-sonner";
 import { getApiErrorMessage } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -43,33 +43,15 @@ const totalItems = ref(0);
 const statusFilter = ref<string>("all");
 
 const detailDialogOpen = ref(false);
-const selectedOrder = ref<OrderSummary | Order | null>(null);
-
-const detailFields = computed(() => {
-	if (!selectedOrder.value) return null;
-	const o = selectedOrder.value as any;
-	return {
-		orderId: o.orderId || o.id || "-",
-		hotelName: o.hotelName || o.room?.hotel?.hotelName || "-",
-		roomType: o.roomType || o.room?.typeName || "-",
-		orderUserName: o.orderUserName || o.user?.realName || o.user?.username || "-",
-		phone: o.orderUserPhone || o.user?.phone || "-",
-		idCard: o.guests?.[0]?.idCard || "-",
-		quantity: o.quantity,
-		checkInDate: o.checkInDate,
-		checkOutDate: o.checkOutDate,
-		price: o.actualPrice ?? o.totalPrice ?? 0,
-		status: o.status,
-		createAt: o.createAt,
-	};
-});
+const detailLoading = ref(false);
+const selectedOrder = ref<OrderDetail | null>(null);
 
 const statusDialogOpen = ref(false);
-const statusUpdateOrder = ref<OrderSummary | Order | null>(null);
+const statusUpdateOrder = ref<OrderSummary | null>(null);
 const newStatus = ref<OrderStatus>("pending");
 
 const deleteDialogOpen = ref(false);
-const deleteTargetOrder = ref<OrderSummary | Order | null>(null);
+const deleteTargetOrder = ref<OrderSummary | null>(null);
 
 const statusOptions: { value: string; label: string }[] = [
 	{ value: "all", label: "全部状态" },
@@ -126,12 +108,21 @@ async function fetchOrders() {
 	}
 }
 
-function openDetail(order: OrderSummary | Order) {
-	selectedOrder.value = order;
+async function openDetail(orderId: string) {
 	detailDialogOpen.value = true;
+	detailLoading.value = true;
+	try {
+		const res = await orderApi.getDetail(orderId);
+		selectedOrder.value = res.data.data ?? null;
+	} catch (e: unknown) {
+		toast.error(getApiErrorMessage(e, "获取订单详情失败"));
+		detailDialogOpen.value = false;
+	} finally {
+		detailLoading.value = false;
+	}
 }
 
-function openStatusUpdate(order: OrderSummary | Order) {
+function openStatusUpdate(order: OrderSummary) {
 	statusUpdateOrder.value = order;
 	newStatus.value = order.status as OrderStatus;
 	statusDialogOpen.value = true;
@@ -140,7 +131,7 @@ function openStatusUpdate(order: OrderSummary | Order) {
 async function confirmStatusUpdate() {
 	if (!statusUpdateOrder.value) return;
 	try {
-		await orderApi.updateStatus((statusUpdateOrder.value as any).orderId || (statusUpdateOrder.value as any).id, {
+		await orderApi.updateStatus(statusUpdateOrder.value.orderId, {
 			status: newStatus.value,
 		});
 		toast.success("订单状态已更新");
@@ -151,7 +142,7 @@ async function confirmStatusUpdate() {
 	}
 }
 
-function openDelete(order: OrderSummary | Order) {
+function openDelete(order: OrderSummary) {
 	deleteTargetOrder.value = order;
 	deleteDialogOpen.value = true;
 }
@@ -159,7 +150,7 @@ function openDelete(order: OrderSummary | Order) {
 async function confirmDelete() {
 	if (!deleteTargetOrder.value) return;
 	try {
-		await orderApi.delete((deleteTargetOrder.value as any).orderId || (deleteTargetOrder.value as any).id);
+		await orderApi.delete(deleteTargetOrder.value.orderId);
 		toast.success("订单已删除");
 		deleteDialogOpen.value = false;
 		await fetchOrders();
@@ -279,12 +270,12 @@ onMounted(() => {
 									¥{{ order.actualPrice.toFixed(2) }}
 								</TableCell>
 								<TableCell class="whitespace-nowrap">
-								<Badge
-									:class="statusBadgeClass(order.status as OrderStatus)"
-									variant="outline"
-									class="whitespace-nowrap"
-								>
-									{{ statusLabel(order.status as OrderStatus) }}
+									<Badge
+										:class="statusBadgeClass(order.status as OrderStatus)"
+										variant="outline"
+										class="whitespace-nowrap"
+									>
+										{{ statusLabel(order.status as OrderStatus) }}
 									</Badge>
 								</TableCell>
 								<TableCell class="text-right whitespace-nowrap">
@@ -292,7 +283,7 @@ onMounted(() => {
 										<Button
 											variant="ghost"
 											size="icon"
-											@click="openDetail(order)"
+											@click="openDetail(order.orderId)"
 										>
 											<Search class="h-4 w-4" />
 										</Button>
@@ -351,72 +342,102 @@ onMounted(() => {
 			<DialogContent class="max-w-lg">
 				<DialogHeader>
 					<DialogTitle>订单详情</DialogTitle>
-					<DialogDescription
-						>订单编号: {{ detailFields?.orderId }}</DialogDescription
-					>
+					<DialogDescription>
+						订单编号: {{ selectedOrder?.orderId }}
+					</DialogDescription>
 				</DialogHeader>
-				<div v-if="detailFields" class="space-y-3">
+
+				<!-- Loading -->
+				<div v-if="detailLoading" class="space-y-3 py-4">
+					<Skeleton v-for="i in 6" :key="i" class="h-5 w-full" />
+				</div>
+
+				<!-- Content -->
+				<div v-else-if="selectedOrder" class="space-y-3">
 					<div class="grid grid-cols-2 gap-4">
 						<div>
 							<Label class="text-muted-foreground">酒店</Label>
-							<p class="font-medium">{{ detailFields.hotelName }}</p>
+							<p class="font-medium">{{ selectedOrder.hotelName }}</p>
+							<p
+								v-if="selectedOrder.city"
+								class="text-sm text-muted-foreground"
+							>
+								{{ selectedOrder.city }}
+							</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">房型</Label>
-							<p class="font-medium">{{ detailFields.roomType }}</p>
+							<p class="font-medium">{{ selectedOrder.roomType }}</p>
+							<p class="text-sm text-muted-foreground">
+								¥{{ selectedOrder.roomPrice.toFixed(2) }}/晚
+							</p>
 						</div>
 						<div>
-							<Label class="text-muted-foreground">入住人</Label>
-							<p class="font-medium">{{ detailFields.orderUserName }}</p>
+							<Label class="text-muted-foreground">下单人</Label>
+							<p class="font-medium">
+								{{ selectedOrder.orderUserName || selectedOrder.orderUser }}
+							</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">联系电话</Label>
-							<p class="font-medium">{{ detailFields.phone }}</p>
+							<p class="font-medium">
+								{{ selectedOrder.orderUserPhone || "-" }}
+							</p>
+						</div>
+						<div class="col-span-2">
+							<Label class="text-muted-foreground">入住人</Label>
+							<p class="font-medium">{{ selectedOrder.guestNames || "-" }}</p>
 						</div>
 						<div>
-							<Label class="text-muted-foreground">身份证号</Label>
-							<p class="font-medium">{{ detailFields.idCard }}</p>
+							<Label class="text-muted-foreground">房间数 / 入住人数</Label>
+							<p class="font-medium">
+								{{ selectedOrder.quantity }} 间 /
+								{{ selectedOrder.guestCount }} 人
+							</p>
 						</div>
 						<div>
-							<Label class="text-muted-foreground">房间数</Label>
-							<p class="font-medium">{{ detailFields.quantity }}</p>
+							<Label class="text-muted-foreground">晚数</Label>
+							<p class="font-medium">{{ selectedOrder.nights }} 晚</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">入住日期</Label>
-							<p class="font-medium">{{ detailFields.checkInDate }}</p>
+							<p class="font-medium">
+								{{ formatDate(selectedOrder.checkInDate) }}
+							</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">离店日期</Label>
-							<p class="font-medium">{{ detailFields.checkOutDate }}</p>
+							<p class="font-medium">
+								{{ formatDate(selectedOrder.checkOutDate) }}
+							</p>
 						</div>
 						<div>
-							<Label class="text-muted-foreground">总价</Label>
-							<p class="font-medium text-lg">
-								¥{{ detailFields.price.toFixed(2) }}
+							<Label class="text-muted-foreground">总价 / 实付</Label>
+							<p class="font-medium">
+								<span class="text-muted-foreground line-through mr-2"
+									>¥{{ selectedOrder.totalPrice.toFixed(2) }}</span
+								>
+								¥{{ selectedOrder.actualPrice.toFixed(2) }}
 							</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">状态</Label>
 							<div class="mt-1">
 								<Badge
-									:class="statusBadgeClass(detailFields.status as OrderStatus)"
+									:class="statusBadgeClass(selectedOrder.status as OrderStatus)"
 									variant="outline"
 								>
-									{{ statusLabel(detailFields.status as OrderStatus) }}
+									{{ statusLabel(selectedOrder.status as OrderStatus) }}
 								</Badge>
 							</div>
 						</div>
 					</div>
 					<div>
 						<Label class="text-muted-foreground">创建时间</Label>
-						<p class="font-medium">{{ detailFields.createAt }}</p>
+						<p class="font-medium">{{ formatDate(selectedOrder.createAt) }}</p>
 					</div>
 				</div>
-				<DialogFooter>
-					<Button variant="outline" @click="detailDialogOpen = false"
-						>关闭</Button
-					>
-				</DialogFooter>
+
 			</DialogContent>
 		</Dialog>
 
@@ -426,7 +447,7 @@ onMounted(() => {
 				<DialogHeader>
 					<DialogTitle>更新订单状态</DialogTitle>
 					<DialogDescription>
-						修改订单 {{ ((statusUpdateOrder as any)?.orderId || (statusUpdateOrder as any)?.id || "").slice(0, 8) }} 的状态
+						修改订单 {{ statusUpdateOrder?.orderId?.slice(0, 8) }} 的状态
 					</DialogDescription>
 				</DialogHeader>
 				<div class="space-y-4">
@@ -434,7 +455,9 @@ onMounted(() => {
 						<Label>当前状态</Label>
 						<Badge
 							v-if="statusUpdateOrder"
-							:class="statusBadgeClass(statusUpdateOrder!.status as OrderStatus)"
+							:class="
+								statusBadgeClass(statusUpdateOrder!.status as OrderStatus)
+							"
 							variant="outline"
 							class="ml-2"
 						>
@@ -473,7 +496,7 @@ onMounted(() => {
 					<DialogTitle>确认删除</DialogTitle>
 					<DialogDescription>
 						确定要删除订单
-						{{ ((deleteTargetOrder as any)?.orderId || (deleteTargetOrder as any)?.id || "").slice(0, 8) }} 吗？此操作不可撤销。
+						{{ deleteTargetOrder?.orderId?.slice(0, 8) }} 吗？此操作不可撤销。
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>

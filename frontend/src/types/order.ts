@@ -77,6 +77,28 @@ export interface UpdateOrderStatusRequest {
   status: OrderStatus
 }
 
+/** 订单详情（管理端详情，走 view_order_detail_1718） */
+export interface OrderDetail {
+  orderId: string
+  status: string
+  quantity: number
+  checkInDate: string
+  checkOutDate: string
+  nights: number
+  totalPrice: number
+  actualPrice: number
+  createAt: string
+  orderUser: string          // 下单人用户名
+  orderUserName?: string     // 下单人真实姓名
+  orderUserPhone?: string    // 下单人手机号
+  hotelName: string
+  city?: string
+  roomType: string
+  roomPrice: number
+  guestCount: number         // 入住人数
+  guestNames: string         // 入住人姓名（逗号分隔）
+}
+
 /** 订单概览（管理端列表，走 view_order_summary_1718） */
 export interface OrderSummary {
   orderId: string

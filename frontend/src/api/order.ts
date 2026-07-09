@@ -1,5 +1,5 @@
 import api from './client'
-import type { ApiResponse, Order, OrderSummary, CreateOrderRequest, UpdateOrderStatusRequest, OrderFull, MyOrder } from '@/types'
+import type { ApiResponse, Order, OrderSummary, OrderDetail, CreateOrderRequest, UpdateOrderStatusRequest, OrderFull, MyOrder } from '@/types'
 
 export const orderApi = {
   /** Get all orders with pagination */
@@ -10,6 +10,11 @@ export const orderApi = {
   /** Get one order by ID */
   getById(id: string) {
     return api.get<ApiResponse<Order>>(`/orders/${id}`)
+  },
+
+  /** Get order detail (下单人/入住人区分, view_order_detail_1718) */
+  getDetail(id: string) {
+    return api.get<ApiResponse<OrderDetail>>(`/orders/${id}/detail`)
   },
 
   /** Create order */
