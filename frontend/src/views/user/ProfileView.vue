@@ -27,6 +27,15 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Lock, Crown } from '@lucide/vue'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+const educationOptions = ['小学', '初中', '高中', '中专', '大专', '本科', '硕士', '博士', '其他']
 
 interface VipInfo {
   userId: string
@@ -53,6 +62,9 @@ const profileForm = ref({
   email: '',
   realName: '',
   idCard: '',
+  occupation: '',
+  education: '',
+  income: undefined as number | undefined,
 })
 
 const passwordForm = ref({
@@ -92,6 +104,9 @@ async function fetchUser() {
         email: res.data.data.email ?? '',
         realName: res.data.data.realName ?? '',
         idCard: res.data.data.idCard ?? '',
+        occupation: res.data.data.occupation ?? '',
+        education: res.data.data.education ?? '',
+        income: res.data.data.income ?? undefined,
       }
     }
   } catch (e: unknown) {
@@ -129,6 +144,9 @@ async function saveProfile() {
       email: profileForm.value.email || undefined,
       realName: profileForm.value.realName || undefined,
       idCard: profileForm.value.idCard || undefined,
+      occupation: profileForm.value.occupation || undefined,
+      education: profileForm.value.education || undefined,
+      income: typeof profileForm.value.income === 'number' ? profileForm.value.income : undefined,
     })
     toast.success('个人信息已更新')
     await fetchUser()
@@ -220,6 +238,9 @@ onMounted(() => {
                 <div class="h-10 w-full animate-pulse rounded bg-muted" />
                 <div class="h-10 w-full animate-pulse rounded bg-muted" />
                 <div class="h-10 w-full animate-pulse rounded bg-muted" />
+                <div class="h-10 w-full animate-pulse rounded bg-muted" />
+                <div class="h-10 w-full animate-pulse rounded bg-muted" />
+                <div class="h-10 w-full animate-pulse rounded bg-muted" />
               </div>
               <FieldGroup v-else class="gap-4">
                 <Field>
@@ -259,6 +280,45 @@ onMounted(() => {
                     placeholder="请输入身份证号"
                   />
                   <FieldDescription>用于酒店入住登记验证</FieldDescription>
+                </Field>
+                <Field>
+                  <FieldLabel for="education">学历</FieldLabel>
+                  <Select v-model="profileForm.education">
+                    <SelectTrigger id="education">
+                      <SelectValue placeholder="请选择学历" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem
+                        v-for="opt in educationOptions"
+                        :key="opt"
+                        :value="opt"
+                      >
+                        {{ opt }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FieldDescription>用于客户偏好统计分析</FieldDescription>
+                </Field>
+                <Field>
+                  <FieldLabel for="occupation">职业</FieldLabel>
+                  <Input
+                    id="occupation"
+                    v-model="profileForm.occupation"
+                    placeholder="请输入职业"
+                  />
+                  <FieldDescription>用于客户偏好统计分析</FieldDescription>
+                </Field>
+                <Field>
+                  <FieldLabel for="income">月收入</FieldLabel>
+                  <Input
+                    id="income"
+                    v-model="profileForm.income"
+                    placeholder="请输入月收入"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                  />
+                  <FieldDescription>用于客户偏好统计分析</FieldDescription>
                 </Field>
               </FieldGroup>
             </CardContent>

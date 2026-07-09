@@ -16,6 +16,9 @@ export interface User {
   vipLevel?: VipLevel
   points: number
   idCard?: string
+  occupation?: string
+  education?: string
+  income?: number
   createAt: string
   updateAt: string
   status: number
@@ -48,6 +51,9 @@ export interface UpdateUserRequest {
   email?: string
   realName?: string
   idCard?: string
+  occupation?: string
+  education?: string
+  income?: number
   oldPassword?: string
   password?: string
   role?: 'customer' | 'vip' | 'hotel_manager' | 'admin'

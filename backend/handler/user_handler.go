@@ -183,6 +183,9 @@ type updateUserInput struct {
 	RealName    *string          `json:"realName,omitempty"`
 	IDCard      *string          `json:"idCard,omitempty"`
 	Role        *schema.UserRole `json:"role,omitempty"`
+	Occupation  *string          `json:"occupation,omitempty"`
+	Education   *string          `json:"education,omitempty"`
+	Income      *float64         `json:"income,omitempty"`
 }
 
 // createUserInput 管理员创建用户的请求体（Password 不使用 json:"-"）。
@@ -265,6 +268,15 @@ func (h *UserHandler) Update(c fiber.Ctx) error {
 	}
 	if input.Role != nil {
 		existing.Role = *input.Role
+	}
+	if input.Occupation != nil {
+		existing.Occupation = input.Occupation
+	}
+	if input.Education != nil {
+		existing.Education = input.Education
+	}
+	if input.Income != nil {
+		existing.Income = input.Income
 	}
 
 	if err := h.users.Update(ctx, existing); err != nil {
