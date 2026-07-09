@@ -10,7 +10,7 @@ import (
 // total_orders 只统计 booked/checked_in/completed 状态的订单，
 // 与 total_amount、avg_order_amount 口径一致。
 type GuestBookingStats struct {
-	PersonIDCard   string     `gorm:"column:person_id_card;type:varchar(18);->"`
+	PersonIDCard   string     `gorm:"column:person_id_card;type:char(18);->"`
 	PersonName     string     `gorm:"column:person_name;type:text;->"`
 	Gender         *string    `gorm:"column:gender;type:text;->"`
 	Age            *int       `gorm:"column:age;type:integer;->"`

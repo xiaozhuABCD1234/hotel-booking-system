@@ -91,7 +91,6 @@ func newTestOrder(userID, roomID uuid.UUID) *model.Order {
 		CheckInDate:  checkIn,
 		CheckOutDate: checkOut,
 		TotalPrice:   200,
-		Discount:     0,
 		ActualPrice:  200,
 		Status:       model.OrderPending,
 		Guests:       []model.OrderGuest{},

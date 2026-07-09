@@ -9,7 +9,7 @@ import (
 // 从身份证号推导性别、年龄、出生日期。
 // ⚠️ 被 ViewOrderFull、ViewGuestBookingStats 依赖（SQL 层视图依赖）。
 type PersonInfo struct {
-	IDCard    string     `gorm:"column:id_card;type:varchar(18);->"`
+	IDCard    string     `gorm:"column:id_card;type:char(18);->"`
 	Name      string     `gorm:"column:name;type:text;->"`
 	Phone     *string    `gorm:"column:phone;type:varchar(20);->"`
 	BirthDate *time.Time `gorm:"column:birth_date;type:date;->"`

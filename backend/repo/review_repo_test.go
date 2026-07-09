@@ -38,7 +38,7 @@ func setupReviewDeps(t *testing.T, tx *gorm.DB) (*model.Region, *model.Hotel, *m
 	if err := tx.Create(user).Error; err != nil {
 		t.Fatalf("user: %v", err)
 	}
-	order := &model.Order{ID: uuid.New(), UserID: user.ID, RoomID: room.ID, Quantity: 1, CheckInDate: now.AddDate(0, 0, 1), CheckOutDate: now.AddDate(0, 0, 3), TotalPrice: 200, Discount: 0, ActualPrice: 200, Status: model.OrderBooked}
+	order := &model.Order{ID: uuid.New(), UserID: user.ID, RoomID: room.ID, Quantity: 1, CheckInDate: now.AddDate(0, 0, 1), CheckOutDate: now.AddDate(0, 0, 3), TotalPrice: 200, ActualPrice: 200, Status: model.OrderBooked}
 	if err := tx.Create(order).Error; err != nil {
 		t.Fatalf("order: %v", err)
 	}
@@ -137,7 +137,6 @@ func TestReviewRepo_FindByHotelID_Pagination(t *testing.T) {
 				CheckInDate:  now.AddDate(0, 0, i*2+1),
 				CheckOutDate: now.AddDate(0, 0, i*2+3),
 				TotalPrice:   200,
-				Discount:     0,
 				ActualPrice:  200,
 				Status:       model.OrderBooked,
 			}
@@ -201,7 +200,6 @@ func TestReviewRepo_FindByUserID(t *testing.T) {
 				CheckInDate:  now.AddDate(0, 0, 5),
 				CheckOutDate: now.AddDate(0, 0, 7),
 				TotalPrice:   200,
-				Discount:     0,
 				ActualPrice:  200,
 				Status:       model.OrderBooked,
 			}
@@ -290,7 +288,6 @@ func TestReviewRepo_FindByRating(t *testing.T) {
 		CheckInDate:  now.AddDate(0, 0, 5),
 		CheckOutDate: now.AddDate(0, 0, 7),
 		TotalPrice:   200,
-		Discount:     0,
 		ActualPrice:  200,
 		Status:       model.OrderBooked,
 	}
@@ -353,7 +350,6 @@ func TestReviewRepo_Update_OnlyRatingAndContent(t *testing.T) {
 		CheckInDate:  now.AddDate(0, 0, 5),
 		CheckOutDate: now.AddDate(0, 0, 7),
 		TotalPrice:   200,
-		Discount:     0,
 		ActualPrice:  200,
 		Status:       model.OrderBooked,
 	}

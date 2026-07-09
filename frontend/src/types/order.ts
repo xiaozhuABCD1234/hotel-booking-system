@@ -11,7 +11,6 @@ export interface Order {
   checkInDate: string
   checkOutDate: string
   totalPrice: number
-  discount: number
   actualPrice: number
   status: OrderStatus
   createAt: string

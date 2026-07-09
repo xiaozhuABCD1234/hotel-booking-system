@@ -32,7 +32,6 @@ type Order struct {
 	CheckInDate  time.Time    `json:"checkInDate"   gorm:"column:check_in_date;type:date;not null;index:idx_order_dates,priority:1"`
 	CheckOutDate time.Time    `json:"checkOutDate"  gorm:"column:check_out_date;type:date;not null;index:idx_order_dates,priority:2"`
 	TotalPrice   float64      `json:"totalPrice"    gorm:"column:total_price;type:numeric(10,2);not null;check:total_price >= 0"`
-	Discount     float64      `json:"discount"      gorm:"column:discount;type:numeric(10,2);not null;default:0;check:discount >= 0"`
 	ActualPrice  float64      `json:"actualPrice"   gorm:"column:actual_price;type:numeric(10,2);not null;check:actual_price >= 0"`
 	Status       OrderStatus  `json:"status"        gorm:"column:status;type:order_status;not null;default:pending;index:idx_order_status"`
 	CreateAt     time.Time    `json:"createAt"      gorm:"column:create_at;type:timestamptz;autoCreateTime;index:idx_order_create"`
@@ -54,7 +53,7 @@ func (o *Order) BeforeSave(tx *gorm.DB) error {
 // OrderGuest 入住人员关联表（订单 ↔ 入住人，多对多），对应表 order_guest_1718
 type OrderGuest struct {
 	OrderID uuid.UUID `json:"orderId" gorm:"column:order_id;type:uuid;primaryKey"`
-	IDCard  string    `json:"idCard"  gorm:"column:id_card;type:varchar(18);primaryKey;index:idx_order_guest_id_card"`
+	IDCard  string    `json:"idCard"  gorm:"column:id_card;type:char(18);primaryKey;index:idx_order_guest_id_card"`
 	Order   Order     `json:"-"       gorm:"foreignKey:OrderID;references:ID;constraint:OnDelete:CASCADE"`
 	Person  Person    `json:"person"  gorm:"foreignKey:IDCard;references:IDCard"`
 }

@@ -103,7 +103,6 @@ func newValidOrder() *model.Order {
 		CheckInDate:  time.Now().AddDate(0, 0, 1),
 		CheckOutDate: time.Now().AddDate(0, 0, 3),
 		TotalPrice:   200,
-		Discount:     0,
 		ActualPrice:  200,
 		Status:       model.OrderPending,
 		Guests:       []model.OrderGuest{},

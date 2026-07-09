@@ -28,11 +28,10 @@ type OrderFull struct {
 	CheckOutDate    time.Time `gorm:"column:check_out_date;type:date;->"`
 	Nights          int       `gorm:"column:nights;type:integer;->"`
 	TotalPrice      float64   `gorm:"column:total_price;type:numeric(10,2);->"`
-	Discount        float64   `gorm:"column:discount;type:numeric(10,2);->"`
 	ActualPrice     float64   `gorm:"column:actual_price;type:numeric(10,2);->"`
 	VipDiscountRate float64   `gorm:"column:vip_discount_rate;type:numeric(3,2);->"`
 	OrderStatus     string    `gorm:"column:order_status;type:order_status;->"`
-	GuestIDCard     *string   `gorm:"column:guest_id_card;type:varchar(18);->"`
+	GuestIDCard     *string   `gorm:"column:guest_id_card;type:char(18);->"`
 	GuestName       *string   `gorm:"column:guest_name;type:text;->"`
 	GuestGender     *string   `gorm:"column:guest_gender;type:text;->"`
 	GuestAge        *int      `gorm:"column:guest_age;type:integer;->"`
