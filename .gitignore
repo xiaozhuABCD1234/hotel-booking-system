@@ -31,3 +31,9 @@ Thumbs.db
 # omo/opencode
 .omo/
 
+
+# Playwright artifacts
+.playwright-cli/
+
+# Auto-generated
+AGENTS.md

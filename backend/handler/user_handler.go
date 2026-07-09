@@ -96,7 +96,7 @@ func (h *UserHandler) GetByID(c fiber.Ctx) error {
 
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return err
+		return model.SendError(c, http.StatusBadRequest, "Invalid user ID")
 	}
 
 	user, err := h.users.FindByID(ctx, id)
@@ -123,20 +123,43 @@ func (h *UserHandler) GetByID(c fiber.Ctx) error {
 func (h *UserHandler) Create(c fiber.Ctx) error {
 	ctx := c.Context()
 
-	var user schema.User
-	if err := c.Bind().Body(&user); err != nil {
+	var input createUserInput
+	if err := c.Bind().Body(&input); err != nil {
 		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
 	}
 
-	if user.Username == "" || user.Password == "" {
+	if input.Username == "" || input.Password == "" {
 		return model.SendError(c, http.StatusBadRequest, "Username and password are required")
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
-	user.Password = string(hashedPassword)
+
+	user := schema.User{
+		Username: input.Username,
+		Password: string(hashedPassword),
+		Role:     schema.RoleCustomer,
+		Points:   0,
+		Status:   1,
+	}
+
+	if input.Phone != nil {
+		user.Phone = input.Phone
+	}
+	if input.Email != nil {
+		user.Email = input.Email
+	}
+	if input.RealName != nil {
+		user.RealName = input.RealName
+	}
+	if input.IDCard != nil {
+		user.IDCard = input.IDCard
+	}
+	if input.Role != nil {
+		user.Role = *input.Role
+	}
 
 	if err := h.users.Create(ctx, &user); err != nil {
 		return err
@@ -160,6 +183,17 @@ type updateUserInput struct {
 	RealName    *string          `json:"realName,omitempty"`
 	IDCard      *string          `json:"idCard,omitempty"`
 	Role        *schema.UserRole `json:"role,omitempty"`
+}
+
+// createUserInput 管理员创建用户的请求体（Password 不使用 json:"-"）。
+type createUserInput struct {
+	Username string           `json:"username"`
+	Password string           `json:"password"`
+	Phone    *string          `json:"phone,omitempty"`
+	Email    *string          `json:"email,omitempty"`
+	RealName *string          `json:"realName,omitempty"`
+	IDCard   *string          `json:"idCard,omitempty"`
+	Role     *schema.UserRole `json:"role,omitempty"`
 }
 
 // Update 根据 ID 更新用户信息。
@@ -258,7 +292,7 @@ func (h *UserHandler) Delete(c fiber.Ctx) error {
 
 	id, err := uuid.Parse(c.Params("id"))
 	if err != nil {
-		return err
+		return model.SendError(c, http.StatusBadRequest, "Invalid user ID")
 	}
 
 	if err := h.users.Delete(ctx, id); err != nil {

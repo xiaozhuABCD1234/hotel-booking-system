@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"backend/model"
@@ -109,6 +110,9 @@ func (h *PersonHandler) Create(c fiber.Ctx) error {
 	}
 
 	if err := h.persons.Create(ctx, &person); err != nil {
+		if strings.Contains(err.Error(), "violates check constraint") {
+			return model.SendError(c, http.StatusBadRequest, "Invalid ID card format (must be 18 digits)")
+		}
 		return err
 	}
 
@@ -146,6 +150,12 @@ func (h *PersonHandler) Update(c fiber.Ctx) error {
 		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
 	}
 	person.IDCard = idCard
+
+	// 查询已有记录
+	_, err := h.persons.FindByIDCard(ctx, idCard)
+	if err != nil {
+		return err // gorm.ErrRecordNotFound → 404
+	}
 
 	if err := h.persons.Update(ctx, &person); err != nil {
 		return err
@@ -270,7 +280,11 @@ func (h *RegionHandler) ListProvinces(c fiber.Ctx) error {
 //	@Router			/regions/by-parent [get]
 func (h *RegionHandler) ListByParent(c fiber.Ctx) error {
 	ctx := c.Context()
-	parentID, err := strconv.Atoi(c.Query("parentID", "0"))
+	parentIDStr := c.Query("parentID", "")
+	if parentIDStr == "" {
+		return fiber.NewError(http.StatusBadRequest, "parentID query parameter is required")
+	}
+	parentID, err := strconv.Atoi(parentIDStr)
 	if err != nil {
 		return fiber.NewError(http.StatusBadRequest, "Invalid parent ID")
 	}
@@ -341,6 +355,12 @@ func (h *RegionHandler) Update(c fiber.Ctx) error {
 		return model.SendError(c, http.StatusBadRequest, "Invalid request body")
 	}
 	region.ID = id
+
+	// 查询已有记录
+	_, err = h.regions.FindByID(ctx, id)
+	if err != nil {
+		return err // gorm.ErrRecordNotFound → 404
+	}
 
 	if err := h.regions.Update(ctx, &region); err != nil {
 		return err

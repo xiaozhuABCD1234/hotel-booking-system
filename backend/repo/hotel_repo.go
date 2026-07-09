@@ -36,7 +36,7 @@ func (r *HotelRepo) Create(ctx context.Context, hotel *model.Hotel) error {
 // FindByID 根据酒店 ID 查询，预加载图片列表；若记录不存在返回 gorm.ErrRecordNotFound。
 func (r *HotelRepo) FindByID(ctx context.Context, id uuid.UUID) (*model.Hotel, error) {
 	var hotel model.Hotel
-	err := r.db.WithContext(ctx).Preload("Images").Where("status != 0").First(&hotel, "id = ?", id).Error
+	err := r.db.WithContext(ctx).Preload("Images").Preload("Region").Where("status != 0").First(&hotel, "id = ?", id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (r *HotelRepo) FindAll(ctx context.Context, offset, limit int, regionID *in
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("Images").Find(&results).Error
+	err := query.Preload("Images").Preload("Region").Find(&results).Error
 	return results, total, err
 }
 
@@ -144,7 +144,7 @@ func (r *RoomRepo) Create(ctx context.Context, room *model.Room) error {
 // FindByID 根据客房 ID 查询，预加载图片与设施列表；若记录不存在返回 gorm.ErrRecordNotFound。
 func (r *RoomRepo) FindByID(ctx context.Context, id uuid.UUID) (*model.Room, error) {
 	var room model.Room
-	err := r.db.WithContext(ctx).Preload("Images").Preload("Facilities").Where("status != 0").First(&room, "id = ?", id).Error
+	err := r.db.WithContext(ctx).Preload("Images").Preload("Facilities").Preload("Hotel").Where("status != 0").First(&room, "id = ?", id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +160,7 @@ func (r *RoomRepo) FindByHotelID(ctx context.Context, hotelID uuid.UUID, offset,
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("Images").Preload("Facilities").Find(&results).Error
+	err := query.Preload("Images").Preload("Facilities").Preload("Hotel").Find(&results).Error
 	return results, total, err
 }
 
@@ -185,7 +185,7 @@ func (r *RoomRepo) FindAvailableRooms(ctx context.Context, hotelID uuid.UUID, ch
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("Images").Preload("Facilities").Find(&results).Error
+	err := query.Preload("Images").Preload("Facilities").Preload("Hotel").Find(&results).Error
 	return results, total, err
 }
 
@@ -198,7 +198,7 @@ func (r *RoomRepo) FindAll(ctx context.Context, offset, limit int) ([]model.Room
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("Images").Preload("Facilities").Find(&results).Error
+	err := query.Preload("Images").Preload("Facilities").Preload("Hotel").Find(&results).Error
 	return results, total, err
 }
 

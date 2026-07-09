@@ -44,7 +44,7 @@ func (r *ReviewRepo) FindByHotelID(ctx context.Context, hotelID uuid.UUID, offse
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("User").Order("create_at DESC").Find(&results).Error
+	err := query.Preload("User").Preload("Hotel").Preload("Order").Order("create_at DESC").Find(&results).Error
 	return results, total, err
 }
 
@@ -57,7 +57,7 @@ func (r *ReviewRepo) FindByUserID(ctx context.Context, userID uuid.UUID, offset,
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("Hotel").Order("create_at DESC").Find(&results).Error
+	err := query.Preload("User").Preload("Hotel").Preload("Order").Order("create_at DESC").Find(&results).Error
 	return results, total, err
 }
 
@@ -80,7 +80,7 @@ func (r *ReviewRepo) FindAll(ctx context.Context, offset, limit int) ([]model.Re
 	if offset >= 0 && limit > 0 {
 		query = query.Offset(offset).Limit(limit)
 	}
-	err := query.Preload("User").Preload("Hotel").Order("create_at DESC").Find(&results).Error
+	err := query.Preload("User").Preload("Hotel").Preload("Order").Order("create_at DESC").Find(&results).Error
 	return results, total, err
 }
 
@@ -104,7 +104,14 @@ func (r *ReviewRepo) Update(ctx context.Context, review *model.Review) error {
 
 // Delete 根据 ID 硬删除评价记录。
 func (r *ReviewRepo) Delete(ctx context.Context, id uuid.UUID) error {
-	return r.db.WithContext(ctx).Delete(&model.Review{}, "id = ?", id).Error
+	result := r.db.WithContext(ctx).Delete(&model.Review{}, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 // ReviewFullRepo 评价视图（view_review_full_1718）的只读仓库。

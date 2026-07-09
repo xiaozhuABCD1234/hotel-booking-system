@@ -59,7 +59,14 @@ func (r *PersonRepo) Update(ctx context.Context, person *model.Person) error {
 }
 
 func (r *PersonRepo) Delete(ctx context.Context, idCard string) error {
-	return r.db.WithContext(ctx).Where("id_card = ?", idCard).Delete(&model.Person{}).Error
+	result := r.db.WithContext(ctx).Where("id_card = ?", idCard).Delete(&model.Person{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 func (r *PersonRepo) Upsert(ctx context.Context, person *model.Person) error {
@@ -120,7 +127,14 @@ func (r *RegionRepo) Update(ctx context.Context, region *model.Region) error {
 }
 
 func (r *RegionRepo) Delete(ctx context.Context, id int) error {
-	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&model.Region{}).Error
+	result := r.db.WithContext(ctx).Where("id = ?", id).Delete(&model.Region{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 // ===================== PersonInfoRepo =====================

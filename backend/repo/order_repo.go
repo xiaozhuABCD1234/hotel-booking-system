@@ -149,7 +149,14 @@ func (r *OrderRepo) UpdateStatus(ctx context.Context, id uuid.UUID, status model
 
 // Delete 根据 ID 硬删除订单。
 func (r *OrderRepo) Delete(ctx context.Context, id uuid.UUID) error {
-	return r.db.WithContext(ctx).Delete(&model.Order{}, "id = ?", id).Error
+	result := r.db.WithContext(ctx).Delete(&model.Order{}, "id = ?", id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 // ===================== OrderGuestRepo =====================
