@@ -70,9 +70,9 @@ func (s *OrderService) ListByUser(ctx context.Context, userID uuid.UUID, offset,
 	return s.orders.FindByUserID(ctx, userID, offset, limit)
 }
 
-// ListAll 查询全部订单。
-func (s *OrderService) ListAll(ctx context.Context, offset, limit int) ([]model.Order, int64, error) {
-	return s.orders.FindAll(ctx, offset, limit)
+// ListAll 查询全部订单（走 view_order_summary_1718，替代原 GORM Preload 查询）。
+func (s *OrderService) ListAll(ctx context.Context, offset, limit int) ([]view.OrderSummary, int64, error) {
+	return s.summaries.FindAll(ctx, offset, limit)
 }
 
 // ListByHotel 按酒店查询订单列表。

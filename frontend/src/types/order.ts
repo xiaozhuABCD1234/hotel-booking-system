@@ -3,6 +3,7 @@ import type { User } from './user'
 
 export type OrderStatus = 'pending' | 'booked' | 'checked_in' | 'cancelled' | 'completed'
 
+/** 订单（GORM Preload 完整模型） */
 export interface Order {
   id: string
   userId: string
@@ -16,10 +17,11 @@ export interface Order {
   createAt: string
   updateAt: string
   room?: Room
-  user?: User
-  guests?: OrderGuest[]
+  user?: User        // 下单人
+  guests?: OrderGuest[]  // 入住人
 }
 
+/** 入住人 */
 export interface OrderGuest {
   orderId: string
   idCard: string
@@ -30,22 +32,24 @@ export interface OrderGuest {
   }
 }
 
+/** 订单完整视图（一行一个入住人，兼容旧接口） */
 export interface OrderFull {
   orderId: string
   userId: string
-  username: string
+  username: string       // 下单人用户名
   hotelName: string
   roomType: string
   checkInDate: string
   checkOutDate: string
-  guestName: string
-  guestIdCard: string
+  guestName: string      // 入住人姓名
+  guestIdCard: string    // 入住人身份证号
   quantity: number
   totalPrice: number
   orderStatus: string
   createAt: string
 }
 
+/** 我的订单列表（用户端） */
 export interface MyOrder {
   orderId: string
   hotelName: string
@@ -58,16 +62,33 @@ export interface MyOrder {
   createAt: string
 }
 
+/** 下单请求 */
 export interface CreateOrderRequest {
   roomId: string
   checkInDate: string
   checkOutDate: string
-  guestName: string
-  guestPhone: string
-  guestIdCard: string
+  guestName: string      // 入住人姓名
+  guestPhone: string     // 入住人电话
+  guestIdCard: string    // 入住人身份证号
   roomCount: number
 }
 
 export interface UpdateOrderStatusRequest {
   status: OrderStatus
+}
+
+/** 订单概览（管理端列表，走 view_order_summary_1718） */
+export interface OrderSummary {
+  orderId: string
+  status: string
+  quantity: number
+  checkInDate: string
+  checkOutDate: string
+  nights: number
+  actualPrice: number
+  createAt: string
+  orderUserName?: string // 下单人姓名
+  hotelName: string
+  roomType: string
+  guestCount: number     // 入住人数
 }

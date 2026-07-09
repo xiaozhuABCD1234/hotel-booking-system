@@ -351,7 +351,7 @@ definitions:
         type: string
       nights:
         type: integer
-      orderID:
+      orderId:
         type: string
       orderUser:
         type: string
@@ -439,7 +439,7 @@ definitions:
         type: string
       nights:
         type: integer
-      orderID:
+      orderId:
         type: string
       orderUserName:
         type: string
@@ -1106,7 +1106,7 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/backend_model_schema.Order'
+                    $ref: '#/definitions/backend_model_view.OrderSummary'
                   type: array
               type: object
         "500":

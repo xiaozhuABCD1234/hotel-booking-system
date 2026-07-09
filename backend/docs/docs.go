@@ -750,7 +750,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/backend_model_schema.Order"
+                                                "$ref": "#/definitions/backend_model_view.OrderSummary"
                                             }
                                         }
                                     }
@@ -4510,7 +4510,7 @@ const docTemplate = `{
                 "nights": {
                     "type": "integer"
                 },
-                "orderID": {
+                "orderId": {
                     "type": "string"
                 },
                 "orderUser": {
@@ -4643,7 +4643,7 @@ const docTemplate = `{
                 "nights": {
                     "type": "integer"
                 },
-                "orderID": {
+                "orderId": {
                     "type": "string"
                 },
                 "orderUserName": {

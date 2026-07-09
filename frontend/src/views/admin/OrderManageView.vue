@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { orderApi } from "@/api/order";
-import type { Order, OrderStatus } from "@/types";
+import type { Order, OrderStatus, OrderSummary } from "@/types";
 import { toast } from "vue-sonner";
 import { getApiErrorMessage } from "@/lib/utils";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/dialog";
 import { ShoppingBag, Filter, Search, Check, Trash2 } from "@lucide/vue";
 
-const orders = ref<Order[]>([]);
+const orders = ref<OrderSummary[]>([]);
 const loading = ref(false);
 const currentPage = ref(1);
 const pageSize = ref(10);
@@ -43,14 +43,33 @@ const totalItems = ref(0);
 const statusFilter = ref<string>("all");
 
 const detailDialogOpen = ref(false);
-const selectedOrder = ref<Order | null>(null);
+const selectedOrder = ref<OrderSummary | Order | null>(null);
+
+const detailFields = computed(() => {
+	if (!selectedOrder.value) return null;
+	const o = selectedOrder.value as any;
+	return {
+		orderId: o.orderId || o.id || "-",
+		hotelName: o.hotelName || o.room?.hotel?.hotelName || "-",
+		roomType: o.roomType || o.room?.typeName || "-",
+		orderUserName: o.orderUserName || o.user?.realName || o.user?.username || "-",
+		phone: o.orderUserPhone || o.user?.phone || "-",
+		idCard: o.guests?.[0]?.idCard || "-",
+		quantity: o.quantity,
+		checkInDate: o.checkInDate,
+		checkOutDate: o.checkOutDate,
+		price: o.actualPrice ?? o.totalPrice ?? 0,
+		status: o.status,
+		createAt: o.createAt,
+	};
+});
 
 const statusDialogOpen = ref(false);
-const statusUpdateOrder = ref<Order | null>(null);
+const statusUpdateOrder = ref<OrderSummary | Order | null>(null);
 const newStatus = ref<OrderStatus>("pending");
 
 const deleteDialogOpen = ref(false);
-const deleteTargetOrder = ref<Order | null>(null);
+const deleteTargetOrder = ref<OrderSummary | Order | null>(null);
 
 const statusOptions: { value: string; label: string }[] = [
 	{ value: "all", label: "全部状态" },
@@ -107,21 +126,21 @@ async function fetchOrders() {
 	}
 }
 
-function openDetail(order: Order) {
+function openDetail(order: OrderSummary | Order) {
 	selectedOrder.value = order;
 	detailDialogOpen.value = true;
 }
 
-function openStatusUpdate(order: Order) {
+function openStatusUpdate(order: OrderSummary | Order) {
 	statusUpdateOrder.value = order;
-	newStatus.value = order.status;
+	newStatus.value = order.status as OrderStatus;
 	statusDialogOpen.value = true;
 }
 
 async function confirmStatusUpdate() {
 	if (!statusUpdateOrder.value) return;
 	try {
-		await orderApi.updateStatus(statusUpdateOrder.value.id, {
+		await orderApi.updateStatus((statusUpdateOrder.value as any).orderId || (statusUpdateOrder.value as any).id, {
 			status: newStatus.value,
 		});
 		toast.success("订单状态已更新");
@@ -132,7 +151,7 @@ async function confirmStatusUpdate() {
 	}
 }
 
-function openDelete(order: Order) {
+function openDelete(order: OrderSummary | Order) {
 	deleteTargetOrder.value = order;
 	deleteDialogOpen.value = true;
 }
@@ -140,7 +159,7 @@ function openDelete(order: Order) {
 async function confirmDelete() {
 	if (!deleteTargetOrder.value) return;
 	try {
-		await orderApi.delete(deleteTargetOrder.value.id);
+		await orderApi.delete((deleteTargetOrder.value as any).orderId || (deleteTargetOrder.value as any).id);
 		toast.success("订单已删除");
 		deleteDialogOpen.value = false;
 		await fetchOrders();
@@ -210,7 +229,8 @@ onMounted(() => {
 								<TableHead class="w-[90px] whitespace-nowrap">订单ID</TableHead>
 								<TableHead class="whitespace-nowrap">酒店</TableHead>
 								<TableHead class="whitespace-nowrap">房型</TableHead>
-								<TableHead class="whitespace-nowrap">入住人</TableHead>
+								<TableHead class="whitespace-nowrap">下单人</TableHead>
+								<TableHead class="whitespace-nowrap">入住人数</TableHead>
 								<TableHead class="whitespace-nowrap">入住日期</TableHead>
 								<TableHead class="whitespace-nowrap">离店日期</TableHead>
 								<TableHead class="text-right whitespace-nowrap">总价</TableHead>
@@ -223,7 +243,7 @@ onMounted(() => {
 						<TableBody>
 							<TableRow v-if="filteredOrders.length === 0">
 								<TableCell
-									colspan="9"
+									colspan="10"
 									class="text-center py-8 text-muted-foreground"
 								>
 									暂无数据
@@ -231,20 +251,23 @@ onMounted(() => {
 							</TableRow>
 							<TableRow
 								v-for="order in filteredOrders"
-								:key="order.id"
+								:key="order.orderId"
 								class="hover:bg-muted/50"
 							>
 								<TableCell class="font-mono text-xs whitespace-nowrap">
-									{{ order.id.slice(0, 8) }}
+									{{ order.orderId.slice(0, 8) }}
 								</TableCell>
 								<TableCell class="whitespace-nowrap">{{
-									order.room?.hotel?.hotelName ?? order.user?.realName ?? "-"
+									order.hotelName
 								}}</TableCell>
 								<TableCell class="whitespace-nowrap">{{
-									order.room?.typeName ?? "-"
+									order.roomType
 								}}</TableCell>
 								<TableCell class="whitespace-nowrap">{{
-									order.user?.realName || order.user?.username || "-"
+									order.orderUserName || "-"
+								}}</TableCell>
+								<TableCell class="whitespace-nowrap">{{
+									order.guestCount
 								}}</TableCell>
 								<TableCell class="whitespace-nowrap">{{
 									formatDate(order.checkInDate)
@@ -253,15 +276,15 @@ onMounted(() => {
 									formatDate(order.checkOutDate)
 								}}</TableCell>
 								<TableCell class="text-right font-medium whitespace-nowrap">
-									¥{{ order.totalPrice.toFixed(2) }}
+									¥{{ order.actualPrice.toFixed(2) }}
 								</TableCell>
 								<TableCell class="whitespace-nowrap">
-									<Badge
-										:class="statusBadgeClass(order.status)"
-										variant="outline"
-										class="whitespace-nowrap"
-									>
-										{{ statusLabel(order.status) }}
+								<Badge
+									:class="statusBadgeClass(order.status as OrderStatus)"
+									variant="outline"
+									class="whitespace-nowrap"
+								>
+									{{ statusLabel(order.status as OrderStatus) }}
 									</Badge>
 								</TableCell>
 								<TableCell class="text-right whitespace-nowrap">
@@ -329,76 +352,64 @@ onMounted(() => {
 				<DialogHeader>
 					<DialogTitle>订单详情</DialogTitle>
 					<DialogDescription
-						>订单编号: {{ selectedOrder?.id }}</DialogDescription
+						>订单编号: {{ detailFields?.orderId }}</DialogDescription
 					>
 				</DialogHeader>
-				<div v-if="selectedOrder" class="space-y-3">
+				<div v-if="detailFields" class="space-y-3">
 					<div class="grid grid-cols-2 gap-4">
 						<div>
 							<Label class="text-muted-foreground">酒店</Label>
-							<p class="font-medium">
-								{{ selectedOrder.room?.hotel?.hotelName ?? "-" }}
-							</p>
+							<p class="font-medium">{{ detailFields.hotelName }}</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">房型</Label>
-							<p class="font-medium">
-								{{ selectedOrder.room?.typeName ?? "-" }}
-							</p>
+							<p class="font-medium">{{ detailFields.roomType }}</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">入住人</Label>
-							<p class="font-medium">
-								{{
-									selectedOrder.user?.realName ||
-									selectedOrder.user?.username ||
-									"-"
-								}}
-							</p>
+							<p class="font-medium">{{ detailFields.orderUserName }}</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">联系电话</Label>
-							<p class="font-medium">{{ selectedOrder.user?.phone ?? "-" }}</p>
+							<p class="font-medium">{{ detailFields.phone }}</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">身份证号</Label>
-							<p class="font-medium">
-								{{ selectedOrder.guests?.[0]?.idCard ?? "-" }}
-							</p>
+							<p class="font-medium">{{ detailFields.idCard }}</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">房间数</Label>
-							<p class="font-medium">{{ selectedOrder.quantity }}</p>
+							<p class="font-medium">{{ detailFields.quantity }}</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">入住日期</Label>
-							<p class="font-medium">{{ selectedOrder.checkInDate }}</p>
+							<p class="font-medium">{{ detailFields.checkInDate }}</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">离店日期</Label>
-							<p class="font-medium">{{ selectedOrder.checkOutDate }}</p>
+							<p class="font-medium">{{ detailFields.checkOutDate }}</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">总价</Label>
 							<p class="font-medium text-lg">
-								¥{{ selectedOrder.totalPrice.toFixed(2) }}
+								¥{{ detailFields.price.toFixed(2) }}
 							</p>
 						</div>
 						<div>
 							<Label class="text-muted-foreground">状态</Label>
 							<div class="mt-1">
 								<Badge
-									:class="statusBadgeClass(selectedOrder.status)"
+									:class="statusBadgeClass(detailFields.status as OrderStatus)"
 									variant="outline"
 								>
-									{{ statusLabel(selectedOrder.status) }}
+									{{ statusLabel(detailFields.status as OrderStatus) }}
 								</Badge>
 							</div>
 						</div>
 					</div>
 					<div>
 						<Label class="text-muted-foreground">创建时间</Label>
-						<p class="font-medium">{{ selectedOrder.createAt }}</p>
+						<p class="font-medium">{{ detailFields.createAt }}</p>
 					</div>
 				</div>
 				<DialogFooter>
@@ -415,7 +426,7 @@ onMounted(() => {
 				<DialogHeader>
 					<DialogTitle>更新订单状态</DialogTitle>
 					<DialogDescription>
-						修改订单 {{ statusUpdateOrder?.id.slice(0, 8) }} 的状态
+						修改订单 {{ ((statusUpdateOrder as any)?.orderId || (statusUpdateOrder as any)?.id || "").slice(0, 8) }} 的状态
 					</DialogDescription>
 				</DialogHeader>
 				<div class="space-y-4">
@@ -423,11 +434,11 @@ onMounted(() => {
 						<Label>当前状态</Label>
 						<Badge
 							v-if="statusUpdateOrder"
-							:class="statusBadgeClass(statusUpdateOrder.status)"
+							:class="statusBadgeClass(statusUpdateOrder!.status as OrderStatus)"
 							variant="outline"
 							class="ml-2"
 						>
-							{{ statusLabel(statusUpdateOrder.status) }}
+							{{ statusLabel(statusUpdateOrder!.status as OrderStatus) }}
 						</Badge>
 					</div>
 					<div>
@@ -462,7 +473,7 @@ onMounted(() => {
 					<DialogTitle>确认删除</DialogTitle>
 					<DialogDescription>
 						确定要删除订单
-						{{ deleteTargetOrder?.id.slice(0, 8) }} 吗？此操作不可撤销。
+						{{ ((deleteTargetOrder as any)?.orderId || (deleteTargetOrder as any)?.id || "").slice(0, 8) }} 吗？此操作不可撤销。
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>

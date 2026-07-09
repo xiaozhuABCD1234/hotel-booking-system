@@ -1,10 +1,10 @@
 import api from './client'
-import type { ApiResponse, Order, CreateOrderRequest, UpdateOrderStatusRequest, OrderFull, MyOrder } from '@/types'
+import type { ApiResponse, Order, OrderSummary, CreateOrderRequest, UpdateOrderStatusRequest, OrderFull, MyOrder } from '@/types'
 
 export const orderApi = {
   /** Get all orders with pagination */
   list(page = 1, pageSize = 10) {
-    return api.get<ApiResponse<Order[]>>('/orders', { params: { page, pageSize } })
+    return api.get<ApiResponse<OrderSummary[]>>('/orders', { params: { page, pageSize } })
   },
 
   /** Get one order by ID */

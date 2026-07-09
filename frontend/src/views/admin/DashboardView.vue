@@ -13,14 +13,14 @@ import {
 } from '@/components/ui/table'
 import { Hotel, DoorOpen, ShoppingBag, Users } from '@lucide/vue'
 import { hotelApi, roomApi, orderApi, userApi } from '@/api'
-import type { Order, OrderStatus } from '@/types'
+import type { OrderStatus, OrderSummary } from '@/types'
 
 const loading = ref(true)
 const hotelCount = ref(0)
 const roomCount = ref(0)
 const orderCount = ref(0)
 const userCount = ref(0)
-const recentOrders = ref<Order[]>([])
+const recentOrders = ref<OrderSummary[]>([])
 
 const statusLabels: Record<OrderStatus, string> = {
   pending: '待确认',
@@ -119,14 +119,14 @@ const stats = [
               </TableRow>
             </template>
             <template v-else>
-              <TableRow v-for="order in recentOrders" :key="order.id">
-                <TableCell>{{ order.user?.realName || order.user?.username || '-' }}</TableCell>
+              <TableRow v-for="order in recentOrders" :key="order.orderId">
+                <TableCell>{{ order.orderUserName || '-' }}</TableCell>
                 <TableCell>{{ order.checkInDate }}</TableCell>
                 <TableCell>{{ order.checkOutDate }}</TableCell>
-                <TableCell>¥{{ order.totalPrice.toFixed(2) }}</TableCell>
+                <TableCell>¥{{ order.actualPrice.toFixed(2) }}</TableCell>
                 <TableCell>
-                  <Badge :variant="statusVariants[order.status]">
-                    {{ statusLabels[order.status] }}
+                  <Badge :variant="statusVariants[order.status as OrderStatus]">
+                    {{ statusLabels[order.status as OrderStatus] }}
                   </Badge>
                 </TableCell>
               </TableRow>

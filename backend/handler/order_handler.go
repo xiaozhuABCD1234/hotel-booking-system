@@ -43,16 +43,16 @@ func isFKeyViolation(err error) bool {
 
 // List 查询全部订单（分页）。
 //
-//	@Summary		查询全部订单
-//	@Description	分页查询全部订单列表
-//	@Tags			orders
-//	@Produce		json
-//	@Param			page		query		int		false	"页码"			default(1)
-//	@Param			pageSize	query		int		false	"每页数量"		default(10)
-//	@Success		200			{object}	model.Response{data=[]model.Order}
-//	@Failure		500			{object}	model.Response
-//	@Security		BearerAuth
-//	@Router			/orders [get]
+// @Summary		查询全部订单
+// @Description	分页查询全部订单列表
+// @Tags			orders
+// @Produce		json
+// @Param			page		query		int		false	"页码"			default(1)
+// @Param			pageSize	query		int		false	"每页数量"		default(10)
+// @Success		200			{object}	model.Response{data=[]view.OrderSummary}
+// @Failure		500			{object}	model.Response
+// @Security		BearerAuth
+// @Router			/orders [get]
 func (h *OrderHandler) List(c fiber.Ctx) error {
 	var q paginationQuery
 	if err := c.Bind().Query(&q); err != nil {
