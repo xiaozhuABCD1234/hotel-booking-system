@@ -46,9 +46,12 @@
 │   │   └── views/       # 页面视图
 │   └── ...
 ├── sql/              # 数据库脚本
-│   ├── table.sql     # 建表语句
+│   ├── table.sql     # 表、类型、索引
+│   ├── trigger.sql   # 触发器
+│   ├── function.sql  # 存储函数/过程
+│   ├── view.sql      # 视图
 │   ├── insert.sql    # 测试数据
-│   └── view.sql      # 视图定义
+│   └── select.sql    # 查询示例
 └── doc/              # 课程设计文档
     ├── 需求分析.md
     ├── 数据库设计.md
@@ -117,8 +120,10 @@ pnpm dev
 
 ```bash
 psql -U <user> -d <dbname> -f sql/table.sql
-psql -U <user> -d <dbname> -f sql/insert.sql
+psql -U <user> -d <dbname> -f sql/trigger.sql
+psql -U <user> -d <dbname> -f sql/function.sql
 psql -U <user> -d <dbname> -f sql/view.sql
+psql -U <user> -d <dbname> -f sql/insert.sql
 ```
 
 ## API 文档
