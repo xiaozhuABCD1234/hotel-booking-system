@@ -9,7 +9,17 @@ CREATE TYPE order_status AS ENUM (
     'completed',
     'cancelled'
 );
-CREATE TYPE education_level AS ENUM ('小学', '初中', '高中', '中专', '大专', '本科', '硕士', '博士', '其他');
+CREATE TYPE education_level AS ENUM (
+    '小学',
+    '初中',
+    '高中',
+    '中专',
+    '大专',
+    '本科',
+    '硕士',
+    '博士',
+    '其他'
+);
 -- 表定义
 -- VIP 等级定义
 CREATE TABLE vip_level_1718 (
@@ -38,7 +48,7 @@ CREATE TABLE user_1718 (
     vip_level SMALLINT NOT NULL DEFAULT 0 REFERENCES vip_level_1718 (level),
     occupation TEXT,
     education education_level,
-    income NUMERIC(10,2),
+    income NUMERIC(10, 2),
     create_at TIMESTAMPTZ DEFAULT now (),
     update_at TIMESTAMPTZ DEFAULT now (),
     status SMALLINT NOT NULL DEFAULT 1
@@ -101,7 +111,7 @@ CREATE TABLE room_facility_1718 (
 CREATE TABLE person_1718 (
     id_card CHAR(18) PRIMARY KEY CHECK (id_card ~ '^\d{17}[\dXx]$'),
     name TEXT NOT NULL,
-    phone VARCHAR(20) CHECK (phone ~ '^\+?[0-9\-]+$'),
+    phone VARCHAR(20) CHECK (phone ~ '^\+?[0-9\-]+$')
 );
 -- 订单
 CREATE TABLE order_1718 (
