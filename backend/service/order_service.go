@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	model "backend/model/schema"
+	"backend/model/view"
 	"backend/repo"
 
 	"github.com/google/uuid"
@@ -17,12 +18,18 @@ var ErrInvalidTransition = errors.New("invalid status transition")
 
 // OrderService 订单业务逻辑。
 type OrderService struct {
-	orders repo.OrderRepository
+	orders    repo.OrderRepository
+	details   repo.OrderDetailRepository
+	summaries repo.OrderSummaryRepository
 }
 
 // NewOrderService 创建 OrderService 实例。
-func NewOrderService(orders repo.OrderRepository) *OrderService {
-	return &OrderService{orders: orders}
+func NewOrderService(
+	orders repo.OrderRepository,
+	details repo.OrderDetailRepository,
+	summaries repo.OrderSummaryRepository,
+) *OrderService {
+	return &OrderService{orders: orders, details: details, summaries: summaries}
 }
 
 // Create 创建订单，校验基本字段。
@@ -53,6 +60,11 @@ func (s *OrderService) GetByID(ctx context.Context, id uuid.UUID) (*model.Order,
 	return s.orders.FindByID(ctx, id)
 }
 
+// GetDetail 查询订单完整详情（走 fn_order_detail_1718，下单人/入住人明确区分）。
+func (s *OrderService) GetDetail(ctx context.Context, id uuid.UUID) (*view.OrderDetail, error) {
+	return s.details.FindDetailByOrderID(ctx, id)
+}
+
 // ListByUser 按用户查询订单列表。
 func (s *OrderService) ListByUser(ctx context.Context, userID uuid.UUID, offset, limit int) ([]model.Order, int64, error) {
 	return s.orders.FindByUserID(ctx, userID, offset, limit)
@@ -66,6 +78,14 @@ func (s *OrderService) ListAll(ctx context.Context, offset, limit int) ([]model.
 // ListByHotel 按酒店查询订单列表。
 func (s *OrderService) ListByHotel(ctx context.Context, hotelID uuid.UUID, offset, limit int) ([]model.Order, int64, error) {
 	return s.orders.FindByHotelID(ctx, hotelID, offset, limit)
+}
+
+// ListSummaries 查询订单概览列表，支持按状态筛选。
+func (s *OrderService) ListSummaries(ctx context.Context, status string, offset, limit int) ([]view.OrderSummary, int64, error) {
+	if status != "" {
+		return s.summaries.FindByStatus(ctx, status, offset, limit)
+	}
+	return s.summaries.FindAll(ctx, offset, limit)
 }
 
 // UpdateStatus 更新订单状态，校验流转合法性。

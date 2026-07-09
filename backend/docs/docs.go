@@ -978,6 +978,74 @@ const docTemplate = `{
                 }
             }
         },
+        "/orders/summaries": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "分页查询订单概览列表，字段精简适合管理端，支持按状态筛选",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "查询订单概览列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "订单状态",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "每页数量",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/backend_model_view.OrderSummary"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/orders/{id}": {
             "get": {
                 "security": [
@@ -1069,6 +1137,70 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{id}/detail": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "根据 UUID 查询订单完整信息，下单人与入住人字段明确区分，入住人已聚合",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "查询订单完整详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "订单 ID (UUID)",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/model.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/backend_model_view.OrderDetail"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -3921,9 +4053,6 @@ const docTemplate = `{
                 "createAt": {
                     "type": "string"
                 },
-                "discount": {
-                    "type": "number"
-                },
                 "guests": {
                     "type": "array",
                     "items": {
@@ -4351,7 +4480,7 @@ const docTemplate = `{
                 }
             }
         },
-        "backend_model_view.OrderFull": {
+        "backend_model_view.OrderDetail": {
             "type": "object",
             "properties": {
                 "actualPrice": {
@@ -4369,8 +4498,64 @@ const docTemplate = `{
                 "createAt": {
                     "type": "string"
                 },
-                "discount": {
+                "guestCount": {
+                    "type": "integer"
+                },
+                "guestNames": {
+                    "type": "string"
+                },
+                "hotelName": {
+                    "type": "string"
+                },
+                "nights": {
+                    "type": "integer"
+                },
+                "orderID": {
+                    "type": "string"
+                },
+                "orderUser": {
+                    "type": "string"
+                },
+                "orderUserName": {
+                    "type": "string"
+                },
+                "orderUserPhone": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "roomPrice": {
                     "type": "number"
+                },
+                "roomType": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "totalPrice": {
+                    "type": "number"
+                }
+            }
+        },
+        "backend_model_view.OrderFull": {
+            "type": "object",
+            "properties": {
+                "actualPrice": {
+                    "type": "number"
+                },
+                "checkInDate": {
+                    "type": "string"
+                },
+                "checkOutDate": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "createAt": {
+                    "type": "string"
                 },
                 "district": {
                     "type": "string"
@@ -4431,6 +4616,47 @@ const docTemplate = `{
                 },
                 "vipDiscountRate": {
                     "type": "number"
+                }
+            }
+        },
+        "backend_model_view.OrderSummary": {
+            "type": "object",
+            "properties": {
+                "actualPrice": {
+                    "type": "number"
+                },
+                "checkInDate": {
+                    "type": "string"
+                },
+                "checkOutDate": {
+                    "type": "string"
+                },
+                "createAt": {
+                    "type": "string"
+                },
+                "guestCount": {
+                    "type": "integer"
+                },
+                "hotelName": {
+                    "type": "string"
+                },
+                "nights": {
+                    "type": "integer"
+                },
+                "orderID": {
+                    "type": "string"
+                },
+                "orderUserName": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "roomType": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },

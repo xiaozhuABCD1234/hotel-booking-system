@@ -35,9 +35,11 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	personInfoRepo := repo.NewPersonInfoRepo(db)
 	guestBookingStatsRepo := repo.NewGuestBookingStatsRepo(db)
 	myOrdersRepo := repo.NewMyOrdersRepo(db)
+	orderDetailRepo := repo.NewOrderDetailRepo(db)
+	orderSummaryRepo := repo.NewOrderSummaryRepo(db)
 
 	// ─── 创建 services ───────────────────────────────────────
-	orderSvc := service.NewOrderService(orderRepo)
+	orderSvc := service.NewOrderService(orderRepo, orderDetailRepo, orderSummaryRepo)
 	cosSvc := service.NewCOSService()
 
 	// ─── 创建 handlers ─────────────────────────────────────────
@@ -121,9 +123,11 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	protectedOrders := protected.Group("/orders")
 	protectedOrders.Get("/", orderH.List)
 	// 静态路由必须在 :id 参数路由之前注册
+	protectedOrders.Get("/summaries", orderH.ListSummaries)
 	protectedOrders.Get("/by-user", orderH.ListByUserID)
 	protectedOrders.Get("/by-hotel", orderH.ListByHotelID)
 	protectedOrders.Get("/:id", orderH.GetByID)
+	protectedOrders.Get("/:id/detail", orderH.Detail)
 	protectedOrders.Post("/", orderH.Create)
 	protectedOrders.Put("/:id/status", orderH.UpdateStatus)
 	protectedOrders.Delete("/:id", orderH.Delete)

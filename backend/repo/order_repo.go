@@ -22,8 +22,14 @@ func NewOrderRepo(db *gorm.DB) *OrderRepo {
 }
 
 // Create 创建订单及入住人（事务）。
+// 先调用 sp_ensure_person_1718 确保入住人存在于人员表，再插入订单和关联记录。
 func (r *OrderRepo) Create(ctx context.Context, order *model.Order) error {
 	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, g := range order.Guests {
+			if err := tx.Exec("CALL sp_ensure_person_1718(?, '', NULL)", g.IDCard).Error; err != nil {
+				return err
+			}
+		}
 		if err := tx.Omit("Guests").Create(order).Error; err != nil {
 			return err
 		}
@@ -295,4 +301,72 @@ func (r *MyOrdersRepo) FindByOrderID(ctx context.Context, orderID uuid.UUID) (*v
 		return nil, err
 	}
 	return &result, nil
+}
+
+// ===================== OrderDetailRepo =====================
+
+// OrderDetailRepo 订单详情视图（view_order_detail_1718）只读仓库。
+type OrderDetailRepo struct {
+	db *gorm.DB
+}
+
+func NewOrderDetailRepo(db *gorm.DB) *OrderDetailRepo {
+	return &OrderDetailRepo{db: db}
+}
+
+// FindDetailByOrderID 调用 PostgreSQL 函数 fn_order_detail_1718 查询订单详情。
+// 走主键索引，比视图全表扫描高效，适合单条订单查询。
+func (r *OrderDetailRepo) FindDetailByOrderID(ctx context.Context, orderID uuid.UUID) (*view.OrderDetail, error) {
+	var result view.OrderDetail
+	err := r.db.WithContext(ctx).Raw(
+		"SELECT * FROM fn_order_detail_1718(?)", orderID,
+	).Scan(&result).Error
+	if err != nil {
+		return nil, err
+	}
+	if result.OrderID == uuid.Nil {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return &result, nil
+}
+
+// ===================== OrderSummaryRepo =====================
+
+// OrderSummaryRepo 订单概览视图（view_order_summary_1718）只读仓库。
+type OrderSummaryRepo struct {
+	db *gorm.DB
+}
+
+func NewOrderSummaryRepo(db *gorm.DB) *OrderSummaryRepo {
+	return &OrderSummaryRepo{db: db}
+}
+
+// FindAll 查询全部订单概览，按 create_at 降序，支持分页。
+func (r *OrderSummaryRepo) FindAll(ctx context.Context, offset, limit int) ([]view.OrderSummary, int64, error) {
+	var results []view.OrderSummary
+	var total int64
+	query := r.db.WithContext(ctx).Model(&view.OrderSummary{})
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	if offset >= 0 && limit > 0 {
+		query = query.Offset(offset).Limit(limit)
+	}
+	err := query.Order("create_at DESC").Find(&results).Error
+	return results, total, err
+}
+
+// FindByStatus 按状态查询订单概览，支持分页。
+func (r *OrderSummaryRepo) FindByStatus(ctx context.Context, status string, offset, limit int) ([]view.OrderSummary, int64, error) {
+	var results []view.OrderSummary
+	var total int64
+	query := r.db.WithContext(ctx).Model(&view.OrderSummary{}).Where("status = ?", status)
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	if offset >= 0 && limit > 0 {
+		query = query.Offset(offset).Limit(limit)
+	}
+	err := query.Order("create_at DESC").Find(&results).Error
+	return results, total, err
 }

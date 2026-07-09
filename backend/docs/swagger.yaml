@@ -46,8 +46,6 @@ definitions:
         type: string
       createAt:
         type: string
-      discount:
-        type: number
       guests:
         items:
           $ref: '#/definitions/backend_model_schema.OrderGuest'
@@ -333,6 +331,45 @@ definitions:
       userID:
         type: string
     type: object
+  backend_model_view.OrderDetail:
+    properties:
+      actualPrice:
+        type: number
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      city:
+        type: string
+      createAt:
+        type: string
+      guestCount:
+        type: integer
+      guestNames:
+        type: string
+      hotelName:
+        type: string
+      nights:
+        type: integer
+      orderID:
+        type: string
+      orderUser:
+        type: string
+      orderUserName:
+        type: string
+      orderUserPhone:
+        type: string
+      quantity:
+        type: integer
+      roomPrice:
+        type: number
+      roomType:
+        type: string
+      status:
+        type: string
+      totalPrice:
+        type: number
+    type: object
   backend_model_view.OrderFull:
     properties:
       actualPrice:
@@ -345,8 +382,6 @@ definitions:
         type: string
       createAt:
         type: string
-      discount:
-        type: number
       district:
         type: string
       guestAge:
@@ -387,6 +422,33 @@ definitions:
         type: string
       vipDiscountRate:
         type: number
+    type: object
+  backend_model_view.OrderSummary:
+    properties:
+      actualPrice:
+        type: number
+      checkInDate:
+        type: string
+      checkOutDate:
+        type: string
+      createAt:
+        type: string
+      guestCount:
+        type: integer
+      hotelName:
+        type: string
+      nights:
+        type: integer
+      orderID:
+        type: string
+      orderUserName:
+        type: string
+      quantity:
+        type: integer
+      roomType:
+        type: string
+      status:
+        type: string
     type: object
   backend_model_view.PersonInfo:
     properties:
@@ -1162,6 +1224,44 @@ paths:
       summary: 查询订单详情
       tags:
       - orders
+  /orders/{id}/detail:
+    get:
+      description: 根据 UUID 查询订单完整信息，下单人与入住人字段明确区分，入住人已聚合
+      parameters:
+      - description: 订单 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_view.OrderDetail'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 查询订单完整详情
+      tags:
+      - orders
   /orders/{id}/status:
     put:
       consumes:
@@ -1302,6 +1402,47 @@ paths:
       security:
       - BearerAuth: []
       summary: 按用户查询订单
+      tags:
+      - orders
+  /orders/summaries:
+    get:
+      description: 分页查询订单概览列表，字段精简适合管理端，支持按状态筛选
+      parameters:
+      - description: 订单状态
+        in: query
+        name: status
+        type: string
+      - default: 1
+        description: 页码
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: 每页数量
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/backend_model_view.OrderSummary'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 查询订单概览列表
       tags:
       - orders
   /persons:

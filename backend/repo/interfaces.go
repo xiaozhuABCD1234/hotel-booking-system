@@ -160,6 +160,17 @@ type MyOrdersRepository interface {
 	FindByOrderID(ctx context.Context, orderID uuid.UUID) (*view.MyOrders, error)
 }
 
+// OrderDetailRepository 订单详情视图接口。
+type OrderDetailRepository interface {
+	FindDetailByOrderID(ctx context.Context, orderID uuid.UUID) (*view.OrderDetail, error)
+}
+
+// OrderSummaryRepository 订单概览视图接口。
+type OrderSummaryRepository interface {
+	FindAll(ctx context.Context, offset, limit int) ([]view.OrderSummary, int64, error)
+	FindByStatus(ctx context.Context, status string, offset, limit int) ([]view.OrderSummary, int64, error)
+}
+
 // ─── 编译时类型检查 ──────────────────────────────────────────
 // 确保所有具体 repo 结构体满足对应接口（IDE 提示 + 编译器保证）
 
@@ -180,4 +191,6 @@ var (
 	_ PersonInfoRepository        = (*PersonInfoRepo)(nil)
 	_ GuestBookingStatsRepository = (*GuestBookingStatsRepo)(nil)
 	_ MyOrdersRepository          = (*MyOrdersRepo)(nil)
+	_ OrderDetailRepository       = (*OrderDetailRepo)(nil)
+	_ OrderSummaryRepository      = (*OrderSummaryRepo)(nil)
 )

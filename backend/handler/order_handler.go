@@ -8,6 +8,7 @@ import (
 
 	appmodel "backend/model"
 	model "backend/model/schema"
+	_ "backend/model/view"
 	"backend/service"
 
 	"github.com/gofiber/fiber/v3"
@@ -293,4 +294,71 @@ func (h *OrderHandler) ListByHotelID(c fiber.Ctx) error {
 	}
 
 	return appmodel.SendSuccess(c, appmodel.WithData(orders), appmodel.WithPagination(total, q.Page, q.PageSize))
+}
+
+// Detail 查询订单完整详情（下单人与入住人明确区分，走 fn_order_detail_1718）。
+//
+//	@Summary		查询订单完整详情
+//	@Description	根据 UUID 查询订单完整信息，下单人与入住人字段明确区分，入住人已聚合
+//	@Tags			orders
+//	@Produce		json
+//	@Param			id		path		string	true	"订单 ID (UUID)"
+//	@Success		200		{object}	model.Response{data=view.OrderDetail}
+//	@Failure		400		{object}	model.Response
+//	@Failure		404		{object}	model.Response
+//	@Failure		500		{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/orders/{id}/detail [get]
+func (h *OrderHandler) Detail(c fiber.Ctx) error {
+	id, err := uuid.Parse(c.Params("id"))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid order id")
+	}
+
+	detail, err := h.orders.GetDetail(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	return appmodel.SendSuccess(c, appmodel.WithData(detail))
+}
+
+// summaryQuery 订单概览查询参数
+type summaryQuery struct {
+	Status string `query:"status"`
+	paginationQuery
+}
+
+// ListSummaries 查询订单概览列表（支持按状态筛选，分页）。
+//
+//	@Summary		查询订单概览列表
+//	@Description	分页查询订单概览列表，字段精简适合管理端，支持按状态筛选
+//	@Tags			orders
+//	@Produce		json
+//	@Param			status		query		string	false	"订单状态"
+//	@Param			page		query		int		false	"页码"			default(1)
+//	@Param			pageSize	query		int		false	"每页数量"		default(10)
+//	@Success		200			{object}	model.Response{data=[]view.OrderSummary}
+//	@Failure		500			{object}	model.Response
+//	@Security		BearerAuth
+//	@Router			/orders/summaries [get]
+func (h *OrderHandler) ListSummaries(c fiber.Ctx) error {
+	var q summaryQuery
+	if err := c.Bind().Query(&q); err != nil {
+		return appmodel.SendError(c, http.StatusBadRequest, "Invalid request query")
+	}
+	if q.Page <= 0 {
+		q.Page = 1
+	}
+	if q.PageSize <= 0 {
+		q.PageSize = 10
+	}
+	offset := (q.Page - 1) * q.PageSize
+
+	results, total, err := h.orders.ListSummaries(c.Context(), q.Status, offset, q.PageSize)
+	if err != nil {
+		return err
+	}
+
+	return appmodel.SendSuccess(c, appmodel.WithData(results), appmodel.WithPagination(total, q.Page, q.PageSize))
 }
