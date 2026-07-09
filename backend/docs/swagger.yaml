@@ -3111,6 +3111,51 @@ paths:
       summary: 查询用户详情
       tags:
       - users
+    put:
+      consumes:
+      - application/json
+      description: 根据 UUID 更新用户信息
+      parameters:
+      - description: 用户 ID (UUID)
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 更新的用户信息
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/backend_model_schema.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/model.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/backend_model_schema.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新用户信息
+      tags:
+      - users
 securityDefinitions:
   BearerAuth:
     description: JWT Bearer Token，格式 "Bearer <token>"

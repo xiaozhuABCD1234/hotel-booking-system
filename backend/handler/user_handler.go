@@ -150,6 +150,18 @@ func (h *UserHandler) Create(c fiber.Ctx) error {
 	return c.Status(http.StatusCreated).JSON(r)
 }
 
+// updateUserInput 仅包含客户端可更新的用户字段。
+type updateUserInput struct {
+	Username    string           `json:"username,omitempty"`
+	OldPassword string           `json:"oldPassword,omitempty"`
+	Password    string           `json:"password,omitempty"`
+	Phone       *string          `json:"phone,omitempty"`
+	Email       *string          `json:"email,omitempty"`
+	RealName    *string          `json:"realName,omitempty"`
+	IDCard      *string          `json:"idCard,omitempty"`
+	Role        *schema.UserRole `json:"role,omitempty"`
+}
+
 // Update 根据 ID 更新用户信息。
 //
 //	@Summary		更新用户信息
@@ -165,19 +177,6 @@ func (h *UserHandler) Create(c fiber.Ctx) error {
 //	@Failure		500		{object}	model.Response
 //	@Security		BearerAuth
 //	@Router			/users/{id} [put]
-//
-// updateUserInput 仅包含客户端可更新的用户字段。
-type updateUserInput struct {
-	Username    string           `json:"username,omitempty"`
-	OldPassword string           `json:"oldPassword,omitempty"`
-	Password    string           `json:"password,omitempty"`
-	Phone       *string          `json:"phone,omitempty"`
-	Email       *string          `json:"email,omitempty"`
-	RealName    *string          `json:"realName,omitempty"`
-	IDCard      *string          `json:"idCard,omitempty"`
-	Role        *schema.UserRole `json:"role,omitempty"`
-}
-
 func (h *UserHandler) Update(c fiber.Ctx) error {
 	ctx := c.Context()
 
