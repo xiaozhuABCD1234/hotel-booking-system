@@ -30,7 +30,7 @@ const selectedStar = ref<string>('')
 const searchParams = computed<HotelSearchParams>(() => {
   const params: HotelSearchParams = {}
   if (selectedRegion.value && selectedRegion.value !== 'all') {
-    params.regionId = Number(selectedRegion.value)
+    params.regionID = Number(selectedRegion.value)
   }
   if (selectedStar.value && selectedStar.value !== 'all') {
     params.starLevel = Number(selectedStar.value)

@@ -1,3 +1,10 @@
+export interface VipLevel {
+  level: number
+  levelName: string
+  minPoints: number
+  discountRate: number
+}
+
 export interface User {
   id: string
   username: string
@@ -6,7 +13,9 @@ export interface User {
   email?: string
   role: 'customer' | 'vip' | 'hotel_manager' | 'admin'
   vipLevelId?: number
+  vipLevel?: VipLevel
   points: number
+  idCard?: string
   createAt: string
   updateAt: string
   status: number
@@ -17,10 +26,13 @@ export interface UserVip {
   username: string
   phone?: string
   email?: string
+  realName?: string
+  idCard?: string
   role: string
   vipLevelName?: string
   discountRate?: number
   points: number
+  pointsToNextLevel?: number
 }
 
 export interface CreateUserRequest {
@@ -34,5 +46,9 @@ export interface CreateUserRequest {
 export interface UpdateUserRequest {
   phone?: string
   email?: string
+  realName?: string
+  idCard?: string
+  oldPassword?: string
+  password?: string
   role?: 'customer' | 'vip' | 'hotel_manager' | 'admin'
 }

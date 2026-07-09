@@ -143,13 +143,13 @@ type UserVipRepository interface {
 // PersonInfoRepository 入住人信息视图接口。
 type PersonInfoRepository interface {
 	FindByIDCard(ctx context.Context, idCard string) (*view.PersonInfo, error)
-	FindAll(ctx context.Context, offset, limit int, gender string, minAge, maxAge *int) ([]view.PersonInfo, int64, error)
+	FindAll(ctx context.Context, offset, limit int, gender, occupation, education string, minIncome, maxIncome *float64, minAge, maxAge *int) ([]view.PersonInfo, int64, error)
 }
 
 // GuestBookingStatsRepository 入住人统计视图接口。
 type GuestBookingStatsRepository interface {
 	FindByIDCard(ctx context.Context, idCard string) (*view.GuestBookingStats, error)
-	FindAll(ctx context.Context, offset, limit int, ageGroup, gender, favCity string) ([]view.GuestBookingStats, int64, error)
+	FindAll(ctx context.Context, offset, limit int, ageGroup, gender, favCity, occupation, education string, minIncome, maxIncome *float64) ([]view.GuestBookingStats, int64, error)
 	FindTopGuests(ctx context.Context, limit int) ([]view.GuestBookingStats, error)
 }
 

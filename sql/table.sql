@@ -9,6 +9,7 @@ CREATE TYPE order_status AS ENUM (
     'completed',
     'cancelled'
 );
+CREATE TYPE education_level AS ENUM ('小学', '初中', '高中', '中专', '大专', '本科', '硕士', '博士', '其他');
 -- 表定义
 -- VIP 等级定义
 CREATE TABLE vip_level_1718 (
@@ -97,8 +98,13 @@ CREATE TABLE room_facility_1718 (
 CREATE TABLE person_1718 (
     id_card CHAR(18) PRIMARY KEY CHECK (id_card ~ '^\d{17}[\dXx]$'),
     name TEXT NOT NULL,
-    phone VARCHAR(20)
+    phone VARCHAR(20) CHECK (phone ~ '^\+?[0-9\-]+$'),
+    occupation TEXT,
+    education education_level,
+    income numrange
 );
+-- 收入范围 GiST 索引（支持范围查询）
+CREATE INDEX idx_person_1718_income ON person_1718 USING GIST (income);
 -- 订单
 CREATE TABLE order_1718 (
     id UUID PRIMARY KEY DEFAULT uuidv7 (),

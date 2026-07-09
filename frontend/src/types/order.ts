@@ -71,6 +71,8 @@ export interface CreateOrderRequest {
   guestPhone: string     // 入住人电话
   guestIdCard: string    // 入住人身份证号
   roomCount: number
+  totalPrice: number
+  actualPrice: number
 }
 
 export interface UpdateOrderStatusRequest {

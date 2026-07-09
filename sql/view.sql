@@ -63,6 +63,9 @@ CREATE OR REPLACE VIEW view_person_info_1718 AS
 SELECT id_card,
     name,
     phone,
+    occupation,
+    education,
+    income,
     TO_DATE(SUBSTRING(id_card, 7, 8), 'YYYYMMDD') AS birth_date,
     CASE
         WHEN SUBSTRING(id_card, 17, 1) ~ '\d'
@@ -201,13 +204,16 @@ FROM review_1718 rv
     JOIN hotel_1718 h ON h.id = rv.hotel_id
     JOIN order_1718 o ON o.id = rv.order_id
     JOIN room_1718 rm ON rm.id = o.room_id;
--- 入住人预订统计分析 — 按年龄/性别等维度分析客户偏好
+-- 入住人预订统计分析 — 按年龄/性别/职业/学历/收入等维度分析客户偏好
 -- 依赖 view_person_info_1718
 CREATE OR REPLACE VIEW view_guest_booking_stats_1718 AS
 SELECT vpi.id_card AS person_id_card,
     vpi.name AS person_name,
     vpi.gender,
     vpi.age,
+    vpi.occupation,
+    vpi.education,
+    vpi.income,
     CASE
         WHEN vpi.age < 18 THEN '18岁以下'
         WHEN vpi.age BETWEEN 18 AND 25 THEN '18-25岁'
@@ -273,7 +279,10 @@ FROM view_person_info_1718 vpi
 GROUP BY vpi.id_card,
     vpi.name,
     vpi.gender,
-    vpi.age;
+    vpi.age,
+    vpi.occupation,
+    vpi.education,
+    vpi.income;
 -- 订单详情（下单人与入住人明确区分，入住人聚合）
 CREATE OR REPLACE VIEW view_order_detail_1718 AS
 SELECT o.id AS order_id,
@@ -365,6 +374,9 @@ SELECT o.id AS order_id,
     p.name AS guest_name,
     vpi.gender AS guest_gender,
     vpi.age AS guest_age,
+    vpi.occupation AS guest_occupation,
+    vpi.education AS guest_education,
+    vpi.income AS guest_income,
     o.create_at
 FROM order_1718 o
     JOIN user_1718 u ON u.id = o.user_id

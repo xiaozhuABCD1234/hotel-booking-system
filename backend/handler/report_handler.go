@@ -385,15 +385,16 @@ func (h *ReportHandler) ReviewFullByUserID(c fiber.Ctx) error {
 
 // ===================== UserVip =====================
 
-// UserVipList 查询用户 VIP 视图列表，支持按角色筛选。
+// UserVipList 查询用户 VIP 视图列表，支持按角色筛选或按 userId 精确查询。
 //
 //	@Summary		用户 VIP 报表
-//	@Description	分页查询用户 VIP 视图，支持按角色筛选
+//	@Description	分页查询用户 VIP 视图，支持按角色筛选或按 userId 精确查询单个用户
 //	@Tags			reports
 //	@Produce		json
 //	@Param			page		query		int		false	"页码"			default(1)
 //	@Param			pageSize	query		int		false	"每页数量"		default(10)
 //	@Param			role		query		string	false	"角色筛选"
+//	@Param			userId		query		string	false	"用户 ID (UUID)，传入则只返回该用户的 VIP 信息"
 //	@Success		200			{object}	model.Response{data=[]view.UserVip}
 //	@Failure		400			{object}	model.Response
 //	@Failure		500			{object}	model.Response
@@ -401,6 +402,20 @@ func (h *ReportHandler) ReviewFullByUserID(c fiber.Ctx) error {
 //	@Router			/reports/user-vip [get]
 func (h *ReportHandler) UserVipList(c fiber.Ctx) error {
 	ctx := c.Context()
+
+	// 按 userId 精确查询单个用户
+	if userIDStr := c.Query("userId"); userIDStr != "" {
+		userID, err := uuid.Parse(userIDStr)
+		if err != nil {
+			return model.SendError(c, http.StatusBadRequest, "Invalid user ID")
+		}
+		result, err := h.userVip.FindByUserID(ctx, userID)
+		if err != nil {
+			return err
+		}
+		return model.SendSuccess(c, model.WithData([]view.UserVip{*result}))
+	}
+
 	page, pageSize, offset, err := parsePageQuery(c)
 	if err != nil {
 		return model.SendError(c, http.StatusBadRequest, "Invalid pagination parameters")
@@ -418,15 +433,19 @@ func (h *ReportHandler) UserVipList(c fiber.Ctx) error {
 
 // ===================== PersonInfo =====================
 
-// PersonInfoList 查询人员信息视图列表，支持按性别、年龄范围筛选。
+// PersonInfoList 查询人员信息视图列表，支持按性别、年龄、职业、学历、收入范围筛选。
 //
 //	@Summary		人员信息报表
-//	@Description	分页查询人员信息视图，支持按性别、年龄范围筛选
+//	@Description	分页查询人员信息视图，支持按性别、年龄、职业、学历、收入范围筛选
 //	@Tags			reports
 //	@Produce		json
 //	@Param			page		query		int		false	"页码"			default(1)
 //	@Param			pageSize	query		int		false	"每页数量"		default(10)
 //	@Param			gender		query		string	false	"性别筛选"
+//	@Param			occupation	query		string	false	"职业筛选"
+//	@Param			education	query		string	false	"学历筛选"
+//	@Param			minIncome	query		number	false	"最低收入"
+//	@Param			maxIncome	query		number	false	"最高收入"
 //	@Param			minAge		query		int		false	"最小年龄"
 //	@Param			maxAge		query		int		false	"最大年龄"
 //	@Success		200			{object}	model.Response{data=[]view.PersonInfo}
@@ -442,10 +461,14 @@ func (h *ReportHandler) PersonInfoList(c fiber.Ctx) error {
 	}
 
 	gender := c.Query("gender")
+	occupation := c.Query("occupation")
+	education := c.Query("education")
+	minIncome := parseOptionalFloat64(c, "minIncome")
+	maxIncome := parseOptionalFloat64(c, "maxIncome")
 	minAge := parseOptionalInt(c, "minAge")
 	maxAge := parseOptionalInt(c, "maxAge")
 
-	results, total, err := h.personInfo.FindAll(ctx, offset, pageSize, gender, minAge, maxAge)
+	results, total, err := h.personInfo.FindAll(ctx, offset, pageSize, gender, occupation, education, minIncome, maxIncome, minAge, maxAge)
 	if err != nil {
 		return err
 	}
@@ -455,10 +478,10 @@ func (h *ReportHandler) PersonInfoList(c fiber.Ctx) error {
 
 // ===================== GuestBookingStats =====================
 
-// GuestStats 查询客人预订统计视图列表，支持按年龄组、性别、偏好城市筛选。
+// GuestStats 查询客人预订统计视图列表，支持按年龄组、性别、偏好城市、职业、学历、收入范围筛选。
 //
 //	@Summary		客人预订统计
-//	@Description	分页查询客人预订统计视图，支持按年龄组、性别、偏好城市筛选
+//	@Description	分页查询客人预订统计视图，支持按年龄组、性别、偏好城市、职业、学历、收入范围筛选
 //	@Tags			reports
 //	@Produce		json
 //	@Param			page		query		int		false	"页码"			default(1)
@@ -466,6 +489,10 @@ func (h *ReportHandler) PersonInfoList(c fiber.Ctx) error {
 //	@Param			ageGroup	query		string	false	"年龄组"
 //	@Param			gender		query		string	false	"性别"
 //	@Param			favCity		query		string	false	"偏好城市"
+//	@Param			occupation	query		string	false	"职业筛选"
+//	@Param			education	query		string	false	"学历筛选"
+//	@Param			minIncome	query		number	false	"最低收入"
+//	@Param			maxIncome	query		number	false	"最高收入"
 //	@Success		200			{object}	model.Response{data=[]view.GuestBookingStats}
 //	@Failure		400			{object}	model.Response
 //	@Failure		500			{object}	model.Response
@@ -481,8 +508,12 @@ func (h *ReportHandler) GuestStats(c fiber.Ctx) error {
 	ageGroup := c.Query("ageGroup")
 	gender := c.Query("gender")
 	favCity := c.Query("favCity")
+	occupation := c.Query("occupation")
+	education := c.Query("education")
+	minIncome := parseOptionalFloat64(c, "minIncome")
+	maxIncome := parseOptionalFloat64(c, "maxIncome")
 
-	results, total, err := h.guestBookingStats.FindAll(ctx, offset, pageSize, ageGroup, gender, favCity)
+	results, total, err := h.guestBookingStats.FindAll(ctx, offset, pageSize, ageGroup, gender, favCity, occupation, education, minIncome, maxIncome)
 	if err != nil {
 		return err
 	}

@@ -42,7 +42,7 @@ export interface HotelSummary {
 export interface HotelSearchParams {
   page?: number
   pageSize?: number
-  regionId?: number
+  regionID?: number
   starLevel?: number
   keyword?: string
 }

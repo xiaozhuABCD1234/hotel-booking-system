@@ -9,6 +9,7 @@ import (
 	appmodel "backend/model"
 	model "backend/model/schema"
 	_ "backend/model/view"
+	"backend/middleware"
 	"backend/service"
 
 	"github.com/gofiber/fiber/v3"
@@ -101,6 +102,20 @@ func (h *OrderHandler) GetByID(c fiber.Ctx) error {
 	return appmodel.SendSuccess(c, appmodel.WithData(order))
 }
 
+// createOrderRequest 下单请求 DTO（匹配前端 BookingView 提交的格式）。
+// 后端负责从 JWT 提取 userId、映射字段名、构造 guests 数组。
+type createOrderRequest struct {
+	RoomID       uuid.UUID `json:"roomId"`
+	CheckInDate  string    `json:"checkInDate"`
+	CheckOutDate string    `json:"checkOutDate"`
+	GuestName    string    `json:"guestName"`
+	GuestPhone   string    `json:"guestPhone"`
+	GuestIDCard  string    `json:"guestIdCard"`
+	RoomCount    int32     `json:"roomCount"`
+	TotalPrice   float64   `json:"totalPrice"`
+	ActualPrice  float64   `json:"actualPrice"`
+}
+
 // Create 创建订单（事务，含入住人），返回 201 Created。
 //
 //	@Summary		创建订单
@@ -108,24 +123,71 @@ func (h *OrderHandler) GetByID(c fiber.Ctx) error {
 //	@Tags			orders
 //	@Accept			json
 //	@Produce		json
-//	@Param			body	body		model.Order	true	"订单信息"
+//	@Param			body	body		createOrderRequest	true	"订单信息"
 //	@Success		201		{object}	model.Response{data=model.Order}
 //	@Failure		400		{object}	model.Response	"请求参数无效"
+//	@Failure		401		{object}	model.Response	"未认证"
 //	@Failure		500		{object}	model.Response
 //	@Security		BearerAuth
 //	@Router			/orders [post]
 func (h *OrderHandler) Create(c fiber.Ctx) error {
-	var order model.Order
-	if err := c.Bind().Body(&order); err != nil {
+	// 从 JWT 提取 userId
+	claims := middleware.GetClaims(c)
+	if claims == nil {
+		return appmodel.SendError(c, http.StatusUnauthorized, "authentication required")
+	}
+	userID, err := uuid.Parse(claims.UserID)
+	if err != nil {
+		return appmodel.SendError(c, http.StatusBadRequest, "invalid user ID in token")
+	}
+
+	// 绑定前端格式的请求体
+	var req createOrderRequest
+	if err := c.Bind().Body(&req); err != nil {
 		return appmodel.SendError(c, http.StatusBadRequest, "Invalid request body")
 	}
 
-	now := time.Now()
-	if order.CreateAt.IsZero() {
-		order.CreateAt = now
+	// 解析日期
+	checkInDate, err := time.Parse("2006-01-02", req.CheckInDate)
+	if err != nil {
+		return appmodel.SendError(c, http.StatusBadRequest, "Invalid checkInDate format (expected YYYY-MM-DD)")
 	}
-	if order.UpdateAt.IsZero() {
-		order.UpdateAt = now
+	checkOutDate, err := time.Parse("2006-01-02", req.CheckOutDate)
+	if err != nil {
+		return appmodel.SendError(c, http.StatusBadRequest, "Invalid checkOutDate format (expected YYYY-MM-DD)")
+	}
+
+	now := time.Now()
+
+	// 构造 Order 模型
+	order := model.Order{
+		UserID:       userID,
+		RoomID:       req.RoomID,
+		Quantity:     req.RoomCount,
+		CheckInDate:  checkInDate,
+		CheckOutDate: checkOutDate,
+		TotalPrice:   req.TotalPrice,
+		ActualPrice:  req.ActualPrice,
+		Status:       model.OrderPending,
+		CreateAt:     now,
+		UpdateAt:     now,
+	}
+
+	// 构造入住人（前端一个表单对应一个住客）
+	if req.GuestName != "" || req.GuestIDCard != "" {
+		if req.GuestName == "" || req.GuestIDCard == "" {
+			return appmodel.SendError(c, http.StatusBadRequest, "guestName and guestIdCard are both required")
+		}
+		order.Guests = []model.OrderGuest{
+			{
+				IDCard: req.GuestIDCard,
+				Person: model.Person{
+					IDCard: req.GuestIDCard,
+					Name:   req.GuestName,
+					Phone:  &req.GuestPhone,
+				},
+			},
+		}
 	}
 
 	if err := h.orders.Create(c.Context(), &order); err != nil {

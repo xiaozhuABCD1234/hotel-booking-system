@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Building2, LogOut, User, ShoppingBag, Hotel } from '@lucide/vue'
+import { Building2, LogOut, User, UserCircle, ShoppingBag, Hotel } from '@lucide/vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -73,6 +73,10 @@ async function handleLogout() {
                 <DropdownMenuItem v-if="auth.isAdmin" @click="router.push('/admin')">
                   <User class="mr-2 h-4 w-4" />
                   后台管理
+                </DropdownMenuItem>
+                <DropdownMenuItem @click="router.push('/profile')">
+                  <UserCircle class="mr-2 h-4 w-4" />
+                  个人中心
                 </DropdownMenuItem>
                 <DropdownMenuItem @click="router.push('/orders')">
                   <ShoppingBag class="mr-2 h-4 w-4" />

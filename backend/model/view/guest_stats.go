@@ -6,7 +6,7 @@ import (
 
 // GuestBookingStats 对应视图 view_guest_booking_stats_1718（只读）
 //
-// 入住人预订统计分析，按年龄/性别等维度分析客户偏好。
+// 入住人预订统计分析，按年龄/性别/职业/学历/收入等维度分析客户偏好。
 // total_orders 只统计 booked/checked_in/completed 状态的订单，
 // 与 total_amount、avg_order_amount 口径一致。
 type GuestBookingStats struct {
@@ -15,6 +15,9 @@ type GuestBookingStats struct {
 	Gender         *string    `gorm:"column:gender;type:text;->"`
 	Age            *int       `gorm:"column:age;type:integer;->"`
 	AgeGroup       string     `gorm:"column:age_group;type:text;->"`
+	Occupation     *string    `gorm:"column:occupation;type:text;->"`
+	Education      *string    `gorm:"column:education;type:text;->"`
+	Income         *string    `gorm:"column:income;type:text;->"`
 	TotalOrders    int64      `gorm:"column:total_orders;type:bigint;->"`
 	TotalNights    int64      `gorm:"column:total_nights;type:bigint;->"`
 	TotalAmount    float64    `gorm:"column:total_amount;type:numeric;->"`

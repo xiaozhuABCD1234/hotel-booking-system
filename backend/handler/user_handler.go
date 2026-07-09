@@ -168,13 +168,14 @@ func (h *UserHandler) Create(c fiber.Ctx) error {
 //
 // updateUserInput 仅包含客户端可更新的用户字段。
 type updateUserInput struct {
-	Username string           `json:"username,omitempty"`
-	Password string           `json:"password,omitempty"`
-	Phone    *string          `json:"phone,omitempty"`
-	Email    *string          `json:"email,omitempty"`
-	RealName *string          `json:"realName,omitempty"`
-	IDCard   *string          `json:"idCard,omitempty"`
-	Role     *schema.UserRole `json:"role,omitempty"`
+	Username    string           `json:"username,omitempty"`
+	OldPassword string           `json:"oldPassword,omitempty"`
+	Password    string           `json:"password,omitempty"`
+	Phone       *string          `json:"phone,omitempty"`
+	Email       *string          `json:"email,omitempty"`
+	RealName    *string          `json:"realName,omitempty"`
+	IDCard      *string          `json:"idCard,omitempty"`
+	Role        *schema.UserRole `json:"role,omitempty"`
 }
 
 func (h *UserHandler) Update(c fiber.Ctx) error {
@@ -202,6 +203,12 @@ func (h *UserHandler) Update(c fiber.Ctx) error {
 		existing.Username = input.Username
 	}
 	if input.Password != "" {
+		if input.OldPassword == "" {
+			return model.SendError(c, http.StatusBadRequest, "Old password is required to change password")
+		}
+		if err := bcrypt.CompareHashAndPassword([]byte(existing.Password), []byte(input.OldPassword)); err != nil {
+			return model.SendError(c, http.StatusBadRequest, "Old password is incorrect")
+		}
 		if len(input.Password) < passwordMinLen {
 			return model.SendError(c, http.StatusBadRequest, "Password must be at least 6 characters")
 		}

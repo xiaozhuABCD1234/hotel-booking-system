@@ -1,5 +1,10 @@
 import type { Hotel } from './hotel'
 
+export interface RoomImage {
+  roomId: string
+  imageUrl: string
+}
+
 export interface Room {
   id: string
   hotelId: string
@@ -8,7 +13,7 @@ export interface Room {
   totalQuantity: number
   availableQuantity: number
   description?: string
-  imageUrl?: string
+  images: RoomImage[]
   createAt: string
   updateAt: string
   status: number
@@ -32,5 +37,5 @@ export interface RoomDetails {
 export interface RoomSearchParams {
   page?: number
   pageSize?: number
-  hotelId?: string
+  hotelID?: string
 }

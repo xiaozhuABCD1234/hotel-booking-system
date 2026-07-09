@@ -2006,7 +2006,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "分页查询客人预订统计视图，支持按年龄组、性别、偏好城市筛选",
+                "description": "分页查询客人预订统计视图，支持按年龄组、性别、偏好城市、职业、学历、收入范围筛选",
                 "produces": [
                     "application/json"
                 ],
@@ -2045,6 +2045,30 @@ const docTemplate = `{
                         "type": "string",
                         "description": "偏好城市",
                         "name": "favCity",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "职业筛选",
+                        "name": "occupation",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "学历筛选",
+                        "name": "education",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "最低收入",
+                        "name": "minIncome",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "最高收入",
+                        "name": "maxIncome",
                         "in": "query"
                     }
                 ],
@@ -2482,7 +2506,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "分页查询人员信息视图，支持按性别、年龄范围筛选",
+                "description": "分页查询人员信息视图，支持按性别、年龄、职业、学历、收入范围筛选",
                 "produces": [
                     "application/json"
                 ],
@@ -2509,6 +2533,30 @@ const docTemplate = `{
                         "type": "string",
                         "description": "性别筛选",
                         "name": "gender",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "职业筛选",
+                        "name": "occupation",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "学历筛选",
+                        "name": "education",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "最低收入",
+                        "name": "minIncome",
+                        "in": "query"
+                    },
+                    {
+                        "type": "number",
+                        "description": "最高收入",
+                        "name": "maxIncome",
                         "in": "query"
                     },
                     {
@@ -2897,7 +2945,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "分页查询用户 VIP 视图，支持按角色筛选",
+                "description": "分页查询用户 VIP 视图，支持按角色筛选或按 userId 精确查询单个用户",
                 "produces": [
                     "application/json"
                 ],
@@ -2924,6 +2972,12 @@ const docTemplate = `{
                         "type": "string",
                         "description": "角色筛选",
                         "name": "role",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "用户 ID (UUID)，传入则只返回该用户的 VIP 信息",
+                        "name": "userId",
                         "in": "query"
                     }
                 ],
@@ -4122,10 +4176,19 @@ const docTemplate = `{
         "backend_model_schema.Person": {
             "type": "object",
             "properties": {
+                "education": {
+                    "type": "string"
+                },
                 "idCard": {
                     "type": "string"
                 },
+                "income": {
+                    "type": "string"
+                },
                 "name": {
+                    "type": "string"
+                },
+                "occupation": {
                     "type": "string"
                 },
                 "phone": {
@@ -4351,6 +4414,9 @@ const docTemplate = `{
                 "avgOrderAmount": {
                     "type": "number"
                 },
+                "education": {
+                    "type": "string"
+                },
                 "favCity": {
                     "type": "string"
                 },
@@ -4363,7 +4429,13 @@ const docTemplate = `{
                 "gender": {
                     "type": "string"
                 },
+                "income": {
+                    "type": "string"
+                },
                 "lastOrderDate": {
+                    "type": "string"
+                },
+                "occupation": {
                     "type": "string"
                 },
                 "personIDCard": {
@@ -4563,13 +4635,22 @@ const docTemplate = `{
                 "guestAge": {
                     "type": "integer"
                 },
+                "guestEducation": {
+                    "type": "string"
+                },
                 "guestGender": {
                     "type": "string"
                 },
                 "guestIDCard": {
                     "type": "string"
                 },
+                "guestIncome": {
+                    "type": "string"
+                },
                 "guestName": {
+                    "type": "string"
+                },
+                "guestOccupation": {
                     "type": "string"
                 },
                 "hotelID": {
@@ -4669,13 +4750,22 @@ const docTemplate = `{
                 "birthDate": {
                     "type": "string"
                 },
+                "education": {
+                    "type": "string"
+                },
                 "gender": {
                     "type": "string"
                 },
                 "idcard": {
                     "type": "string"
                 },
+                "income": {
+                    "type": "string"
+                },
                 "name": {
+                    "type": "string"
+                },
+                "occupation": {
                     "type": "string"
                 },
                 "phone": {

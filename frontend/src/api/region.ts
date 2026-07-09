@@ -52,8 +52,8 @@ export const reportApi = {
     return api.get<ApiResponse>('/reports/room-details/by-hotel', { params: { hotelID: hotelId } })
   },
 
-  userVipList() {
-    return api.get<ApiResponse>('/reports/user-vip')
+  userVipList(params?: Record<string, unknown>) {
+    return api.get<ApiResponse>('/reports/user-vip', { params })
   },
 
   personInfoList() {

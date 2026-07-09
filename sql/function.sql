@@ -136,17 +136,23 @@ GROUP BY rm.id,
 ORDER BY rm.type_name;
 END;
 $$;
--- 确保入住人存在于人员表，不存在则插入，已存在则更新 phone
+-- 确保入住人存在于人员表，不存在则插入，已存在则更新 phone/occupation/education/income
 -- 下订单前调用，避免 order_guest_1718 外键约束失败
 CREATE OR REPLACE PROCEDURE sp_ensure_person_1718(
         p_id_card CHAR(18),
         p_name TEXT,
-        p_phone VARCHAR(20) DEFAULT NULL
+        p_phone VARCHAR(20) DEFAULT NULL,
+        p_occupation TEXT DEFAULT NULL,
+        p_education education_level DEFAULT NULL,
+        p_income numrange DEFAULT NULL
     ) LANGUAGE plpgsql AS $$ BEGIN
-INSERT INTO person_1718 (id_card, name, phone)
-VALUES (p_id_card, p_name, p_phone) ON CONFLICT (id_card) DO
+INSERT INTO person_1718 (id_card, name, phone, occupation, education, income)
+VALUES (p_id_card, p_name, p_phone, p_occupation, p_education, p_income) ON CONFLICT (id_card) DO
 UPDATE
-SET phone = COALESCE(EXCLUDED.phone, person_1718.phone);
+SET phone = COALESCE(EXCLUDED.phone, person_1718.phone),
+    occupation = COALESCE(EXCLUDED.occupation, person_1718.occupation),
+    education = COALESCE(EXCLUDED.education, person_1718.education),
+    income = COALESCE(EXCLUDED.income, person_1718.income);
 END;
 $$;
 -- 查询指定订单的详细信息

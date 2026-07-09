@@ -31,11 +31,14 @@ type OrderFull struct {
 	ActualPrice     float64   `gorm:"column:actual_price;type:numeric(10,2);->"`
 	VipDiscountRate float64   `gorm:"column:vip_discount_rate;type:numeric(3,2);->"`
 	OrderStatus     string    `gorm:"column:order_status;type:order_status;->"`
-	GuestIDCard     *string   `gorm:"column:guest_id_card;type:char(18);->"`
-	GuestName       *string   `gorm:"column:guest_name;type:text;->"`
-	GuestGender     *string   `gorm:"column:guest_gender;type:text;->"`
-	GuestAge        *int      `gorm:"column:guest_age;type:integer;->"`
-	CreateAt        time.Time `gorm:"column:create_at;type:timestamptz;->"`
+	GuestIDCard      *string   `gorm:"column:guest_id_card;type:char(18);->"`
+	GuestName        *string   `gorm:"column:guest_name;type:text;->"`
+	GuestGender      *string   `gorm:"column:guest_gender;type:text;->"`
+	GuestAge         *int      `gorm:"column:guest_age;type:integer;->"`
+	GuestOccupation  *string   `gorm:"column:guest_occupation;type:text;->"`
+	GuestEducation   *string   `gorm:"column:guest_education;type:text;->"`
+	GuestIncome      *string   `gorm:"column:guest_income;type:text;->"`
+	CreateAt         time.Time `gorm:"column:create_at;type:timestamptz;->"`
 }
 
 func (OrderFull) TableName() string {

@@ -39,7 +39,7 @@ export const useHotelStore = defineStore('hotel', () => {
 
   async function fetchRooms(hotelId: string) {
     try {
-      const res = await roomApi.list({ hotelId, pageSize: 100 })
+      const res = await roomApi.list({ hotelID: hotelId, pageSize: 100 })
       if (res.data.success && res.data.data) {
         rooms.value = res.data.data
       } else {

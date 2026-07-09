@@ -227,8 +227,8 @@ onMounted(async () => {
                 <!-- Room Image -->
                 <div class="h-32 w-full shrink-0 overflow-hidden rounded-md bg-gray-100 sm:h-28 sm:w-40">
                   <img
-                    v-if="room.imageUrl"
-                    :src="room.imageUrl"
+                    v-if="room.images?.[0]?.imageUrl"
+                    :src="room.images[0].imageUrl"
                     :alt="room.typeName"
                     class="h-full w-full object-cover"
                   />
