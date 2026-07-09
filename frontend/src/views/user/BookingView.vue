@@ -132,8 +132,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <div class="container mx-auto max-w-3xl px-4 py-6">
+  <div class="container mx-auto max-w-3xl">
       <!-- Back -->
       <Button
         variant="ghost"
@@ -301,5 +300,4 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-  </div>
 </template>

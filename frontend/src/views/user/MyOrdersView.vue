@@ -99,8 +99,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <div class="container mx-auto max-w-5xl px-4 py-6">
+  <div class="container mx-auto max-w-5xl">
       <h1 class="mb-6 text-2xl font-semibold text-gray-900">
         我的订单
       </h1>
@@ -256,5 +255,4 @@ onMounted(() => {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  </div>
 </template>

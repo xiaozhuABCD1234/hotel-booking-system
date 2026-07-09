@@ -7,7 +7,7 @@ const router = useRouter()
 </script>
 
 <template>
-  <div class="flex min-h-[70vh] flex-col items-center justify-center px-4 text-center">
+  <div class="flex min-h-dvh flex-col items-center justify-center bg-background px-4 text-center">
     <h1 class="mb-2 text-7xl font-bold text-blue-900">404</h1>
     <p class="mb-1 text-xl font-medium text-gray-800">页面未找到</p>
     <p class="mb-8 text-sm text-gray-500">

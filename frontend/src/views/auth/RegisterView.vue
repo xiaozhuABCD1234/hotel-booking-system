@@ -103,7 +103,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="flex min-h-dvh items-center justify-center bg-gray-50 px-4 py-12">
+  <div class="flex min-h-dvh items-center justify-center bg-background px-4 py-12">
     <div class="w-full max-w-md">
       <!-- Logo -->
       <div class="mb-8 flex flex-col items-center gap-2">

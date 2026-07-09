@@ -66,9 +66,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <!-- Hero / Search Section -->
-    <section class="bg-blue-900 px-4 py-12">
+  <!-- Hero / Search Section -->
+    <section class="-mx-4 bg-blue-900 px-4 py-12">
       <div class="container mx-auto max-w-4xl">
         <h1 class="mb-2 text-center text-3xl font-semibold text-white">
           发现理想酒店
@@ -149,7 +148,7 @@ onMounted(async () => {
     </section>
 
     <!-- Results Section -->
-    <section class="px-4 py-8">
+    <section class="py-8">
       <div class="container mx-auto max-w-6xl">
         <!-- Loading State -->
         <div v-if="hotelStore.loading" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -260,5 +259,4 @@ onMounted(async () => {
         </div>
       </div>
     </section>
-  </div>
 </template>

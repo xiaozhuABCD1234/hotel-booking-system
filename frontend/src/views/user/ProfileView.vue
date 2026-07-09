@@ -183,8 +183,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <div class="container mx-auto max-w-5xl px-4 py-6">
+  <div class="container mx-auto max-w-5xl">
       <h1 class="mb-6 text-2xl font-semibold text-gray-900">个人中心</h1>
 
       <Tabs default-value="profile" class="w-full">
@@ -390,6 +389,5 @@ onMounted(() => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
   </div>
 </template>
