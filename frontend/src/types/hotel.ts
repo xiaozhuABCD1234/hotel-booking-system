@@ -45,4 +45,8 @@ export interface HotelSearchParams {
   regionID?: number;
   starLevel?: number;
   keyword?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  checkInDate?: string;
+  checkOutDate?: string;
 }

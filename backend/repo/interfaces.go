@@ -3,6 +3,7 @@ package repo
 
 import (
 	"context"
+	"time"
 
 	model "backend/model/schema"
 	"backend/model/view"
@@ -40,7 +41,7 @@ type VipLevelRepository interface {
 type HotelRepository interface {
 	Create(ctx context.Context, hotel *model.Hotel) error
 	FindByID(ctx context.Context, id uuid.UUID) (*model.Hotel, error)
-	FindAll(ctx context.Context, offset, limit int, regionID *int, starLevel *int16, keyword string) ([]model.Hotel, int64, error)
+	FindAll(ctx context.Context, offset, limit int, regionID *int, starLevel *int16, keyword string, minPrice, maxPrice *float64, checkInDate, checkOutDate *time.Time) ([]model.Hotel, int64, error)
 	Update(ctx context.Context, hotel *model.Hotel) error
 	Delete(ctx context.Context, id uuid.UUID) error
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	model "backend/model/schema"
 
@@ -159,7 +160,7 @@ func TestHotelRepo_FindAll_Pagination(t *testing.T) {
 		createTestHotel(t, tx, regionID, "Paginated Hotel")
 	}
 
-	results, total, err := repo.FindAll(ctx, 0, 2, &regionID, nil, "")
+	results, total, err := repo.FindAll(ctx, 0, 2, &regionID, nil, "", nil, nil, nil, nil)
 	if err != nil {
 		t.Fatalf("FindAll(0,2) failed: %v", err)
 	}
@@ -170,7 +171,7 @@ func TestHotelRepo_FindAll_Pagination(t *testing.T) {
 		t.Errorf("page size mismatch: got %d, want 2", len(results))
 	}
 
-	results, total, err = repo.FindAll(ctx, 2, 2, &regionID, nil, "")
+	results, total, err = repo.FindAll(ctx, 2, 2, &regionID, nil, "", nil, nil, nil, nil)
 	if err != nil {
 		t.Fatalf("FindAll(2,2) failed: %v", err)
 	}
@@ -188,7 +189,7 @@ func TestHotelRepo_FindAll_KeywordFilter(t *testing.T) {
 	createTestHotel(t, tx, region.ID, "Grand Hotel")
 	createTestHotel(t, tx, region.ID, "Budget Inn")
 
-	results, total, err := repo.FindAll(ctx, 0, 10, nil, nil, "Grand")
+	results, total, err := repo.FindAll(ctx, 0, 10, nil, nil, "Grand", nil, nil, nil, nil)
 	if err != nil {
 		t.Fatalf("FindAll with keyword failed: %v", err)
 	}
@@ -221,6 +222,163 @@ func TestHotelRepo_HardDelete(t *testing.T) {
 	}
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		t.Errorf("expected gorm.ErrRecordNotFound, got %v", err)
+	}
+}
+
+func TestHotelRepo_FindAll_PriceRange(t *testing.T) {
+	tx := txRepo(t)
+	ctx := context.Background()
+	repo := NewHotelRepo(tx)
+
+	region := createTestRegion(t, tx)
+	hotel1 := createTestHotel(t, tx, region.ID, "Budget Hotel")
+	hotel2 := createTestHotel(t, tx, region.ID, "Luxury Hotel")
+	createTestRoom(t, tx, hotel1.ID, "Cheap")
+	createTestRoom(t, tx, hotel2.ID, "Expensive")
+
+	tx.Model(&model.Room{}).Where("hotel_id = ?", hotel2.ID).Update("price", 999.99)
+
+	min := 500.0
+	max := 1500.0
+	results, total, err := repo.FindAll(ctx, 0, 10, &region.ID, nil, "", &min, &max, nil, nil)
+	if err != nil {
+		t.Fatalf("FindAll with price range failed: %v", err)
+	}
+	if total != 1 {
+		t.Errorf("total mismatch: got %d, want 1", total)
+	}
+	if len(results) > 0 && results[0].ID != hotel2.ID {
+		t.Errorf("expected Luxury Hotel, got %s", results[0].HotelName)
+	}
+}
+
+func TestHotelRepo_FindAll_SingleSidedMinPrice(t *testing.T) {
+	tx := txRepo(t)
+	ctx := context.Background()
+	repo := NewHotelRepo(tx)
+
+	region := createTestRegion(t, tx)
+	hotel := createTestHotel(t, tx, region.ID, "Pricey Hotel")
+	createTestRoom(t, tx, hotel.ID, "Deluxe")
+
+	min := 400.0
+	results, _, err := repo.FindAll(ctx, 0, 10, &region.ID, nil, "", &min, nil, nil, nil)
+	if err != nil {
+		t.Fatalf("FindAll with minPrice failed: %v", err)
+	}
+	if len(results) != 0 {
+		t.Errorf("expected no hotels above 400, got %d", len(results))
+	}
+
+	min = 100.0
+	results, total, err := repo.FindAll(ctx, 0, 10, &region.ID, nil, "", &min, nil, nil, nil)
+	if err != nil {
+		t.Fatalf("FindAll with minPrice=100 failed: %v", err)
+	}
+	if total != 1 {
+		t.Errorf("total mismatch: got %d, want 1", total)
+	}
+}
+
+func TestHotelRepo_FindAll_SingleSidedMaxPrice(t *testing.T) {
+	tx := txRepo(t)
+	ctx := context.Background()
+	repo := NewHotelRepo(tx)
+
+	region := createTestRegion(t, tx)
+	hotel := createTestHotel(t, tx, region.ID, "Affordable Hotel")
+	createTestRoom(t, tx, hotel.ID, "Standard")
+
+	max := 200.0
+	results, _, err := repo.FindAll(ctx, 0, 10, &region.ID, nil, "", nil, &max, nil, nil)
+	if err != nil {
+		t.Fatalf("FindAll with maxPrice failed: %v", err)
+	}
+	if len(results) != 0 {
+		t.Errorf("expected no hotels under 200, got %d", len(results))
+	}
+
+	max = 500.0
+	results, total, err := repo.FindAll(ctx, 0, 10, &region.ID, nil, "", nil, &max, nil, nil)
+	if err != nil {
+		t.Fatalf("FindAll with maxPrice=500 failed: %v", err)
+	}
+	if total != 1 {
+		t.Errorf("total mismatch: got %d, want 1", total)
+	}
+}
+
+func TestHotelRepo_FindAll_DateAvailability(t *testing.T) {
+	tx := txRepo(t)
+	ctx := context.Background()
+	repo := NewHotelRepo(tx)
+
+	region := createTestRegion(t, tx)
+	hotel := createTestHotel(t, tx, region.ID, "Date Hotel")
+	createTestRoom(t, tx, hotel.ID, "Standard")
+
+	tomorrow := time.Now().AddDate(0, 0, 1).Truncate(24 * time.Hour)
+	dayAfter := tomorrow.AddDate(0, 0, 1)
+
+	results, total, err := repo.FindAll(ctx, 0, 10, &region.ID, nil, "", nil, nil, &tomorrow, &dayAfter)
+	if err != nil {
+		t.Fatalf("FindAll with date filter failed: %v", err)
+	}
+	if total != 1 {
+		t.Errorf("total mismatch: got %d, want 1", total)
+	}
+	if len(results) != 1 {
+		t.Errorf("results count mismatch: got %d, want 1", len(results))
+	}
+}
+
+func TestHotelRepo_FindAll_DateAndPriceCombined(t *testing.T) {
+	tx := txRepo(t)
+	ctx := context.Background()
+	repo := NewHotelRepo(tx)
+
+	region := createTestRegion(t, tx)
+	hotel1 := createTestHotel(t, tx, region.ID, "Match Hotel")
+	_ = createTestHotel(t, tx, region.ID, "Wrong Price Hotel")
+	createTestRoom(t, tx, hotel1.ID, "Standard")
+
+	tomorrow := time.Now().AddDate(0, 0, 1).Truncate(24 * time.Hour)
+	dayAfter := tomorrow.AddDate(0, 0, 1)
+	min := 200.0
+	max := 400.0
+
+	results, total, err := repo.FindAll(ctx, 0, 10, &region.ID, nil, "", &min, &max, &tomorrow, &dayAfter)
+	if err != nil {
+		t.Fatalf("FindAll with combined filters failed: %v", err)
+	}
+	if total != 1 {
+		t.Errorf("total mismatch: got %d, want 1", total)
+	}
+	if len(results) != 1 {
+		t.Errorf("results count mismatch: got %d, want 1", len(results))
+	}
+	if results[0].HotelName != "Match Hotel" {
+		t.Errorf("HotelName mismatch: got %q, want %q", results[0].HotelName, "Match Hotel")
+	}
+}
+
+func TestHotelRepo_FindAll_NoNewParams(t *testing.T) {
+	tx := txRepo(t)
+	ctx := context.Background()
+	repo := NewHotelRepo(tx)
+
+	region := createTestRegion(t, tx)
+	createTestHotel(t, tx, region.ID, "Classic Hotel")
+
+	results, total, err := repo.FindAll(ctx, 0, 10, &region.ID, nil, "", nil, nil, nil, nil)
+	if err != nil {
+		t.Fatalf("FindAll with no new params failed: %v", err)
+	}
+	if total != 1 {
+		t.Errorf("total mismatch: got %d, want 1", total)
+	}
+	if len(results) != 1 {
+		t.Errorf("results count mismatch: got %d, want 1", len(results))
 	}
 }
 

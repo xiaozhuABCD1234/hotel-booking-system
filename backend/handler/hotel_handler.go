@@ -38,20 +38,24 @@ func NewHotelHandler(hotelRepo repo.HotelRepository, roomRepo repo.RoomRepositor
 	}
 }
 
-// List 查询酒店列表（支持按区域、星级、关键词筛选）。
+// List 查询酒店列表（支持按区域、星级、关键词、价格范围、入住日期筛选）。
 //
 //	@Summary		查询酒店列表
-//	@Description	分页查询酒店列表，支持按区域、星级、关键词筛选
+//	@Description	分页查询酒店列表，支持按区域、星级、关键词、价格范围、入住日期筛选
 //	@Tags			hotels
 //	@Produce		json
-//	@Param			page		query		int		false	"页码"			default(1)
-//	@Param			pageSize	query		int		false	"每页数量"		default(10)
-//	@Param			regionID	query		int		false	"区域 ID"
-//	@Param			starLevel	query		int		false	"星级"
-//	@Param			keyword		query		string	false	"搜索关键词"
-//	@Success		200			{object}	model.Response{data=[]schema.Hotel}
-//	@Failure		400			{object}	model.Response
-//	@Failure		500			{object}	model.Response
+//	@Param			page			query		int		false	"页码"			default(1)
+//	@Param			pageSize		query		int		false	"每页数量"		default(10)
+//	@Param			regionID		query		int		false	"区域 ID"
+//	@Param			starLevel		query		int		false	"星级"
+//	@Param			keyword			query		string	false	"搜索关键词"
+//	@Param			minPrice		query		number	false	"最低价格"
+//	@Param			maxPrice		query		number	false	"最高价格"
+//	@Param			checkInDate		query		string	false	"入住日期 (YYYY-MM-DD)"
+//	@Param			checkOutDate	query		string	false	"离店日期 (YYYY-MM-DD)"
+//	@Success		200				{object}	model.Response{data=[]schema.Hotel}
+//	@Failure		400				{object}	model.Response
+//	@Failure		500				{object}	model.Response
 //	@Router			/hotels [get]
 func (h *HotelHandler) List(c fiber.Ctx) error {
 	ctx := c.Context()
@@ -71,6 +75,10 @@ func (h *HotelHandler) List(c fiber.Ctx) error {
 	regionIDStr := c.Query("regionID")
 	starLevelStr := c.Query("starLevel")
 	keyword := c.Query("keyword")
+	minPriceStr := c.Query("minPrice")
+	maxPriceStr := c.Query("maxPrice")
+	checkInDateStr := c.Query("checkInDate")
+	checkOutDateStr := c.Query("checkOutDate")
 
 	var regionID *int
 	if regionIDStr != "" {
@@ -87,7 +95,57 @@ func (h *HotelHandler) List(c fiber.Ctx) error {
 		}
 	}
 
-	hotels, total, err := h.hotels.FindAll(ctx, offset, pq.PageSize, regionID, starLevel, keyword)
+	var minPrice, maxPrice *float64
+	if minPriceStr != "" {
+		v, err := strconv.ParseFloat(minPriceStr, 64)
+		if err != nil || v < 0 {
+			return model.SendError(c, http.StatusBadRequest, "minPrice must be a non-negative number")
+		}
+		minPrice = &v
+	}
+	if maxPriceStr != "" {
+		v, err := strconv.ParseFloat(maxPriceStr, 64)
+		if err != nil || v < 0 {
+			return model.SendError(c, http.StatusBadRequest, "maxPrice must be a non-negative number")
+		}
+		maxPrice = &v
+	}
+	if minPrice != nil && maxPrice != nil && *minPrice > *maxPrice {
+		return model.SendError(c, http.StatusBadRequest, "minPrice cannot exceed maxPrice")
+	}
+
+	var checkInDate, checkOutDate *time.Time
+	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	if checkInDateStr != "" {
+		v, err := time.ParseInLocation("2006-01-02", checkInDateStr, time.Local)
+		if err != nil {
+			return model.SendError(c, http.StatusBadRequest, "checkInDate must be in YYYY-MM-DD format")
+		}
+		if v.Before(today) {
+			return model.SendError(c, http.StatusBadRequest, "checkInDate cannot be in the past")
+		}
+		checkInDate = &v
+	}
+	if checkOutDateStr != "" {
+		v, err := time.ParseInLocation("2006-01-02", checkOutDateStr, time.Local)
+		if err != nil {
+			return model.SendError(c, http.StatusBadRequest, "checkOutDate must be in YYYY-MM-DD format")
+		}
+		if v.Before(today) {
+			return model.SendError(c, http.StatusBadRequest, "checkOutDate cannot be in the past")
+		}
+		checkOutDate = &v
+	}
+	// Require both dates together — single date is silently useless
+	if (checkInDate != nil) != (checkOutDate != nil) {
+		return model.SendError(c, http.StatusBadRequest, "Both checkInDate and checkOutDate are required for date filtering")
+	}
+	if checkInDate != nil && checkOutDate != nil && !checkInDate.Before(*checkOutDate) {
+		return model.SendError(c, http.StatusBadRequest, "checkInDate must be before checkOutDate")
+	}
+
+	hotels, total, err := h.hotels.FindAll(ctx, offset, pq.PageSize, regionID, starLevel, keyword, minPrice, maxPrice, checkInDate, checkOutDate)
 	if err != nil {
 		return err
 	}

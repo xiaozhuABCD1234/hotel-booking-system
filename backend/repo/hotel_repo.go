@@ -43,8 +43,8 @@ func (r *HotelRepo) FindByID(ctx context.Context, id uuid.UUID) (*model.Hotel, e
 	return &hotel, nil
 }
 
-// FindAll 查询酒店列表，支持按区域、星级、名称关键字筛选，返回分页结果与总记录数。
-func (r *HotelRepo) FindAll(ctx context.Context, offset, limit int, regionID *int, starLevel *int16, keyword string) ([]model.Hotel, int64, error) {
+// FindAll 查询酒店列表，支持按区域、星级、名称关键字、价格范围、入住日期筛选，返回分页结果与总记录数。
+func (r *HotelRepo) FindAll(ctx context.Context, offset, limit int, regionID *int, starLevel *int16, keyword string, minPrice, maxPrice *float64, checkInDate, checkOutDate *time.Time) ([]model.Hotel, int64, error) {
 	var results []model.Hotel
 	var total int64
 	query := r.db.WithContext(ctx).Model(&model.Hotel{}).Where("status != 0")
@@ -57,6 +57,26 @@ func (r *HotelRepo) FindAll(ctx context.Context, offset, limit int, regionID *in
 	}
 	if keyword != "" {
 		query = query.Where("hotel_name ILIKE ?", "%"+keyword+"%")
+	}
+
+	// Price filter: hotel has at least one active room in the price range
+	if minPrice != nil && maxPrice != nil {
+		query = query.Where("EXISTS (SELECT 1 FROM room_1718 r WHERE r.hotel_id = hotel_1718.id AND r.status = 1 AND r.price BETWEEN ? AND ?)", *minPrice, *maxPrice)
+	} else if minPrice != nil {
+		query = query.Where("EXISTS (SELECT 1 FROM room_1718 r WHERE r.hotel_id = hotel_1718.id AND r.status = 1 AND r.price >= ?)", *minPrice)
+	} else if maxPrice != nil {
+		query = query.Where("EXISTS (SELECT 1 FROM room_1718 r WHERE r.hotel_id = hotel_1718.id AND r.status = 1 AND r.price <= ?)", *maxPrice)
+	}
+
+	// Date filter: hotel has at least one room with availability during the date range
+	if checkInDate != nil && checkOutDate != nil {
+		query = query.Where(
+			`EXISTS (SELECT 1 FROM room_1718 r WHERE r.hotel_id = hotel_1718.id AND r.status = 1
+			 AND r.total_quantity > COALESCE((SELECT SUM(o.quantity) FROM order_1718 o
+			 WHERE o.room_id = r.id AND o.status != 'cancelled'
+			 AND o.check_in_date < ? AND o.check_out_date > ?), 0))`,
+			checkOutDate, checkInDate,
+		)
 	}
 
 	query.Count(&total)

@@ -3,6 +3,8 @@ import { ref } from "vue";
 import { hotelApi, roomApi } from "@/api";
 import type { Hotel, HotelSearchParams, Room, Pagination } from "@/types";
 
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
 export const useHotelStore = defineStore("hotel", () => {
   const hotels = ref<Hotel[]>([]);
   const pagination = ref<Pagination | null>(null);
@@ -28,6 +30,13 @@ export const useHotelStore = defineStore("hotel", () => {
       loading.value = false;
     }
   }
+
+  const debouncedFetchHotels = (params: HotelSearchParams = {}) => {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      fetchHotels(params);
+    }, 300);
+  };
 
   async function fetchHotelById(id: string) {
     const res = await hotelApi.getById(id);
@@ -89,6 +98,7 @@ export const useHotelStore = defineStore("hotel", () => {
     currentHotel,
     rooms,
     fetchHotels,
+    debouncedFetchHotels,
     fetchHotelById,
     fetchRooms,
     createHotel,

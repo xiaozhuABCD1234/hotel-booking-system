@@ -123,7 +123,7 @@ async function handleLogout() {
     </header>
 
     <!-- Page Content -->
-    <main class="px-4 py-6">
+    <main class="px-0 py-0">
       <router-view />
     </main>
 

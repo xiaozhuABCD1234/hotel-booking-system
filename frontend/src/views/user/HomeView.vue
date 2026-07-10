@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import { Search, MapPin } from "@lucide/vue";
+import { Search, MapPin, DollarSign, Calendar, XCircle } from "@lucide/vue";
 
 const router = useRouter();
 const hotelStore = useHotelStore();
@@ -26,6 +26,10 @@ const regions = ref<Region[]>([]);
 const keyword = ref("");
 const selectedRegion = ref<string>("");
 const selectedStar = ref<string>("");
+const minPrice = ref<number | undefined>(undefined);
+const maxPrice = ref<number | undefined>(undefined);
+const checkInDate = ref("");
+const checkOutDate = ref("");
 
 const searchParams = computed<HotelSearchParams>(() => {
   const params: HotelSearchParams = {};
@@ -36,11 +40,40 @@ const searchParams = computed<HotelSearchParams>(() => {
     params.starLevel = Number(selectedStar.value);
   }
   if (keyword.value.trim()) params.keyword = keyword.value.trim();
+  if (minPrice.value !== undefined && minPrice.value !== null && !isNaN(minPrice.value)) {
+    params.minPrice = minPrice.value;
+  }
+  if (maxPrice.value !== undefined && maxPrice.value !== null && !isNaN(maxPrice.value)) {
+    params.maxPrice = maxPrice.value;
+  }
+  if (checkInDate.value) params.checkInDate = checkInDate.value;
+  if (checkOutDate.value) params.checkOutDate = checkOutDate.value;
   return params;
 });
 
+const hasActiveFilters = computed(() => {
+  return (
+    minPrice.value !== undefined ||
+    maxPrice.value !== undefined ||
+    checkInDate.value !== "" ||
+    checkOutDate.value !== ""
+  );
+});
+
+function clearFilters() {
+  minPrice.value = undefined;
+  maxPrice.value = undefined;
+  checkInDate.value = "";
+  checkOutDate.value = "";
+  hotelStore.fetchHotels(searchParams.value);
+}
+
 function handleSearch() {
   hotelStore.fetchHotels(searchParams.value);
+}
+
+function handlePriceInput() {
+  hotelStore.debouncedFetchHotels(searchParams.value);
 }
 
 function goToHotel(id: string) {
@@ -142,6 +175,71 @@ onMounted(async () => {
               </Button>
             </div>
           </div>
+
+          <!-- Price & Date Filter Row -->
+          <div class="mt-4 grid gap-4 md:grid-cols-5">
+            <div>
+              <Label class="mb-1.5 block text-sm">最低价格</Label>
+              <div class="relative">
+                <DollarSign class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  type="number"
+                  :model-value="minPrice !== undefined ? minPrice : ''"
+                  placeholder="最低"
+                  class="pl-9"
+                  @update:model-value="(v: string) => { minPrice = v === '' ? undefined : Number(v); handlePriceInput(); }"
+                />
+              </div>
+            </div>
+            <div>
+              <Label class="mb-1.5 block text-sm">最高价格</Label>
+              <div class="relative">
+                <DollarSign class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  type="number"
+                  :model-value="maxPrice !== undefined ? maxPrice : ''"
+                  placeholder="最高"
+                  class="pl-9"
+                  @update:model-value="(v: string) => { maxPrice = v === '' ? undefined : Number(v); handlePriceInput(); }"
+                />
+              </div>
+            </div>
+            <div>
+              <Label class="mb-1.5 block text-sm">入住日期</Label>
+              <div class="relative">
+                <Calendar class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  v-model="checkInDate"
+                  type="date"
+                  class="pl-9"
+                  @change="handleSearch"
+                />
+              </div>
+            </div>
+            <div>
+              <Label class="mb-1.5 block text-sm">离店日期</Label>
+              <div class="relative">
+                <Calendar class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Input
+                  v-model="checkOutDate"
+                  type="date"
+                  class="pl-9"
+                  @change="handleSearch"
+                />
+              </div>
+            </div>
+            <div class="flex items-end">
+              <Button
+                v-if="hasActiveFilters"
+                variant="outline"
+                class="w-full"
+                @click="clearFilters"
+              >
+                <XCircle class="mr-2 h-4 w-4" />
+                清除筛选
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -175,8 +273,12 @@ onMounted(async () => {
         class="flex flex-col items-center justify-center py-20 text-center"
       >
         <Search class="mb-4 h-12 w-12 text-gray-300" />
-        <h3 class="mb-1 text-lg font-medium text-gray-700">暂无搜索结果</h3>
-        <p class="text-sm text-gray-500">请尝试调整筛选条件</p>
+        <h3 class="mb-1 text-lg font-medium text-gray-700">
+          {{ hasActiveFilters ? '没有符合条件的酒店' : '暂无搜索结果' }}
+        </h3>
+        <p class="text-sm text-gray-500">
+          {{ hasActiveFilters ? '请尝试调整价格范围或日期' : '请尝试调整筛选条件' }}
+        </p>
       </div>
 
       <!-- Hotel Cards -->
