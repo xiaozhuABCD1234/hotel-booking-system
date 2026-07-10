@@ -11,7 +11,6 @@ type UserRole string
 
 const (
 	RoleCustomer     UserRole = "customer"
-	RoleVIP          UserRole = "vip"
 	RoleHotelManager UserRole = "hotel_manager"
 	RoleAdmin        UserRole = "admin"
 )

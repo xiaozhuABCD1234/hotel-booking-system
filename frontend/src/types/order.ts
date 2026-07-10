@@ -73,7 +73,7 @@ export interface CreateOrderRequest {
   guestIdCard: string; // 入住人身份证号
   roomCount: number;
   totalPrice: number;
-  actualPrice: number;
+  actualPrice?: number;
 }
 
 export interface UpdateOrderStatusRequest {

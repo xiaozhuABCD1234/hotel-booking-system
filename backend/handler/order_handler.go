@@ -159,7 +159,7 @@ func (h *OrderHandler) Create(c fiber.Ctx) error {
 
 	now := time.Now()
 
-	// 构造 Order 模型
+	// 构造 Order 模型（VIP 折扣由 trg_order_vip_discount_1718 触发器自动计算）
 	order := model.Order{
 		UserID:       userID,
 		RoomID:       req.RoomID,

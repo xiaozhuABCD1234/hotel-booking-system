@@ -43,7 +43,7 @@ const totalItems = ref(0);
 
 const editDialogOpen = ref(false);
 const editUser = ref<User | null>(null);
-const editRole = ref<"customer" | "vip" | "hotel_manager" | "admin">(
+const editRole = ref<"customer" | "hotel_manager" | "admin">(
   "customer",
 );
 
@@ -309,7 +309,6 @@ onMounted(() => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="customer">普通用户</SelectItem>
-                <SelectItem value="vip">VIP用户</SelectItem>
                 <SelectItem value="hotel_manager">酒店管理员</SelectItem>
                 <SelectItem value="admin">系统管理员</SelectItem>
               </SelectContent>

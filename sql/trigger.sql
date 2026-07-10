@@ -114,6 +114,16 @@ BEGIN
         WHERE id = OLD.user_id;
     END IF;
 
+    -- 通过积分自动更新vip等级
+    UPDATE user_1718
+    SET vip_level = (
+        SELECT COALESCE(MAX(level), 0)
+        FROM vip_level_1718
+        WHERE min_points <= user_1718.points
+    ),
+    update_at = now()
+    WHERE id = COALESCE(NEW.user_id, OLD.user_id);
+
     RETURN NEW;
 END;
 $$;
@@ -123,3 +133,25 @@ CREATE TRIGGER trg_order_user_points_1718
     ON order_1718
     FOR EACH ROW
     EXECUTE FUNCTION fn_update_user_points_1718();
+
+-- 下单时自动应用 VIP 折扣（BEFORE INSERT，原子性，无 TOCTOU）
+CREATE OR REPLACE FUNCTION fn_apply_vip_discount_1718()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_discount_rate DECIMAL(3,2);
+BEGIN
+    SELECT COALESCE(vl.discount_rate, 1.0)
+    INTO v_discount_rate
+    FROM user_1718 u
+    JOIN vip_level_1718 vl ON vl.level = u.vip_level
+    WHERE u.id = NEW.user_id;
+
+    NEW.actual_price := NEW.total_price * v_discount_rate;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_order_vip_discount_1718
+    BEFORE INSERT ON order_1718
+    FOR EACH ROW
+    EXECUTE FUNCTION fn_apply_vip_discount_1718();

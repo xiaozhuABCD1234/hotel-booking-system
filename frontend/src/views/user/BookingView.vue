@@ -87,7 +87,6 @@ async function handleSubmit() {
       guestIdCard: form.value.guestIdCard.trim(),
       roomCount: form.value.roomCount,
       totalPrice: totalPrice.value,
-      actualPrice: totalPrice.value,
     };
 
     const res = await orderStore.createOrder(data);

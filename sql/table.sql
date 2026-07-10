@@ -1,7 +1,7 @@
 -- 酒店预订管理系统 — 数据库定义
 -- PostgreSQL 18
 -- 自定义类型
-CREATE TYPE user_role AS ENUM ('customer', 'vip', 'hotel_manager', 'admin');
+CREATE TYPE user_role AS ENUM ('customer', 'hotel_manager', 'admin');
 CREATE TYPE order_status AS ENUM (
     'pending',
     'booked',

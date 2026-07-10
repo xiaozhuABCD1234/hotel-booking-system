@@ -337,7 +337,7 @@ func TestUsers_CRUD(t *testing.T) {
 	}
 
 	resp = request(t, "PUT", "/api/v1/users/"+created.ID,
-		fmt.Sprintf(`{"Username":"upd_%s","Role":"vip","Password":"","Phone":null,"Email":null,"RealName":null,"IDCard":null,"Points":0,"VipLevelID":0,"Status":1}`, ts), h)
+		fmt.Sprintf(`{"Username":"upd_%s","Role":"customer","Password":"","Phone":null,"Email":null,"RealName":null,"IDCard":null,"Points":0,"VipLevelID":0,"Status":1}`, ts), h)
 	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("update: expected 200, got %d", resp.StatusCode)
 	}

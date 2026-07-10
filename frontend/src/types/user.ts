@@ -11,7 +11,7 @@ export interface User {
   realName?: string;
   phone?: string;
   email?: string;
-  role: "customer" | "vip" | "hotel_manager" | "admin";
+  role: "customer" | "hotel_manager" | "admin";
   vipLevelId?: number;
   vipLevel?: VipLevel;
   points: number;
@@ -43,7 +43,7 @@ export interface CreateUserRequest {
   password: string;
   phone?: string;
   email?: string;
-  role?: "customer" | "vip" | "hotel_manager" | "admin";
+  role?: "customer" | "hotel_manager" | "admin";
 }
 
 export interface UpdateUserRequest {
@@ -56,5 +56,5 @@ export interface UpdateUserRequest {
   income?: number;
   oldPassword?: string;
   password?: string;
-  role?: "customer" | "vip" | "hotel_manager" | "admin";
+  role?: "customer" | "hotel_manager" | "admin";
 }
